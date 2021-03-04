@@ -7,7 +7,7 @@ interface ComponentProps {
 }
 
 export default function App(props: ComponentProps) {
-  let x = 50;
+  const x = 50;
   const y = 50;
 
   //See annotations in JS for more information
