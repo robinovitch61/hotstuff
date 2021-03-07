@@ -8,67 +8,36 @@ interface ComponentProps {
 }
 
 export default function App(props: ComponentProps) {
-  var img: p5Types.Image;
-  var w: number, h: number, tow: number, toh: number;
-  var x: number, y: number, tox: number, toy: number;
-  var zoom = .01; //zoom step per mouse tick
-
-  function preload(p5: p5Types) {
-    img = p5.loadImage("https://i.imgur.com/9dbblSn.jpg");
-  }
+  let translateX = 0;
+  let translateY = 0;
+  let scaleFactor = 1;
+  const scaleIncrement = 0.03;
 
   const handleMouseWheel = (p5: p5Types, event: WheelEvent) => {
-    const scrollAmount = -event.deltaY;
-
-    if (scrollAmount > 0) { // zoom in
-      for (var i = 0; i < scrollAmount; i++) {
-        // if (tow > 30 * p5.width) return; //max zoom
-        tox -= zoom * (p5.mouseX - tox);
-        toy -= zoom * (p5.mouseY - toy);
-        tow *= zoom + 1;
-        toh *= zoom + 1;
-      }
-    }
-
-    if (scrollAmount < 0) { // zoom out
-      for (var i = 0; i < -scrollAmount; i++) {
-        // if (tow < p5.width) return; //min zoom
-        tox += zoom / (zoom + 1) * (p5.mouseX - tox);
-        toy += zoom / (zoom + 1) * (p5.mouseY - toy);
-        toh /= zoom + 1;
-        tow /= zoom + 1;
-      }
-    }
+    const requestedScroll = event.deltaY;
+    const scaleAdjustment = requestedScroll < 0 ? 1 + scaleIncrement : 1 - scaleIncrement;
+    scaleFactor *= scaleAdjustment;
+    translateX = p5.mouseX * (1 - scaleAdjustment) + translateX * scaleAdjustment;
+    translateY = p5.mouseY * (1 - scaleAdjustment) + translateY * scaleAdjustment;
   };
 
   function setup(p5: p5Types) {
     const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight);
     canvas.mouseWheel((event: WheelEvent) => handleMouseWheel(p5, event));
-    w = tow = img.width;
-    h = toh = img.height;
-    x = tox = w / 2;
-    y = toy = h / 2;
   }
 
   function draw(p5: p5Types) {
-    p5.background('red');
+    p5.background(255);
+    p5.translate(translateX, translateY);
+    p5.scale(scaleFactor);
+    p5.rect(100, 100, 100, 100);
+    p5.rect(50, 50, 100, 100);
 
-    //
-    x = p5.lerp(x, tox, .1);
-    // console.log(x);
-    // console.log(tox);
-    y = p5.lerp(y, toy, .1);
-    w = p5.lerp(w, tow, .1);
-    h = p5.lerp(h, toh, .1);
-
-    p5.image(img, x - w / 2, y - h / 2, w, h);
+    if (p5.mouseIsPressed) {
+      translateX -= p5.pmouseX - p5.mouseX;
+      translateY -= p5.pmouseY - p5.mouseY;
+    }
   }
-
-  function mouseDragged(p5: p5Types) {
-    tox += p5.mouseX - p5.pmouseX;
-    toy += p5.mouseY - p5.pmouseY;
-  }
-
 
   const windowResized = (p5: p5Types) => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
@@ -76,11 +45,9 @@ export default function App(props: ComponentProps) {
 
   return (
       <Sketch
-          preload={preload}
           setup={setup}
           draw={draw}
           windowResized={windowResized}
-          mouseDragged={mouseDragged}
       />
   );
 };
