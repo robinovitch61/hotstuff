@@ -8,10 +8,11 @@ interface ComponentProps {
 }
 
 export default function App(props: ComponentProps) {
+  const scaleIncrement = 0.03;
+  let spaceBarWasPressed = false;
   let translateX = 0;
   let translateY = 0;
   let scaleFactor = 1;
-  const scaleIncrement = 0.03;
 
   const handleMouseWheel = (p5: p5Types, event: WheelEvent) => {
     const requestedScroll = event.deltaY;
@@ -30,12 +31,20 @@ export default function App(props: ComponentProps) {
     p5.background(255);
     p5.translate(translateX, translateY);
     p5.scale(scaleFactor);
+
     p5.rect(100, 100, 100, 100);
     p5.rect(50, 50, 100, 100);
+    p5.text(p5.keyCode, 33, 65);
 
     if (p5.mouseIsPressed) {
       translateX -= p5.pmouseX - p5.mouseX;
       translateY -= p5.pmouseY - p5.mouseY;
+    }
+    if (p5.keyCode === 32 && !spaceBarWasPressed) {
+      spaceBarWasPressed = true;
+      scaleFactor = 1;
+      translateX = 0;
+      translateY = 0;
     }
   }
 
