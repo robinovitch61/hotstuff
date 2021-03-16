@@ -1,0 +1,17 @@
+{
+  "name": "hotstuff-network",
+  "version": "0.0.1",
+  "description": "State space thermal network simulation tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leo Robinovitch",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robinovitch61/hotstuff.network",
+    "directory": "packages/hotstuff-network"
+  },
+  "homepage": "https://github.com/robinovitch61/hotstuff.network/tree/main/packages/hotstuff-network"
+}
