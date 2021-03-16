@@ -20,10 +20,10 @@ export type HotNode = {
 }
 
 export default function App() {
-  const [nodes, updateNodes] = useState<HotNode[]>([]);
+  const nodes: HotNode[] = [];
 
   function addNode(node: HotNode) {
-    updateNodes([...nodes, node]);
+    nodes.push(node);
   }
 
   return (

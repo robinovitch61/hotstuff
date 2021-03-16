@@ -10,12 +10,13 @@ type CanvasProps = {
 }
 
 export default function Canvas(props: CanvasProps) {
+  console.log("RERENDERED");
   const SCALE_INCREMENT = 0.03;
   const SCROLL_SPEED_SCALE_EFFECT = 0.005;
   const RESET_VIEW_KEY = 32; // 32 is space
   const DEFAULT_NODE_WIDTH = 50; // pixels
   const DEFAULT_NODE_HEIGHT = DEFAULT_NODE_WIDTH; // pixels
-  const theseNodes: HotNode[] = [];
+  // const theseNodes: HotNode[] = [];
 
   let canResetView = false;
   let translateX = 0;
@@ -73,8 +74,8 @@ export default function Canvas(props: CanvasProps) {
     // if (props.nodes[0]) {
     //   console.log(props.nodes[0].bottomRightCorner);
     // }
-    // drawNodes(p5, props.nodes);
-    drawNodes(p5, theseNodes);
+    drawNodes(p5, props.nodes);
+    // drawNodes(p5, theseNodes);
     p5.rect(100, 100, 100, 100);
     p5.rect(50, 50, 100, 100);
     p5.circle(150, 150, 50);
@@ -120,8 +121,8 @@ export default function Canvas(props: CanvasProps) {
       temperature: Qty('0 degC'),
       isBoundary: false
     };
-    // props.addNode(newNode);
-    theseNodes.push(newNode);
+    props.addNode(newNode);
+    // theseNodes.push(newNode);
   };
 
   return (
