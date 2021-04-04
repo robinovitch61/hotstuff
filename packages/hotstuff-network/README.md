@@ -7,3 +7,10 @@ npm i hotstuff-network
 ```
 
 ### Dev
+```sh
+# version up:
+npm version patch
+
+# publish:
+npm publish
+```
