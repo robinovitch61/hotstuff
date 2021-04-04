@@ -1,39 +1,44 @@
 import * as math from '../deps/math';
 import { Matrix as MathMatrix } from '../deps/math';
 
-type Matrix = MathMatrix;
-type MatrixVals = number[] | number[][];
+type Matrix = number[] | number[][];
 
-export const utils = {
-  matrix: (values: MatrixVals): Matrix => math.matrix(values),
-
-  add: (x: Matrix | number, y: Matrix | number) => {
+export const matrixUtils = {
+  add: (x: Matrix, y: Matrix): Matrix => {
     try {
-      return math.add(x, y);
+      const res = math.add(math.matrix(x), math.matrix(y)) as MathMatrix;
+      return res.toArray();
     } catch {
       throw Error(`Failed to add ${x} + ${y}`);
     }
   },
 
-  sub: (x: Matrix | number, y: Matrix | number) => {
+  sub: (x: Matrix, y: Matrix) => {
     try {
-      return math.subtract(x, y);
+      const res = math.subtract(math.matrix(x), math.matrix(y)) as MathMatrix;
+      return res.toArray();
     } catch {
       throw Error(`Failed to subtract ${x} - ${y}`);
     }
   },
 
-  mult: (x: Matrix | number, y: Matrix | number) => {
+  mult: (x: Matrix, y: Matrix) => {
     try {
-      return math.multiply(x, y);
+      const res = math.multiply(math.matrix(x), math.matrix(y)) as MathMatrix;
+      // math.js returns scalar if 1x1s here
+      if (typeof res === 'number') {
+        return [res];
+      }
+      return res.toArray();
     } catch {
       throw Error(`Failed to multiply ${x} * ${y}`);
     }
   },
 
-  divide: (x: Matrix | number, y: Matrix | number) => {
+  divide: (x: Matrix, y: Matrix) => {
     try {
-      return math.dotDivide(x, y);
+      const res = math.dotDivide(math.matrix(x), math.matrix(y)) as MathMatrix;
+      return res.toArray();
     } catch {
       throw Error(`Failed to divide ${x} - ${y}`);
     }
