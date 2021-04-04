@@ -43,4 +43,13 @@ export const matrixUtils = {
       throw Error(`Failed to divide ${x} - ${y}`);
     }
   },
+
+  zeros2d: (width: number, height: number): Matrix => {
+    try {
+      const res = math.zeros(height, width) as MathMatrix;
+      return res.toArray();
+    } catch {
+      throw Error(`Failed to create ${height}x${width} 2d matrix`);
+    }
+  },
 };

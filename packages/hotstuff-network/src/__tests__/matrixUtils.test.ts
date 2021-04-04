@@ -85,3 +85,16 @@ describe('divide', () => {
     expect(matrixUtils.divide(first, second)).toEqual(quotient);
   });
 });
+
+describe('zeros2d', () => {
+  test('1x1 zeros', () => {
+    expect(matrixUtils.zeros2d(1, 1)).toEqual([[0]]);
+  });
+
+  test('2x2 zeros', () => {
+    expect(matrixUtils.zeros2d(2, 2)).toEqual([
+      [0, 0],
+      [0, 0],
+    ]);
+  });
+});

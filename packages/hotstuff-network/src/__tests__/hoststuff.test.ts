@@ -34,7 +34,7 @@ describe('validate inputs', () => {
     isBoundary: true,
   };
 
-  const data: ModelInputs = {
+  const modelInputs: ModelInputs = {
     nodes: [firstNode, secondNode],
     connections: [
       {
@@ -45,38 +45,52 @@ describe('validate inputs', () => {
         heatTransfer: Qty('10 W'),
       },
     ],
-    timeStep: 0.1,
+    timeStep: Qty('0.1 s'),
+    runTime: Qty('10 s'),
   };
 
   test('valid input does not throw', () => {
-    expect(() => validateInputs(data)).not.toThrow();
+    expect(() => validateInputs(modelInputs)).not.toThrow();
   });
 
-  test('timestep', () => {
-    expect(() => validateInputs({ ...data, timeStep: 0 })).toThrow();
-    expect(() => validateInputs({ ...data, timeStep: -1 })).toThrow();
+  test('timestep is valid', () => {
+    expect(() => validateInputs({ ...modelInputs, timeStep: Qty('0 s') })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, timeStep: Qty('-1 s') })).toThrow();
   });
 
-  test('nodes', () => {
-    // duplicate ids in nodes
-    expect(() => validateInputs({ ...data, nodes: [firstNode, firstNode] })).toThrow();
-
-    // temperature
-    expect(() =>
-      validateInputs({ ...data, nodes: [firstNode, { ...secondNode, temperature: Qty('-1 degK') }] }),
-    ).toThrow();
-
-    // capacitance
-    expect(() =>
-      validateInputs({ ...data, nodes: [firstNode, { ...secondNode, capacitance: Qty('-1 J/degK') }] }),
-    ).toThrow();
-  });
-
-  test('connections', () => {
-    // connections include id that isn't a node
+  test('runTime is valid', () => {
+    expect(() => validateInputs({ ...modelInputs, runTime: Qty('0 s') })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, runTime: Qty('-1 s') })).toThrow();
     expect(() =>
       validateInputs({
-        ...data,
+        ...modelInputs,
+        timeStep: Qty('1 s'),
+        runTime: Qty('0.5s'),
+      }),
+    ).toThrow();
+  });
+
+  test('nodes have unique ids', () => {
+    expect(() => validateInputs({ ...modelInputs, nodes: [firstNode, firstNode] })).toThrow();
+  });
+
+  test('temperature is valid', () => {
+    // temperature
+    expect(() =>
+      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, temperature: Qty('-1 degK') }] }),
+    ).toThrow();
+  });
+
+  test('capacitance is valid', () => {
+    expect(() =>
+      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, capacitance: Qty('-1 J/degK') }] }),
+    ).toThrow();
+  });
+
+  test('connections correspond to real node ids', () => {
+    expect(() =>
+      validateInputs({
+        ...modelInputs,
         connections: [
           {
             source: firstNode,
@@ -91,11 +105,45 @@ describe('validate inputs', () => {
 
     expect(() =>
       validateInputs({
-        ...data,
+        ...modelInputs,
         connections: [
           {
             source: { ...firstNode, id: 'notANode' },
             target: secondNode,
+            resistance: Qty('10 degK/W'),
+            kind: 'bi',
+            heatTransfer: Qty('10 W'),
+          },
+        ],
+      }),
+    ).toThrow();
+  });
+
+  test('connections have valid resistances', () => {
+    expect(() =>
+      validateInputs({
+        ...modelInputs,
+        connections: [
+          {
+            source: firstNode,
+            target: secondNode,
+            resistance: Qty('-1 degK/W'),
+            kind: 'bi',
+            heatTransfer: Qty('10 W'),
+          },
+        ],
+      }),
+    ).toThrow();
+  });
+
+  test("connections don't point to themselves", () => {
+    expect(() =>
+      validateInputs({
+        ...modelInputs,
+        connections: [
+          {
+            source: firstNode,
+            target: firstNode,
             resistance: Qty('10 degK/W'),
             kind: 'bi',
             heatTransfer: Qty('10 W'),

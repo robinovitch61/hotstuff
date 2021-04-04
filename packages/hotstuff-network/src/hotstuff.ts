@@ -23,7 +23,8 @@ type Connections = Connection[];
 export type ModelInputs = {
   nodes: Node[];
   connections: Connections;
-  timeStep: number;
+  timeStep: Qty;
+  runTime: Qty;
 };
 
 export function makeId(): string {
@@ -39,8 +40,12 @@ export function fromKey(key: string) {
 }
 
 export function validateInputs(data: ModelInputs) {
-  if (data.timeStep <= 0) {
+  if (data.timeStep <= Qty('0 s')) {
     throw Error('Timestep must be greater than 0');
+  }
+
+  if (data.runTime <= Qty('0 s') || data.runTime < data.timeStep) {
+    throw Error('Runtime must be greater than 0 and greater than timestep');
   }
 
   const uniqueIds = new Set(data.nodes.map((n) => n.id));
@@ -65,9 +70,23 @@ export function validateInputs(data: ModelInputs) {
       throw Error(`Impossible thermal capacitance of ${node.capacitance}`);
     }
   });
+
+  data.connections.forEach((conn) => {
+    if (conn.resistance < Qty('0 degK/W')) {
+      throw Error(`Impossible thermal resistance of ${conn.resistance}`);
+    }
+    if (conn.source.id === conn.target.id) {
+      throw Error('Connection source and target are the same');
+    }
+  });
+}
+
+function createAMatrix(data: ModelInputs) {
+  const numNodes = data.nodes.length;
 }
 
 export default function run(data: ModelInputs) {
   validateInputs(data);
+  const A = createAMatrix(data);
   return 1;
 }
