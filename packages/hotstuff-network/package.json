@@ -34,6 +34,7 @@
   "homepage": "https://github.com/robinovitch61/hotstuff.network/tree/main/packages/hotstuff-network",
   "devDependencies": {
     "@types/jest": "^26.0.20",
+    "@types/js-quantities": "^1.6.2",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "eslint": "^7.22.0",
@@ -43,5 +44,8 @@
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.3",
     "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "js-quantities": "^1.7.6"
   }
 }

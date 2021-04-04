@@ -1,4 +1,4 @@
-import { matrixUtils } from '../hotstuff';
+import { matrixUtils } from '../matrixUtils';
 
 describe('add', () => {
   test('1x1 addition', () => {

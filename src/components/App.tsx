@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Qty from "js-quantities"; // https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities/definitions.js
 import Canvas from "./Canvas/Canvas";
-import { matrixUtils } from "hotstuff-network";
 
 export type Point = {
   xPos: number;
@@ -18,7 +17,6 @@ export type HotNode = {
 };
 
 export default function App() {
-  console.log(matrixUtils.add([1], [1]));
   const nodes: HotNode[] = [];
 
   function addNode(node: HotNode) {
