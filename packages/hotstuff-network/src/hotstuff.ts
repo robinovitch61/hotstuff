@@ -1,34 +1,46 @@
 import { matrixUtils } from './matrixUtils';
 import Qty = require('js-quantities');
 
-type Node = {
-  id: string;
+type NodeParams = {
   name: string;
-  temperature: Qty;
-  capacitance: Qty;
-  powerGen: Qty;
+  temperature: Qty; // degC
+  capacitance: Qty; // J/degK
+  powerGen: Qty; // W
   isBoundary: boolean;
+};
+
+type Node = NodeParams & {
+  id: string;
 };
 
 type Connection = {
   source: Node;
   target: Node;
-  resistance: Qty;
+  resistance: Qty; // degK/W
   kind: 'bi' | 'uni' | 'rad';
-  heatTransfer: Qty;
+  heatTransfer: Qty; // W
 };
-
-type Connections = Connection[];
 
 export type ModelInputs = {
   nodes: Node[];
-  connections: Connections;
+  connections: Connection[];
   timeStep: Qty;
   runTime: Qty;
 };
 
 export function makeId(): string {
   return (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
+}
+
+export function makeNode({ name, temperature, capacitance, powerGen, isBoundary }: NodeParams): Node {
+  return {
+    id: makeId(),
+    name,
+    temperature,
+    capacitance,
+    powerGen,
+    isBoundary,
+  };
 }
 
 export function toKey(sourceId: string, targetId: string) {
@@ -81,12 +93,40 @@ export function validateInputs(data: ModelInputs) {
   });
 }
 
-function createAMatrix(data: ModelInputs) {
-  const numNodes = data.nodes.length;
+// TODO: Rename
+export function calculateTerm(capacitance: Qty, resistance: Qty): number {
+  return 1 / capacitance.to('J/degC').toFloat() / resistance.to('degK/W').toFloat();
+}
+
+export function createAMatrix(nodes: Node[], connections: Connection[]) {
+  const numNodes = nodes.length;
+  const nodeIds = nodes.map((node) => node.id);
+  const vals = matrixUtils.zeros2d(numNodes, numNodes);
+  const nonRadConnections = connections.filter((conn) => conn.kind !== 'rad');
+  nodes.forEach((node, nodeIdx) => {
+    nonRadConnections.forEach((conn) => {
+      if (node.id !== conn.source.id && node.id !== conn.target.id) {
+        return;
+      } else {
+        const sourceIdx = nodeIds.indexOf(conn.source.id);
+        const targetIdx = nodeIds.indexOf(conn.target.id);
+
+        // if unidirectional, target does not affect source
+        if (node.id === conn.source.id && conn.kind !== 'uni') {
+          vals[nodeIdx][sourceIdx] -= calculateTerm(node.capacitance, conn.resistance);
+          vals[nodeIdx][targetIdx] += calculateTerm(node.capacitance, conn.resistance);
+        } else {
+          vals[nodeIdx][targetIdx] -= calculateTerm(node.capacitance, conn.resistance);
+          vals[nodeIdx][sourceIdx] += calculateTerm(node.capacitance, conn.resistance);
+        }
+      }
+    });
+  });
+  return vals;
 }
 
 export default function run(data: ModelInputs) {
   validateInputs(data);
-  const A = createAMatrix(data);
+  const A = createAMatrix(data.nodes, data.connections);
   return 1;
 }

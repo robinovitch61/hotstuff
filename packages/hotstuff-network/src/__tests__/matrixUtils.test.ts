@@ -87,6 +87,10 @@ describe('divide', () => {
 });
 
 describe('zeros2d', () => {
+  test('0x0 case', () => {
+    expect(matrixUtils.zeros2d(0, 0)).toEqual([[]]);
+  });
+
   test('1x1 zeros', () => {
     expect(matrixUtils.zeros2d(1, 1)).toEqual([[0]]);
   });

@@ -44,10 +44,13 @@ export const matrixUtils = {
     }
   },
 
-  zeros2d: (width: number, height: number): Matrix => {
+  zeros2d: (width: number, height: number): number[][] => {
     try {
+      if (width === 0 && height === 0) {
+        return [[]];
+      }
       const res = math.zeros(height, width) as MathMatrix;
-      return res.toArray();
+      return res.toArray() as number[][];
     } catch {
       throw Error(`Failed to create ${height}x${width} 2d matrix`);
     }

@@ -16,14 +16,13 @@ describe('key serdes', () => {
 });
 
 describe('validate inputs', () => {
-  const firstNode = {
-    id: hs.makeId(),
+  const firstNode = hs.makeNode({
     name: 'first',
     temperature: Qty('10 degC'),
     capacitance: Qty('10 J/degK'),
     powerGen: Qty('10W'),
     isBoundary: false,
-  };
+  });
 
   const secondNode = {
     id: hs.makeId(),
@@ -153,3 +152,16 @@ describe('validate inputs', () => {
     ).toThrow();
   });
 });
+
+describe('calculateTerm', () => {
+  console.log('TODO');
+});
+
+// describe('createAMatrix', () => {
+//   const nodes = [
+//     {
+//       id:
+//     }
+//     ];
+//   const aMatrix = hs.createAMatrix();
+// });
