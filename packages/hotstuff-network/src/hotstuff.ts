@@ -131,8 +131,18 @@ export function createAMatrix(nodes: Node[], connections: Connection[]) {
   return [vals, vals4];
 }
 
+export function numTimeSteps(timeStep: Qty, runTime: Qty) {
+  if (timeStep.gt(runTime)) {
+    return 0;
+  }
+  return Math.ceil(runTime.div(timeStep).scalar);
+}
+
 export default function run(data: ModelInputs) {
   validateInputs(data);
-  const A = createAMatrix(data.nodes, data.connections);
-  return 1;
+  const [A, A4] = createAMatrix(data.nodes, data.connections);
+  const numSteps = numTimeSteps(data.timeStep, data.runTime);
+  Array.from(Array(numSteps).keys()).forEach((step) => {
+    console.log(step);
+  });
 }

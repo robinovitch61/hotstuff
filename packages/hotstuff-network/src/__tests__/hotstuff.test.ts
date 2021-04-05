@@ -281,3 +281,25 @@ describe('createAMatrix', () => {
     ]);
   });
 });
+
+describe('numTimeSteps', () => {
+  test('runTime < timeStep', () => {
+    expect(hs.numTimeSteps(Qty('100 s'), Qty('10 s'))).toEqual(0);
+  });
+
+  test('same values', () => {
+    expect(hs.numTimeSteps(Qty('10 s'), Qty('10 s'))).toEqual(1);
+  });
+
+  test('double', () => {
+    expect(hs.numTimeSteps(Qty('5 s'), Qty('10 s'))).toEqual(2);
+  });
+
+  test('unit conversion', () => {
+    expect(hs.numTimeSteps(Qty('5 ms'), Qty('10 s'))).toEqual(2000);
+  });
+
+  test('ceil', () => {
+    expect(hs.numTimeSteps(Qty('4 s'), Qty('10 s'))).toEqual(3);
+  });
+});
