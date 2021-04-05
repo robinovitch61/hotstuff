@@ -1,49 +1,48 @@
 import * as hs from '../hotstuff';
 import { Connection, makeId, ModelInputs, validateInputs } from '../hotstuff';
-import Qty = require('js-quantities');
 
 const firstNode = hs.makeNode({
   name: 'test',
-  temperature: Qty('10 degC'),
-  capacitance: Qty('10 J/degK'),
-  powerGen: Qty('80 W'),
+  temperatureDegC: 10,
+  capacitanceJPerDegK: 10,
+  powerGenW: 80,
   isBoundary: false,
 });
 
 const secondNode = hs.makeNode({
   name: 'test2',
-  temperature: Qty('20 degC'),
-  capacitance: Qty('20 J/degK'),
-  powerGen: Qty('0 W'),
+  temperatureDegC: 20,
+  capacitanceJPerDegK: 20,
+  powerGenW: 0,
   isBoundary: false,
 });
 
 const thirdNode = hs.makeNode({
   name: 'test3',
-  temperature: Qty('40 degC'),
-  capacitance: Qty('40 J/degK'),
-  powerGen: Qty('-10 W'),
+  temperatureDegC: 40,
+  capacitanceJPerDegK: 40,
+  powerGenW: -10,
   isBoundary: false,
 });
 
 const connFirstSecond: Connection = {
   source: firstNode,
   target: secondNode,
-  resistance: Qty('100 degK/W'),
+  resistanceDegKPerW: 100,
   kind: 'bi',
 };
 
 const connSecondThird: Connection = {
   source: secondNode,
   target: thirdNode,
-  resistance: Qty('100 degK/W'),
+  resistanceDegKPerW: 100,
   kind: 'uni',
 };
 
 const connRadSecondThird: Connection = {
   source: secondNode,
   target: thirdNode,
-  resistance: Qty('100 degK/W'),
+  resistanceDegKPerW: 100,
   kind: 'rad',
 };
 
@@ -63,18 +62,18 @@ describe('key serdes', () => {
 describe('validate inputs', () => {
   const firstNode = hs.makeNode({
     name: 'first',
-    temperature: Qty('10 degC'),
-    capacitance: Qty('10 J/degK'),
-    powerGen: Qty('10W'),
+    temperatureDegC: 10,
+    capacitanceJPerDegK: 10,
+    powerGenW: 10,
     isBoundary: false,
   });
 
   const secondNode = {
     id: hs.makeId(),
     name: 'second',
-    temperature: Qty('10 degC'),
-    capacitance: Qty('10 J/degK'),
-    powerGen: Qty('10W'),
+    temperatureDegC: 10,
+    capacitanceJPerDegK: 10,
+    powerGenW: 10,
     isBoundary: true,
   };
 
@@ -84,31 +83,31 @@ describe('validate inputs', () => {
       {
         source: firstNode,
         target: secondNode,
-        resistance: Qty('10 degK/W'),
+        resistanceDegKPerW: 10,
         kind: 'bi',
       },
     ],
-    timestep: Qty('0.1 s'),
-    runTime: Qty('10 s'),
+    timestepS: 0.1,
+    runTimeS: 10,
   };
 
   test('valid input does not throw', () => {
     expect(() => validateInputs(modelInputs)).not.toThrow();
   });
 
-  test('timestep is valid', () => {
-    expect(() => validateInputs({ ...modelInputs, timestep: Qty('0 s') })).toThrow();
-    expect(() => validateInputs({ ...modelInputs, timestep: Qty('-1 s') })).toThrow();
+  test('timestepS is valid', () => {
+    expect(() => validateInputs({ ...modelInputs, timestepS: 0 })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, timestepS: -1 })).toThrow();
   });
 
-  test('runTime is valid', () => {
-    expect(() => validateInputs({ ...modelInputs, runTime: Qty('0 s') })).toThrow();
-    expect(() => validateInputs({ ...modelInputs, runTime: Qty('-1 s') })).toThrow();
+  test('runTimeS is valid', () => {
+    expect(() => validateInputs({ ...modelInputs, runTimeS: 0 })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, runTimeS: -1 })).toThrow();
     expect(() =>
       validateInputs({
         ...modelInputs,
-        timestep: Qty('1 s'),
-        runTime: Qty('0.5s'),
+        timestepS: 1,
+        runTimeS: 0.5,
       }),
     ).toThrow();
   });
@@ -117,16 +116,15 @@ describe('validate inputs', () => {
     expect(() => validateInputs({ ...modelInputs, nodes: [firstNode, firstNode] })).toThrow();
   });
 
-  test('temperature is valid', () => {
-    // temperature
+  test('temperatureDegC is valid', () => {
     expect(() =>
-      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, temperature: Qty('-1 degK') }] }),
+      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, temperatureDegC: -1 }] }),
     ).toThrow();
   });
 
-  test('capacitance is valid', () => {
+  test('capacitanceJPerDegK is valid', () => {
     expect(() =>
-      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, capacitance: Qty('-1 J/degK') }] }),
+      validateInputs({ ...modelInputs, nodes: [firstNode, { ...secondNode, capacitanceJPerDegK: -1 }] }),
     ).toThrow();
   });
 
@@ -138,7 +136,7 @@ describe('validate inputs', () => {
           {
             source: firstNode,
             target: { ...secondNode, id: 'notANode' },
-            resistance: Qty('10 degK/W'),
+            resistanceDegKPerW: 10,
             kind: 'bi',
           },
         ],
@@ -152,7 +150,7 @@ describe('validate inputs', () => {
           {
             source: { ...firstNode, id: 'notANode' },
             target: secondNode,
-            resistance: Qty('10 degK/W'),
+            resistanceDegKPerW: 10,
             kind: 'bi',
           },
         ],
@@ -168,7 +166,7 @@ describe('validate inputs', () => {
           {
             source: firstNode,
             target: secondNode,
-            resistance: Qty('-1 degK/W'),
+            resistanceDegKPerW: -1,
             kind: 'bi',
           },
         ],
@@ -184,7 +182,7 @@ describe('validate inputs', () => {
           {
             source: firstNode,
             target: firstNode,
-            resistance: Qty('10 degK/W'),
+            resistanceDegKPerW: 10,
             kind: 'bi',
           },
         ],
@@ -195,12 +193,7 @@ describe('validate inputs', () => {
 
 describe('calculateTerm', () => {
   test('with expected units', () => {
-    expect(hs.calculateTerm(Qty('10 J/degC'), Qty('10 degK/W'))).toEqual(1 / 10 / 10);
-  });
-
-  test('with unit conversion', () => {
-    // floating point rounding stuff going on with conversions, assume ok for now
-    expect(hs.calculateTerm(Qty('10 MJ/degC'), Qty('10 udegK/W'))).toBeCloseTo(1 / 10 / 10);
+    expect(hs.calculateTerm(10, 10)).toEqual(1 / 10 / 10);
   });
 });
 
@@ -311,23 +304,19 @@ describe('getTemps', () => {
 });
 
 describe('numTimesteps', () => {
-  test('runTime < timestep', () => {
-    expect(hs.numTimesteps(Qty('100 s'), Qty('10 s'))).toEqual(0);
+  test('runTimeS < timestepS', () => {
+    expect(hs.numTimesteps(100, 10)).toEqual(0);
   });
 
   test('same values', () => {
-    expect(hs.numTimesteps(Qty('10 s'), Qty('10 s'))).toEqual(1);
+    expect(hs.numTimesteps(10, 10)).toEqual(1);
   });
 
   test('double', () => {
-    expect(hs.numTimesteps(Qty('5 s'), Qty('10 s'))).toEqual(2);
-  });
-
-  test('unit conversion', () => {
-    expect(hs.numTimesteps(Qty('5 ms'), Qty('10 min'))).toEqual(2000 * 60);
+    expect(hs.numTimesteps(5, 10)).toEqual(2);
   });
 
   test('ceil', () => {
-    expect(hs.numTimesteps(Qty('4 s'), Qty('10 s'))).toEqual(3);
+    expect(hs.numTimesteps(4, 10)).toEqual(3);
   });
 });
