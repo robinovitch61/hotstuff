@@ -38,6 +38,7 @@ type HeatTransferOutput = {
 
 export type ModelOutput = {
   timeS: number[];
+  timestepS: number;
   runTimeS: number;
   numTimesteps: number;
   temps: TempOutput[];
@@ -158,6 +159,23 @@ export function getNodeTemps(nodes: Node[]): number[][] {
   return matrixUtils.makeVertical(flatTemps);
 }
 
+export function getHeatTransfer(temps: number[][], nodes: Node[], connections: Connection[]): number[] {
+  const flatTemps = matrixUtils.flatten(temps);
+  const nodeIds = nodes.map((n) => n.id);
+  return connections.map((conn) => {
+    const sourceIdx = nodeIds.indexOf(conn.source.id);
+    const targetIdx = nodeIds.indexOf(conn.target.id);
+    const sourceTemp = flatTemps[sourceIdx];
+    const targetTemp = flatTemps[targetIdx];
+
+    if (conn.kind === 'rad') {
+      return (Math.pow(sourceTemp, 4) - Math.pow(targetTemp, 4)) / conn.resistanceDegKPerW;
+    } else {
+      return (sourceTemp - targetTemp) / conn.resistanceDegKPerW;
+    }
+  });
+}
+
 export function numTimesteps(timestepS: number, runTimeS: number) {
   if (timestepS > runTimeS) {
     return 0;
@@ -181,25 +199,42 @@ export function getNewTemps(
   return result as number[][];
 }
 
+export function shapeOutput(
+  data: ModelInput,
+  timeS: number[],
+  numSteps: number,
+  outputTemps: number[][][],
+  heatTransfer: number[][],
+): ModelOutput {
+  return {
+    timeS,
+    timestepS: data.timestepS,
+    runTimeS: data.timestepS * numSteps,
+    numTimesteps: numSteps,
+    temps: [],
+    heatTransfer: [],
+  };
+}
+
 export default function run(data: ModelInput): ModelOutput {
   validateInputs(data);
   const [A, A4] = createAMatrix(data.nodes, data.connections);
   const B = createBVector(data.nodes);
   const initialTemps = getNodeTemps(data.nodes);
-  // const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
-  const steps = numTimesteps(data.timestepS, data.runTimeS);
+  const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
+  const numSteps = numTimesteps(data.timestepS, data.runTimeS);
   const outputTemps = [initialTemps];
-  // const heatTransfer = [initialHeatTransfer];
+  const heatTransfer = [initialHeatTransfer];
+  const timeStepRange = Array.from(Array(numSteps).keys());
+  const timeS = timeStepRange.map((t) => t * data.timestepS);
 
-  Array.from(Array(steps).keys()).forEach((step) => {
-    const recentTemps = outputTemps[outputTemps.length - 1];
-    const newTemps = getNewTemps(data.timestepS, recentTemps, A, A4, B);
-    // const newHeatTransfer = getHeatTransfer(newTemps, data.nodes, data.connections);
+  timeStepRange.forEach((step) => {
+    const mostRecentTemps = outputTemps[step];
+    const newTemps = getNewTemps(data.timestepS, mostRecentTemps, A, A4, B);
+    const newHeatTransfer = getHeatTransfer(newTemps, data.nodes, data.connections);
     outputTemps.push(newTemps);
-    // heatTransfer.push(newHeatTransfer);
+    heatTransfer.push(newHeatTransfer);
   });
 
-  // const output = shapeOutput(data, steps, outputTemps, heatTransfer);
-
-  return {} as ModelOutput;
+  return shapeOutput(data, timeS, numSteps, outputTemps, heatTransfer);
 }

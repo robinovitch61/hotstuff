@@ -55,6 +55,29 @@ describe('addScalar', () => {
   });
 });
 
+describe('size', () => {
+  test('empty input', () => {
+    expect(matrixUtils.size([[]])).toEqual({ height: 0, width: 0 });
+  });
+
+  test('1x1 input', () => {
+    expect(matrixUtils.size([[1]])).toEqual({ height: 1, width: 1 });
+  });
+
+  test('2x1 input', () => {
+    expect(matrixUtils.size([[1], [2]])).toEqual({ height: 2, width: 1 });
+  });
+
+  test('2x2 input', () => {
+    expect(
+      matrixUtils.size([
+        [1, 2],
+        [3, 4],
+      ]),
+    ).toEqual({ height: 2, width: 2 });
+  });
+});
+
 describe('mult', () => {
   test('1x1 multiplication', () => {
     expect(matrixUtils.mult([1], [2])).toEqual([2]);
@@ -174,5 +197,19 @@ describe('makeVertical', () => {
 
   test('multiple inputs', () => {
     expect(matrixUtils.makeVertical([1, 2])).toEqual([[1], [2]]);
+  });
+});
+
+describe('flatten', () => {
+  test('empty input', () => {
+    expect(matrixUtils.flatten([[]])).toEqual([]);
+  });
+
+  test('single input', () => {
+    expect(matrixUtils.flatten([[1]])).toEqual([1]);
+  });
+
+  test('multiple inputs', () => {
+    expect(matrixUtils.flatten([[1], [2]])).toEqual([1, 2]);
   });
 });

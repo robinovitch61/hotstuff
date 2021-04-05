@@ -304,6 +304,28 @@ describe('getNodeTemps', () => {
   });
 });
 
+describe('getHeatTransfer', () => {
+  test('empty input', () => {
+    expect(hs.getHeatTransfer([[]], [], [])).toEqual([]);
+  });
+
+  test('simple input', () => {
+    expect(hs.getHeatTransfer([[1], [2]], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
+  });
+
+  test('three node input without rad', () => {
+    expect(
+      hs.getHeatTransfer([[1], [2], [3]], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird]),
+    ).toEqual([-0.01, -0.01]);
+  });
+
+  test('three node input with rad', () => {
+    expect(
+      hs.getHeatTransfer([[1], [2], [3]], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
+    ).toEqual([-0.01, -0.65]);
+  });
+});
+
 describe('numTimesteps', () => {
   test('runTimeS < timestepS', () => {
     expect(hs.numTimesteps(100, 10)).toEqual(0);

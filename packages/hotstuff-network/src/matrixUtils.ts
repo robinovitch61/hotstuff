@@ -3,8 +3,8 @@ import { Matrix as MathMatrix } from '../deps/math';
 
 type Matrix = number[] | number[][];
 type Size = {
-  width: number;
   height: number;
+  width: number;
 };
 
 function add(x: Matrix, y: Matrix): Matrix {
@@ -34,6 +34,12 @@ function size(x: Matrix): Size {
     };
   } else {
     const twoD = x as number[][];
+    if (twoD[0].length === 0) {
+      return {
+        height: 0,
+        width: 0,
+      };
+    }
     const width = twoD[0].length;
     twoD.forEach((row) => {
       if (row.length !== width) {
@@ -104,6 +110,16 @@ function makeVertical(x: number[]): number[][] {
   return x.map((val) => [val]);
 }
 
+function flatten(x: number[][]): number[] {
+  const xSize = size(x);
+  if (xSize.width === 0 && xSize.height === 0) {
+    return [];
+  } else if (xSize.width !== 1) {
+    throw Error('Can only flatten N x 1 matrix');
+  }
+  return x.map((val) => val[0]);
+}
+
 export const matrixUtils = {
   add,
   addScalar,
@@ -113,4 +129,5 @@ export const matrixUtils = {
   pow,
   zeros2d,
   makeVertical,
+  flatten,
 };
