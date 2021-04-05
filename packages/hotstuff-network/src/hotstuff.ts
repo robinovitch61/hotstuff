@@ -13,12 +13,11 @@ type Node = NodeParams & {
   id: string;
 };
 
-type Connection = {
+export type Connection = {
   source: Node;
   target: Node;
   resistance: Qty; // degK/W
   kind: 'bi' | 'uni' | 'rad';
-  heatTransfer: Qty; // W
 };
 
 export type ModelInputs = {
@@ -95,34 +94,41 @@ export function validateInputs(data: ModelInputs) {
 
 // TODO: Rename
 export function calculateTerm(capacitance: Qty, resistance: Qty): number {
-  return 1 / capacitance.to('J/degC').toFloat() / resistance.to('degK/W').toFloat();
+  return 1 / capacitance.to('J/degC').scalar / resistance.to('degK/W').scalar;
 }
 
 export function createAMatrix(nodes: Node[], connections: Connection[]) {
   const numNodes = nodes.length;
   const nodeIds = nodes.map((node) => node.id);
   const vals = matrixUtils.zeros2d(numNodes, numNodes);
-  const nonRadConnections = connections.filter((conn) => conn.kind !== 'rad');
-  nodes.forEach((node, nodeIdx) => {
-    nonRadConnections.forEach((conn) => {
-      if (node.id !== conn.source.id && node.id !== conn.target.id) {
-        return;
-      } else {
+  const vals4 = matrixUtils.zeros2d(numNodes, numNodes);
+  connections.forEach((conn) => {
+    nodes.forEach((node, nodeIdx) => {
+      if (node.id === conn.source.id || node.id === conn.target.id) {
         const sourceIdx = nodeIds.indexOf(conn.source.id);
         const targetIdx = nodeIds.indexOf(conn.target.id);
+        const term = calculateTerm(node.capacitance, conn.resistance);
 
-        // if unidirectional, target does not affect source
-        if (node.id === conn.source.id && conn.kind !== 'uni') {
-          vals[nodeIdx][sourceIdx] -= calculateTerm(node.capacitance, conn.resistance);
-          vals[nodeIdx][targetIdx] += calculateTerm(node.capacitance, conn.resistance);
+        if (conn.kind !== 'rad') {
+          // if unidirectional, target does not affect source
+          if (node.id === conn.source.id && conn.kind !== 'uni') {
+            vals[nodeIdx][sourceIdx] -= term;
+            vals[nodeIdx][targetIdx] += term;
+          } else if (node.id === conn.target.id) {
+            vals[nodeIdx][targetIdx] -= term;
+            vals[nodeIdx][sourceIdx] += term;
+          }
         } else {
-          vals[nodeIdx][targetIdx] -= calculateTerm(node.capacitance, conn.resistance);
-          vals[nodeIdx][sourceIdx] += calculateTerm(node.capacitance, conn.resistance);
+          // assume target radiates to ambient and not back to source
+          if (node.id == conn.source.id) {
+            vals4[nodeIdx][sourceIdx] -= term;
+            vals4[nodeIdx][targetIdx] += term;
+          }
         }
       }
     });
   });
-  return vals;
+  return [vals, vals4];
 }
 
 export default function run(data: ModelInputs) {
