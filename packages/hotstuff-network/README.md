@@ -1,6 +1,15 @@
 ## hotstuff-network
 This is the thermal simulation code that powers [hotstuff.network](https://hotstuff.network) [currently WIP].
 
+### TODO:
+- [] address TODOs in Code
+- [] makeConnection function, add ID to connections
+- [] variable power inputs
+- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timestep
+- [] information about instability
+- [] clarify runTimeS naming
+
+
 ### Installation
 ```sh
 npm i hotstuff-network
