@@ -16,6 +16,7 @@ function add(x: Matrix, y: Matrix): Matrix {
   }
 }
 
+// TODO: MAKE GENERIC TYPED SO DON'T HAVE TO CAST RESULT
 function addScalar(x: Matrix, y: number): Matrix {
   try {
     const res = math.add(math.matrix(x), y) as MathMatrix;

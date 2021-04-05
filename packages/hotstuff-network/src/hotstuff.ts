@@ -1,5 +1,7 @@
 import { matrixUtils } from './matrixUtils';
 
+export const KELVIN = 273.15;
+
 type NodeParams = {
   name: string;
   temperatureDegC: number;
@@ -26,7 +28,7 @@ export type ModelInput = {
   runTimeS: number;
 };
 
-type TempOutput = {
+export type TempOutput = {
   node: Node;
   tempDegC: number[];
 };
@@ -37,7 +39,7 @@ type HeatTransferOutput = {
 };
 
 export type ModelOutput = {
-  timeS: number[];
+  timeSeriesS: number[];
   timestepS: number;
   runTimeS: number;
   numTimesteps: number;
@@ -154,9 +156,30 @@ export function createBVector(nodes: Node[]): number[][] {
   return matrixUtils.makeVertical(flatB);
 }
 
+// TODO: TEST
+export function toKelvin(temps: number[]): number[] {
+  return matrixUtils.addScalar(temps, KELVIN) as number[];
+}
+
+// TODO: TEST
+export function toCelcius(temps: number[]): number[] {
+  return matrixUtils.addScalar(temps, -KELVIN) as number[];
+}
+
 export function getNodeTemps(nodes: Node[]): number[][] {
   const flatTemps = nodes.map((node) => node.temperatureDegC);
-  return matrixUtils.makeVertical(flatTemps);
+  return matrixUtils.makeVertical(toKelvin(flatTemps));
+}
+
+// TODO: TEST
+export function tempsWithBoundary(nodes: Node[], recentTemps: number[][], newTemps: number[][]) {
+  const temps = [...newTemps];
+  nodes.map((node, idx) => {
+    if (node.isBoundary) {
+      temps[idx] = recentTemps[idx];
+    }
+  });
+  return temps;
 }
 
 export function getHeatTransfer(temps: number[][], nodes: Node[], connections: Connection[]): number[] {
@@ -201,22 +224,37 @@ export function getNewTemps(
 
 export function shapeOutput(
   data: ModelInput,
-  timeS: number[],
-  numSteps: number,
+  timeSeriesS: number[],
   outputTemps: number[][][],
-  heatTransfer: number[][],
+  outputHeatTransfer: number[][],
 ): ModelOutput {
+  const flatTemps = outputTemps.map((temp) => toCelcius(matrixUtils.flatten(temp)));
+
+  const temps = data.nodes.map((node, idx) => {
+    return {
+      node,
+      tempDegC: flatTemps.map((temp) => temp[idx]),
+    };
+  });
+
+  const heatTransfer = data.connections.map((connection, idx) => {
+    return {
+      connection,
+      heatTransferW: outputHeatTransfer.map((ht) => ht[idx]),
+    };
+  });
+
   return {
-    timeS,
-    timestepS: data.timestepS,
-    runTimeS: data.timestepS * numSteps,
-    numTimesteps: numSteps,
-    temps: [],
-    heatTransfer: [],
+    timeSeriesS,
+    timestepS: timeSeriesS[1],
+    runTimeS: timeSeriesS[timeSeriesS.length - 1],
+    numTimesteps: timeSeriesS.length,
+    temps,
+    heatTransfer,
   };
 }
 
-export default function run(data: ModelInput): ModelOutput {
+export function run(data: ModelInput): ModelOutput {
   validateInputs(data);
   const [A, A4] = createAMatrix(data.nodes, data.connections);
   const B = createBVector(data.nodes);
@@ -224,17 +262,21 @@ export default function run(data: ModelInput): ModelOutput {
   const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
   const numSteps = numTimesteps(data.timestepS, data.runTimeS);
   const outputTemps = [initialTemps];
-  const heatTransfer = [initialHeatTransfer];
+  const outputHeatTransfer = [initialHeatTransfer];
   const timeStepRange = Array.from(Array(numSteps).keys());
-  const timeS = timeStepRange.map((t) => t * data.timestepS);
+  const timeSeriesS = timeStepRange.map((t) => t * data.timestepS);
+
+  // account for time 0 being input vals
+  timeSeriesS.push(timeSeriesS[timeSeriesS.length - 1] + data.timestepS);
 
   timeStepRange.forEach((step) => {
     const mostRecentTemps = outputTemps[step];
     const newTemps = getNewTemps(data.timestepS, mostRecentTemps, A, A4, B);
-    const newHeatTransfer = getHeatTransfer(newTemps, data.nodes, data.connections);
-    outputTemps.push(newTemps);
-    heatTransfer.push(newHeatTransfer);
+    const adjustedTemps = tempsWithBoundary(data.nodes, mostRecentTemps, newTemps);
+    const newHeatTransfer = getHeatTransfer(adjustedTemps, data.nodes, data.connections);
+    outputTemps.push(adjustedTemps);
+    outputHeatTransfer.push(newHeatTransfer);
   });
 
-  return shapeOutput(data, timeS, numSteps, outputTemps, heatTransfer);
+  return shapeOutput(data, timeSeriesS, outputTemps, outputHeatTransfer);
 }
