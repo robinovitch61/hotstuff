@@ -19,11 +19,29 @@ export type Connection = {
   kind: 'bi' | 'uni' | 'rad';
 };
 
-export type ModelInputs = {
+export type ModelInput = {
   nodes: Node[];
   connections: Connection[];
   timestepS: number;
   runTimeS: number;
+};
+
+type TempOutput = {
+  node: Node;
+  tempDegC: number[];
+};
+
+type HeatTransferOutput = {
+  connection: Connection;
+  heatTransferW: number[];
+};
+
+export type ModelOutput = {
+  timeS: number[];
+  runTimeS: number;
+  numTimesteps: number;
+  temps: TempOutput[];
+  heatTransfer: HeatTransferOutput[];
 };
 
 export function makeId(): string {
@@ -49,7 +67,7 @@ export function fromKey(key: string) {
   return key.split('-');
 }
 
-export function validateInputs(data: ModelInputs) {
+export function validateInputs(data: ModelInput) {
   if (data.timestepS <= 0) {
     throw Error('timestepS must be greater than 0');
   }
@@ -135,7 +153,7 @@ export function createBVector(nodes: Node[]): number[][] {
   return matrixUtils.makeVertical(flatB);
 }
 
-export function getTemps(nodes: Node[]): number[][] {
+export function getNodeTemps(nodes: Node[]): number[][] {
   const flatTemps = nodes.map((node) => node.temperatureDegC);
   return matrixUtils.makeVertical(flatTemps);
 }
@@ -147,17 +165,41 @@ export function numTimesteps(timestepS: number, runTimeS: number) {
   return Math.ceil(runTimeS / timestepS);
 }
 
-export function doTimestep(timestepS: number, temps: number[][], A: number[][], A4: number[][], B: number[][]) {
-  console.log('yay');
+export function getNewTemps(
+  timestepS: number,
+  temps: number[][],
+  A: number[][],
+  A4: number[][],
+  B: number[][],
+): number[][] {
+  const temps4 = matrixUtils.pow(temps, 4);
+  const aMult = matrixUtils.mult(A, temps);
+  const a4Mult = matrixUtils.mult(A4, temps4);
+  const sum = matrixUtils.add(aMult, matrixUtils.add(a4Mult, B));
+  const deltaT = matrixUtils.multScalar(sum, timestepS);
+  const result = matrixUtils.add(temps, deltaT);
+  return result as number[][];
 }
 
-export default function run(data: ModelInputs) {
+export default function run(data: ModelInput): ModelOutput {
   validateInputs(data);
   const [A, A4] = createAMatrix(data.nodes, data.connections);
-  // const B = createBVector(data.nodes);
-  // const initialTemps = getTemps(data.nodes);
+  const B = createBVector(data.nodes);
+  const initialTemps = getNodeTemps(data.nodes);
+  // const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
   const steps = numTimesteps(data.timestepS, data.runTimeS);
+  const outputTemps = [initialTemps];
+  // const heatTransfer = [initialHeatTransfer];
+
   Array.from(Array(steps).keys()).forEach((step) => {
-    // const output = doTimestep();
+    const recentTemps = outputTemps[outputTemps.length - 1];
+    const newTemps = getNewTemps(data.timestepS, recentTemps, A, A4, B);
+    // const newHeatTransfer = getHeatTransfer(newTemps, data.nodes, data.connections);
+    outputTemps.push(newTemps);
+    // heatTransfer.push(newHeatTransfer);
   });
+
+  // const output = shapeOutput(data, steps, outputTemps, heatTransfer);
+
+  return {} as ModelOutput;
 }

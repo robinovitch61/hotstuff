@@ -1,5 +1,6 @@
 import * as hs from '../hotstuff';
-import { Connection, makeId, ModelInputs, validateInputs } from '../hotstuff';
+import { Connection, makeId, ModelInput, validateInputs } from '../hotstuff';
+import { matrixUtils } from '../matrixUtils';
 
 const firstNode = hs.makeNode({
   name: 'test',
@@ -77,7 +78,7 @@ describe('validate inputs', () => {
     isBoundary: true,
   };
 
-  const modelInputs: ModelInputs = {
+  const modelInputs: ModelInput = {
     nodes: [firstNode, secondNode],
     connections: [
       {
@@ -289,17 +290,17 @@ describe('createBVector', () => {
   });
 });
 
-describe('getTemps', () => {
+describe('getNodeTemps', () => {
   test('empty input', () => {
-    expect(hs.getTemps([])).toEqual([[]]);
+    expect(hs.getNodeTemps([])).toEqual([[]]);
   });
 
   test('single node input', () => {
-    expect(hs.getTemps([firstNode])).toEqual([[10]]);
+    expect(hs.getNodeTemps([firstNode])).toEqual([[10]]);
   });
 
   test('two node input', () => {
-    expect(hs.getTemps([firstNode, secondNode])).toEqual([[10], [20]]);
+    expect(hs.getNodeTemps([firstNode, secondNode])).toEqual([[10], [20]]);
   });
 });
 
@@ -318,5 +319,26 @@ describe('numTimesteps', () => {
 
   test('ceil', () => {
     expect(hs.numTimesteps(4, 10)).toEqual(3);
+  });
+});
+
+describe('getNewTemps', () => {
+  test('contrived 2 node system', () => {
+    const timestepS = 0.1;
+    const temps = [[1], [2]];
+    const A = [
+      [-1, 2],
+      [3, -4],
+    ];
+    const A4 = [
+      [-1, 2],
+      [3, -4],
+    ];
+    const B = [[4], [5]];
+    const newTemps = hs.getNewTemps(timestepS, temps, A, A4, B);
+    expect(matrixUtils.size(newTemps).width).toEqual(1);
+    expect(matrixUtils.size(newTemps).height).toEqual(2);
+    expect(newTemps[0][0]).toBeCloseTo(4.8);
+    expect(newTemps[1][0]).toBeCloseTo(-4.1);
   });
 });

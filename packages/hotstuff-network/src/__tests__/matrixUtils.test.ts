@@ -5,6 +5,13 @@ describe('add', () => {
     expect(matrixUtils.add([1], [1])).toEqual([2]);
   });
 
+  test('2x1 addition', () => {
+    const first = [[1], [3]];
+    const second = [[2], [4]];
+    const sum = [[3], [7]];
+    expect(matrixUtils.add(first, second)).toEqual(sum);
+  });
+
   test('2x2 addition', () => {
     const first = [
       [1, 2],
