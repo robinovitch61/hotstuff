@@ -1,6 +1,8 @@
 import { matrixUtils } from './matrixUtils';
 import Qty = require('js-quantities');
 
+// TODO: Remove unit conversion stuff, just document units
+
 type NodeParams = {
   name: string;
   temperature: Qty; // degC
@@ -23,7 +25,7 @@ export type Connection = {
 export type ModelInputs = {
   nodes: Node[];
   connections: Connection[];
-  timeStep: Qty;
+  timestep: Qty;
   runTime: Qty;
 };
 
@@ -51,11 +53,11 @@ export function fromKey(key: string) {
 }
 
 export function validateInputs(data: ModelInputs) {
-  if (data.timeStep <= Qty('0 s')) {
-    throw Error('Timestep must be greater than 0');
+  if (data.timestep <= Qty('0 s')) {
+    throw Error('timestep must be greater than 0');
   }
 
-  if (data.runTime <= Qty('0 s') || data.runTime < data.timeStep) {
+  if (data.runTime <= Qty('0 s') || data.runTime < data.timestep) {
     throw Error('Runtime must be greater than 0 and greater than timestep');
   }
 
@@ -92,7 +94,7 @@ export function validateInputs(data: ModelInputs) {
   });
 }
 
-// TODO: Rename
+// TODO: Rename?
 export function calculateTerm(capacitance: Qty, resistance: Qty): number {
   return 1 / capacitance.to('J/degC').scalar / resistance.to('degK/W').scalar;
 }
@@ -131,18 +133,34 @@ export function createAMatrix(nodes: Node[], connections: Connection[]) {
   return [vals, vals4];
 }
 
-export function numTimeSteps(timeStep: Qty, runTime: Qty) {
-  if (timeStep.gt(runTime)) {
+export function createBVector(nodes: Node[]): number[][] {
+  const flatB = nodes.map((node) => node.powerGen.div(node.capacitance).scalar);
+  return matrixUtils.makeVertical(flatB);
+}
+
+export function getTemps(nodes: Node[]): number[][] {
+  const flatTemps = nodes.map((node) => node.temperature.scalar);
+  return matrixUtils.makeVertical(flatTemps);
+}
+
+export function numTimesteps(timestep: Qty, runTime: Qty) {
+  if (timestep.gt(runTime)) {
     return 0;
   }
-  return Math.ceil(runTime.div(timeStep).scalar);
+  return Math.ceil(runTime.div(timestep).scalar);
+}
+
+export function updateTemps(timestep: number, temps: number[][], A: number[][], A4: number[][], B: number[][]) {
+  console.log('yay');
 }
 
 export default function run(data: ModelInputs) {
   validateInputs(data);
   const [A, A4] = createAMatrix(data.nodes, data.connections);
-  const numSteps = numTimeSteps(data.timeStep, data.runTime);
-  Array.from(Array(numSteps).keys()).forEach((step) => {
-    console.log(step);
+  // const B = createBVector(data.nodes);
+  // const initialTemps = getTemps(data.nodes);
+  const steps = numTimesteps(data.timestep, data.runTime);
+  Array.from(Array(steps).keys()).forEach((step) => {
+    // const output = updateTemps();
   });
 }

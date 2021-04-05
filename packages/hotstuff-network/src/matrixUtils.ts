@@ -97,6 +97,13 @@ function zeros2d(width: number, height: number): number[][] {
   }
 }
 
+function makeVertical(x: number[]): number[][] {
+  if (x.length === 0) {
+    return [[]];
+  }
+  return x.map((val) => [val]);
+}
+
 export const matrixUtils = {
   add,
   addScalar,
@@ -105,4 +112,5 @@ export const matrixUtils = {
   multScalar,
   pow,
   zeros2d,
+  makeVertical,
 };

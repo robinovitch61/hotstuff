@@ -155,3 +155,17 @@ describe('zeros2d', () => {
     ]);
   });
 });
+
+describe('makeVertical', () => {
+  test('empty input', () => {
+    expect(matrixUtils.makeVertical([])).toEqual([[]]);
+  });
+
+  test('single input', () => {
+    expect(matrixUtils.makeVertical([1])).toEqual([[1]]);
+  });
+
+  test('multiple inputs', () => {
+    expect(matrixUtils.makeVertical([1, 2])).toEqual([[1], [2]]);
+  });
+});

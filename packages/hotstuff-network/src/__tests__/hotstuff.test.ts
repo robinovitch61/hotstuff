@@ -2,6 +2,51 @@ import * as hs from '../hotstuff';
 import { Connection, makeId, ModelInputs, validateInputs } from '../hotstuff';
 import Qty = require('js-quantities');
 
+const firstNode = hs.makeNode({
+  name: 'test',
+  temperature: Qty('10 degC'),
+  capacitance: Qty('10 J/degK'),
+  powerGen: Qty('80 W'),
+  isBoundary: false,
+});
+
+const secondNode = hs.makeNode({
+  name: 'test2',
+  temperature: Qty('20 degC'),
+  capacitance: Qty('20 J/degK'),
+  powerGen: Qty('0 W'),
+  isBoundary: false,
+});
+
+const thirdNode = hs.makeNode({
+  name: 'test3',
+  temperature: Qty('40 degC'),
+  capacitance: Qty('40 J/degK'),
+  powerGen: Qty('-10 W'),
+  isBoundary: false,
+});
+
+const connFirstSecond: Connection = {
+  source: firstNode,
+  target: secondNode,
+  resistance: Qty('100 degK/W'),
+  kind: 'bi',
+};
+
+const connSecondThird: Connection = {
+  source: secondNode,
+  target: thirdNode,
+  resistance: Qty('100 degK/W'),
+  kind: 'uni',
+};
+
+const connRadSecondThird: Connection = {
+  source: secondNode,
+  target: thirdNode,
+  resistance: Qty('100 degK/W'),
+  kind: 'rad',
+};
+
 describe('key serdes', () => {
   test('toKey', () => {
     const key = hs.toKey('test1', 'test2');
@@ -43,7 +88,7 @@ describe('validate inputs', () => {
         kind: 'bi',
       },
     ],
-    timeStep: Qty('0.1 s'),
+    timestep: Qty('0.1 s'),
     runTime: Qty('10 s'),
   };
 
@@ -52,8 +97,8 @@ describe('validate inputs', () => {
   });
 
   test('timestep is valid', () => {
-    expect(() => validateInputs({ ...modelInputs, timeStep: Qty('0 s') })).toThrow();
-    expect(() => validateInputs({ ...modelInputs, timeStep: Qty('-1 s') })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, timestep: Qty('0 s') })).toThrow();
+    expect(() => validateInputs({ ...modelInputs, timestep: Qty('-1 s') })).toThrow();
   });
 
   test('runTime is valid', () => {
@@ -62,7 +107,7 @@ describe('validate inputs', () => {
     expect(() =>
       validateInputs({
         ...modelInputs,
-        timeStep: Qty('1 s'),
+        timestep: Qty('1 s'),
         runTime: Qty('0.5s'),
       }),
     ).toThrow();
@@ -160,51 +205,6 @@ describe('calculateTerm', () => {
 });
 
 describe('createAMatrix', () => {
-  const firstNode = hs.makeNode({
-    name: 'test',
-    temperature: Qty('10 degC'),
-    capacitance: Qty('10 J/degK'),
-    powerGen: Qty('80 W'),
-    isBoundary: false,
-  });
-
-  const secondNode = hs.makeNode({
-    name: 'test2',
-    temperature: Qty('20 degC'),
-    capacitance: Qty('20 J/degK'),
-    powerGen: Qty('0 W'),
-    isBoundary: false,
-  });
-
-  const thirdNode = hs.makeNode({
-    name: 'test3',
-    temperature: Qty('40 degC'),
-    capacitance: Qty('40 J/degK'),
-    powerGen: Qty('-10 W'),
-    isBoundary: false,
-  });
-
-  const connFirstSecond: Connection = {
-    source: firstNode,
-    target: secondNode,
-    resistance: Qty('100 degK/W'),
-    kind: 'bi',
-  };
-
-  const connSecondThird: Connection = {
-    source: secondNode,
-    target: thirdNode,
-    resistance: Qty('100 degK/W'),
-    kind: 'uni',
-  };
-
-  const connRadSecondThird: Connection = {
-    source: secondNode,
-    target: thirdNode,
-    resistance: Qty('100 degK/W'),
-    kind: 'rad',
-  };
-
   test('no nodes, no connections', () => {
     const [aMatrix, aMatrix4] = hs.createAMatrix([], []);
     expect(aMatrix).toEqual([[]]);
@@ -282,24 +282,52 @@ describe('createAMatrix', () => {
   });
 });
 
-describe('numTimeSteps', () => {
-  test('runTime < timeStep', () => {
-    expect(hs.numTimeSteps(Qty('100 s'), Qty('10 s'))).toEqual(0);
+describe('createBVector', () => {
+  test('empty input', () => {
+    expect(hs.createBVector([])).toEqual([[]]);
+  });
+
+  test('single node input', () => {
+    expect(hs.createBVector([firstNode])).toEqual([[8]]);
+  });
+
+  test('two node input', () => {
+    expect(hs.createBVector([firstNode, secondNode])).toEqual([[8], [0]]);
+  });
+});
+
+describe('getTemps', () => {
+  test('empty input', () => {
+    expect(hs.getTemps([])).toEqual([[]]);
+  });
+
+  test('single node input', () => {
+    expect(hs.getTemps([firstNode])).toEqual([[10]]);
+  });
+
+  test('two node input', () => {
+    expect(hs.getTemps([firstNode, secondNode])).toEqual([[10], [20]]);
+  });
+});
+
+describe('numTimesteps', () => {
+  test('runTime < timestep', () => {
+    expect(hs.numTimesteps(Qty('100 s'), Qty('10 s'))).toEqual(0);
   });
 
   test('same values', () => {
-    expect(hs.numTimeSteps(Qty('10 s'), Qty('10 s'))).toEqual(1);
+    expect(hs.numTimesteps(Qty('10 s'), Qty('10 s'))).toEqual(1);
   });
 
   test('double', () => {
-    expect(hs.numTimeSteps(Qty('5 s'), Qty('10 s'))).toEqual(2);
+    expect(hs.numTimesteps(Qty('5 s'), Qty('10 s'))).toEqual(2);
   });
 
   test('unit conversion', () => {
-    expect(hs.numTimeSteps(Qty('5 ms'), Qty('10 s'))).toEqual(2000);
+    expect(hs.numTimesteps(Qty('5 ms'), Qty('10 min'))).toEqual(2000 * 60);
   });
 
   test('ceil', () => {
-    expect(hs.numTimeSteps(Qty('4 s'), Qty('10 s'))).toEqual(3);
+    expect(hs.numTimesteps(Qty('4 s'), Qty('10 s'))).toEqual(3);
   });
 });
