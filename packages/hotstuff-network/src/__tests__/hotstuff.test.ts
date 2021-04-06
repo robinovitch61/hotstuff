@@ -1,23 +1,7 @@
-import run, {
-  calculateNewTemps,
-  calculateTerm,
-  createAMatrix,
-  createBVector,
-  fromKey,
-  getHeatTransfer,
-  getNodeTempsDegK,
-  makeConnection,
-  makeNode,
-  numTimeSteps,
-  shapeOutput,
-  tempsWithBoundary,
-  toCelcius,
-  toKelvin,
-  toKey,
-} from '../hotstuff';
+import * as hs from '../hotstuff';
 import { emptyOutput, KELVIN, ModelInput, ModelOutput, validateInputs } from '../hotstuff';
 
-const firstNode = makeNode({
+const firstNode = hs.makeNode({
   name: 'test',
   temperatureDegC: 10,
   capacitanceJPerDegK: 10000,
@@ -25,7 +9,7 @@ const firstNode = makeNode({
   isBoundary: false,
 });
 
-const secondNode = makeNode({
+const secondNode = hs.makeNode({
   name: 'test2',
   temperatureDegC: 20,
   capacitanceJPerDegK: 20000,
@@ -33,7 +17,7 @@ const secondNode = makeNode({
   isBoundary: false,
 });
 
-const thirdNode = makeNode({
+const thirdNode = hs.makeNode({
   name: 'test3',
   temperatureDegC: 40,
   capacitanceJPerDegK: 40000,
@@ -41,28 +25,28 @@ const thirdNode = makeNode({
   isBoundary: true,
 });
 
-const connFirstSecond = makeConnection({
+const connFirstSecond = hs.makeConnection({
   source: firstNode,
   target: secondNode,
   resistanceDegKPerW: 100,
   kind: 'bi',
 });
 
-const connSecondThird = makeConnection({
+const connSecondThird = hs.makeConnection({
   source: secondNode,
   target: thirdNode,
   resistanceDegKPerW: 100,
   kind: 'uni',
 });
 
-const connRadSecondThird = makeConnection({
+const connRadSecondThird = hs.makeConnection({
   source: secondNode,
   target: thirdNode,
   resistanceDegKPerW: 50,
   kind: 'rad',
 });
 
-const connFirstThird = makeConnection({
+const connFirstThird = hs.makeConnection({
   source: firstNode,
   target: thirdNode,
   resistanceDegKPerW: 75,
@@ -78,12 +62,12 @@ const modelInput: ModelInput = {
 
 describe('key serdes', () => {
   test('toKey', () => {
-    const key = toKey('test1', 'test2');
+    const key = hs.toKey('test1', 'test2');
     expect(key).toBe('test1-test2');
   });
 
   test('fromKey', () => {
-    const [first, second] = fromKey('test1-test2');
+    const [first, second] = hs.fromKey('test1-test2');
     expect(first).toBe('test1');
     expect(second).toBe('test2');
   });
@@ -132,7 +116,7 @@ describe('validate inputs', () => {
       validateInputs({
         ...modelInput,
         connections: [
-          makeConnection({
+          hs.makeConnection({
             source: firstNode,
             target: { ...secondNode, id: 'notANode' },
             resistanceDegKPerW: 10,
@@ -146,7 +130,7 @@ describe('validate inputs', () => {
       validateInputs({
         ...modelInput,
         connections: [
-          makeConnection({
+          hs.makeConnection({
             source: { ...firstNode, id: 'notANode' },
             target: secondNode,
             resistanceDegKPerW: 10,
@@ -162,7 +146,7 @@ describe('validate inputs', () => {
       validateInputs({
         ...modelInput,
         connections: [
-          makeConnection({
+          hs.makeConnection({
             source: firstNode,
             target: secondNode,
             resistanceDegKPerW: -1,
@@ -178,7 +162,7 @@ describe('validate inputs', () => {
       validateInputs({
         ...modelInput,
         connections: [
-          makeConnection({
+          hs.makeConnection({
             source: firstNode,
             target: firstNode,
             resistanceDegKPerW: 10,
@@ -192,25 +176,25 @@ describe('validate inputs', () => {
 
 describe('calculateTerm', () => {
   test('with expected units', () => {
-    expect(calculateTerm(10, 10)).toEqual(1 / 10 / 10);
+    expect(hs.calculateTerm(10, 10)).toEqual(1 / 10 / 10);
   });
 });
 
 describe('createAMatrix', () => {
   test('no nodes, no connections', () => {
-    const [aMatrix, aMatrix4] = createAMatrix([], []);
+    const [aMatrix, aMatrix4] = hs.createAMatrix([], []);
     expect(aMatrix).toEqual([[]]);
     expect(aMatrix4).toEqual([[]]);
   });
 
   test('single node, no connections', () => {
-    const [aMatrix, aMatrix4] = createAMatrix([firstNode], []);
+    const [aMatrix, aMatrix4] = hs.createAMatrix([firstNode], []);
     expect(aMatrix).toEqual([[0]]);
     expect(aMatrix4).toEqual([[0]]);
   });
 
   test('two nodes, no connections', () => {
-    const [aMatrix, aMatrix4] = createAMatrix([firstNode, secondNode], []);
+    const [aMatrix, aMatrix4] = hs.createAMatrix([firstNode, secondNode], []);
     expect(aMatrix).toEqual([
       [0, 0],
       [0, 0],
@@ -222,7 +206,7 @@ describe('createAMatrix', () => {
   });
 
   test('no nodes, one connection', () => {
-    const [aMatrix, aMatrix4] = createAMatrix([], [connFirstSecond]);
+    const [aMatrix, aMatrix4] = hs.createAMatrix([], [connFirstSecond]);
     expect(aMatrix).toEqual([[]]);
     expect(aMatrix4).toEqual([[]]);
   });
@@ -230,7 +214,7 @@ describe('createAMatrix', () => {
   test('two connected nodes', () => {
     const nodes = [firstNode, secondNode];
     const connections = [connFirstSecond];
-    const [aMatrix, aMatrix4] = createAMatrix(nodes, connections);
+    const [aMatrix, aMatrix4] = hs.createAMatrix(nodes, connections);
     expect(aMatrix).toEqual([
       [-0.000001, 0.000001],
       [5e-7, -5e-7],
@@ -244,7 +228,7 @@ describe('createAMatrix', () => {
   test('with uni connection', () => {
     const nodes = [firstNode, secondNode, thirdNode];
     const connections = [connFirstSecond, connSecondThird];
-    const [aMatrix, aMatrix4] = createAMatrix(nodes, connections);
+    const [aMatrix, aMatrix4] = hs.createAMatrix(nodes, connections);
     expect(aMatrix).toEqual([
       [-0.000001, 0.000001, 0],
       [0.0000005, -0.0000005, 0],
@@ -260,7 +244,7 @@ describe('createAMatrix', () => {
   test('with rad connection', () => {
     const nodes = [firstNode, secondNode, thirdNode];
     const connections = [connFirstSecond, connRadSecondThird];
-    const [aMatrix, aMatrix4] = createAMatrix(nodes, connections);
+    const [aMatrix, aMatrix4] = hs.createAMatrix(nodes, connections);
     expect(aMatrix).toEqual([
       [-0.000001, 0.000001, 0],
       [0.0000005, -0.0000005, 0],
@@ -276,112 +260,111 @@ describe('createAMatrix', () => {
 
 describe('createBVector', () => {
   test('empty input', () => {
-    expect(createBVector([])).toEqual([]);
+    expect(hs.createBVector([])).toEqual([]);
   });
 
   test('single node input', () => {
-    expect(createBVector([firstNode])).toEqual([0.008]);
+    expect(hs.createBVector([firstNode])).toEqual([0.008]);
   });
 
   test('two node input', () => {
-    expect(createBVector([firstNode, secondNode])).toEqual([0.008, 0]);
+    expect(hs.createBVector([firstNode, secondNode])).toEqual([0.008, 0]);
   });
 });
 
 describe('toKelvin', () => {
   test('empty input', () => {
-    expect(toKelvin([])).toEqual([]);
+    expect(hs.toKelvin([])).toEqual([]);
   });
 
   test('single entry input', () => {
-    expect(toKelvin([1])).toEqual([1 + KELVIN]);
+    expect(hs.toKelvin([1])).toEqual([1 + KELVIN]);
   });
 
   test('two entry input', () => {
-    expect(toKelvin([1, 2])).toEqual([1 + KELVIN, 2 + KELVIN]);
+    expect(hs.toKelvin([1, 2])).toEqual([1 + KELVIN, 2 + KELVIN]);
   });
 });
 
 describe('toCelcius', () => {
   test('empty input', () => {
-    expect(toCelcius([])).toEqual([]);
+    expect(hs.toCelcius([])).toEqual([]);
   });
 
   test('single entry input', () => {
-    expect(toCelcius([KELVIN])).toEqual([0]);
+    expect(hs.toCelcius([KELVIN])).toEqual([0]);
   });
 
   test('two entry input', () => {
-    expect(toCelcius([KELVIN + 1, KELVIN + 2])).toEqual([1, 2]);
+    expect(hs.toCelcius([KELVIN + 1, KELVIN + 2])).toEqual([1, 2]);
   });
 });
 
 describe('getNodeTempsDegK', () => {
   test('empty input', () => {
-    expect(getNodeTempsDegK([])).toEqual([]);
+    expect(hs.getNodeTempsDegK([])).toEqual([]);
   });
 
   test('single node input', () => {
-    expect(getNodeTempsDegK([firstNode])).toEqual([10 + KELVIN]);
+    expect(hs.getNodeTempsDegK([firstNode])).toEqual([10 + KELVIN]);
   });
 
   test('two node input', () => {
-    expect(getNodeTempsDegK([firstNode, secondNode])).toEqual([10 + KELVIN, 20 + KELVIN]);
+    expect(hs.getNodeTempsDegK([firstNode, secondNode])).toEqual([10 + KELVIN, 20 + KELVIN]);
   });
 });
 
 describe('tempsWithBoundary', () => {
   test('empty input', () => {
-    expect(tempsWithBoundary([], [], [])).toEqual([]);
+    expect(hs.tempsWithBoundary([], [], [])).toEqual([]);
   });
 
   test('non-boundary node inputs', () => {
-    expect(tempsWithBoundary([firstNode, secondNode], [1, 2], [3, 4])).toEqual([3, 4]);
+    expect(hs.tempsWithBoundary([firstNode, secondNode], [1, 2], [3, 4])).toEqual([3, 4]);
   });
 
   test('with boundary node input', () => {
-    expect(tempsWithBoundary([firstNode, secondNode, thirdNode], [1, 2, 3], [3, 4, 5])).toEqual([3, 4, 3]);
+    expect(hs.tempsWithBoundary([firstNode, secondNode, thirdNode], [1, 2, 3], [3, 4, 5])).toEqual([3, 4, 3]);
   });
 });
 
 describe('getHeatTransfer', () => {
   test('empty input', () => {
-    expect(getHeatTransfer([], [], [])).toEqual([]);
+    expect(hs.getHeatTransfer([], [], [])).toEqual([]);
   });
 
   test('simple input', () => {
-    expect(getHeatTransfer([1, 2], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
+    expect(hs.getHeatTransfer([1, 2], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
   });
 
   test('three node input without rad', () => {
-    expect(getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird])).toEqual([
-      -0.01,
-      -0.01,
-    ]);
+    expect(
+      hs.getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird]),
+    ).toEqual([-0.01, -0.01]);
   });
 
   test('three node input with rad', () => {
     expect(
-      getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
+      hs.getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
     ).toEqual([-0.01, -1.3]);
   });
 });
 
 describe('numTimeSteps', () => {
   test('totalTimeS < timeStepS', () => {
-    expect(numTimeSteps(100, 10)).toEqual(0);
+    expect(hs.numTimeSteps(100, 10)).toEqual(0);
   });
 
   test('same values', () => {
-    expect(numTimeSteps(10, 10)).toEqual(1);
+    expect(hs.numTimeSteps(10, 10)).toEqual(1);
   });
 
   test('double', () => {
-    expect(numTimeSteps(5, 10)).toEqual(2);
+    expect(hs.numTimeSteps(5, 10)).toEqual(2);
   });
 
   test('ceil', () => {
-    expect(numTimeSteps(4, 10)).toEqual(3);
+    expect(hs.numTimeSteps(4, 10)).toEqual(3);
   });
 });
 
@@ -398,7 +381,7 @@ describe('getNewTemps', () => {
       [3, -4],
     ];
     const B = [4, 5];
-    const newTemps = calculateNewTemps(timeStepS, temps, A, A4, B);
+    const newTemps = hs.calculateNewTemps(timeStepS, temps, A, A4, B);
     expect(newTemps.length).toEqual(2);
     expect(newTemps[0]).toBeCloseTo(4.8);
     expect(newTemps[1]).toBeCloseTo(-4.1);
@@ -419,7 +402,7 @@ describe('shapeOutput', () => {
       [10 + KELVIN, 20 + KELVIN],
     ];
     const outputHeatTransfer = [[30], [40]];
-    const output = shapeOutput(modelInput, timeSeriesS, outputTemps, outputHeatTransfer);
+    const output = hs.shapeOutput(modelInput, timeSeriesS, outputTemps, outputHeatTransfer);
     const expectedOutput: ModelOutput = {
       timeSeriesS,
       timeStepS: modelInput.timeStepS,
@@ -454,7 +437,7 @@ describe('run', () => {
       timeStepS: 0,
       totalTimeS: 0,
     };
-    const { errors, ...output } = run(input);
+    const { errors, ...output } = hs.run(input);
     expect(errors).not.toBeUndefined();
     expect(!!errors && errors.map((e) => e.name).sort()).toEqual([
       'TimeStepValidationError',
@@ -470,7 +453,7 @@ describe('run', () => {
       timeStepS: 0.1,
       totalTimeS: 0.1,
     };
-    const output = run(input);
+    const output = hs.run(input);
     expect(output.timeSeriesS).toEqual([0, 0.1]);
     expect(output.numTimeSteps).toEqual(2);
     expect(output.totalTimeS).toEqual(0.1);
@@ -492,7 +475,7 @@ describe('run', () => {
       timeStepS: 0.01,
       totalTimeS: 0.1,
     };
-    const output = run(input);
+    const output = hs.run(input);
     const expectedTemps = [
       [
         10.0,
