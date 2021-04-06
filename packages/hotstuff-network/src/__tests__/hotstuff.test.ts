@@ -261,50 +261,50 @@ describe('createAMatrix', () => {
 
 describe('createBVector', () => {
   test('empty input', () => {
-    expect(hs.createBVector([])).toEqual([[]]);
+    expect(hs.createBVector([])).toEqual([]);
   });
 
   test('single node input', () => {
-    expect(hs.createBVector([firstNode])).toEqual([[0.008]]);
+    expect(hs.createBVector([firstNode])).toEqual([0.008]);
   });
 
   test('two node input', () => {
-    expect(hs.createBVector([firstNode, secondNode])).toEqual([[0.008], [0]]);
+    expect(hs.createBVector([firstNode, secondNode])).toEqual([0.008, 0]);
   });
 });
 
-describe('getNodeTemps', () => {
+describe('getNodeTempsDegK', () => {
   test('empty input', () => {
-    expect(hs.getNodeTemps([])).toEqual([[]]);
+    expect(hs.getNodeTempsDegK([])).toEqual([]);
   });
 
   test('single node input', () => {
-    expect(hs.getNodeTemps([firstNode])).toEqual([[10 + KELVIN]]);
+    expect(hs.getNodeTempsDegK([firstNode])).toEqual([10 + KELVIN]);
   });
 
   test('two node input', () => {
-    expect(hs.getNodeTemps([firstNode, secondNode])).toEqual([[10 + KELVIN], [20 + KELVIN]]);
+    expect(hs.getNodeTempsDegK([firstNode, secondNode])).toEqual([10 + KELVIN, 20 + KELVIN]);
   });
 });
 
 describe('getHeatTransfer', () => {
   test('empty input', () => {
-    expect(hs.getHeatTransfer([[]], [], [])).toEqual([]);
+    expect(hs.getHeatTransfer([], [], [])).toEqual([]);
   });
 
   test('simple input', () => {
-    expect(hs.getHeatTransfer([[1], [2]], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
+    expect(hs.getHeatTransfer([1, 2], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
   });
 
   test('three node input without rad', () => {
     expect(
-      hs.getHeatTransfer([[1], [2], [3]], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird]),
+      hs.getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird]),
     ).toEqual([-0.01, -0.01]);
   });
 
   test('three node input with rad', () => {
     expect(
-      hs.getHeatTransfer([[1], [2], [3]], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
+      hs.getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
     ).toEqual([-0.01, -1.3]);
   });
 });
@@ -330,7 +330,7 @@ describe('numTimesteps', () => {
 describe('getNewTemps', () => {
   test('2 node system temps', () => {
     const timestepS = 0.1;
-    const temps = [[1], [2]];
+    const temps = [1, 2];
     const A = [
       [-1, 2],
       [3, -4],
@@ -339,12 +339,11 @@ describe('getNewTemps', () => {
       [-1, 2],
       [3, -4],
     ];
-    const B = [[4], [5]];
-    const newTemps = hs.getNewTemps(timestepS, temps, A, A4, B);
-    expect(matrixUtils.size(newTemps).width).toEqual(1);
-    expect(matrixUtils.size(newTemps).height).toEqual(2);
-    expect(newTemps[0][0]).toBeCloseTo(4.8);
-    expect(newTemps[1][0]).toBeCloseTo(-4.1);
+    const B = [4, 5];
+    const newTemps = hs.calculateNewTemps(timestepS, temps, A, A4, B);
+    expect(newTemps.length).toEqual(2);
+    expect(newTemps[0]).toBeCloseTo(4.8);
+    expect(newTemps[1]).toBeCloseTo(-4.1);
   });
 });
 
@@ -358,8 +357,8 @@ describe('shapeOutput', () => {
     };
     const timeSeriesS = [0, 0.1];
     const outputTemps = [
-      [[firstNode.temperatureDegC + KELVIN], [secondNode.temperatureDegC + KELVIN]],
-      [[10 + KELVIN], [20 + KELVIN]],
+      [firstNode.temperatureDegC + KELVIN, secondNode.temperatureDegC + KELVIN],
+      [10 + KELVIN, 20 + KELVIN],
     ];
     const outputHeatTransfer = [[30], [40]];
     const output = hs.shapeOutput(modelInput, timeSeriesS, outputTemps, outputHeatTransfer);

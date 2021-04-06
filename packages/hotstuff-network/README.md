@@ -8,7 +8,7 @@ This is the thermal simulation code that powers [hotstuff.network](https://hotst
 - [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timestep
 - [] information about instability
 - [] clarify runTimeS naming
-
+- [] return errors instead of throwing
 
 ### Installation
 ```sh

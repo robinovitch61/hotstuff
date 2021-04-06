@@ -151,9 +151,8 @@ export function createAMatrix(nodes: Node[], connections: Connection[]) {
   return [vals, vals4];
 }
 
-export function createBVector(nodes: Node[]): number[][] {
-  const flatB = nodes.map((node) => node.powerGenW / node.capacitanceJPerDegK);
-  return matrixUtils.makeVertical(flatB);
+export function createBVector(nodes: Node[]): number[] {
+  return nodes.map((node) => node.powerGenW / node.capacitanceJPerDegK);
 }
 
 // TODO: TEST
@@ -166,30 +165,29 @@ export function toCelcius(temps: number[]): number[] {
   return matrixUtils.addScalar(temps, -KELVIN) as number[];
 }
 
-export function getNodeTemps(nodes: Node[]): number[][] {
-  const flatTemps = nodes.map((node) => node.temperatureDegC);
-  return matrixUtils.makeVertical(toKelvin(flatTemps));
+export function getNodeTempsDegK(nodes: Node[]): number[] {
+  return toKelvin(nodes.map((node) => node.temperatureDegC));
 }
 
 // TODO: TEST
-export function tempsWithBoundary(nodes: Node[], recentTemps: number[][], newTemps: number[][]) {
-  const temps = [...newTemps];
-  nodes.map((node, idx) => {
-    if (node.isBoundary) {
-      temps[idx] = recentTemps[idx];
+export function tempsWithBoundary(nodes: Node[], recentTemps: number[], newTemps: number[]) {
+  return newTemps.map((temp, idx) => {
+    if (nodes[idx].isBoundary) {
+      return recentTemps[idx];
+    } else {
+      return temp;
     }
   });
-  return temps;
 }
 
-export function getHeatTransfer(temps: number[][], nodes: Node[], connections: Connection[]): number[] {
-  const flatTemps = matrixUtils.flatten(temps);
+export function getHeatTransfer(temps: number[], nodes: Node[], connections: Connection[]): number[] {
+  // const flatTemps = matrixUtils.flatten(temps);
   const nodeIds = nodes.map((n) => n.id);
   return connections.map((conn) => {
     const sourceIdx = nodeIds.indexOf(conn.source.id);
     const targetIdx = nodeIds.indexOf(conn.target.id);
-    const sourceTemp = flatTemps[sourceIdx];
-    const targetTemp = flatTemps[targetIdx];
+    const sourceTemp = temps[sourceIdx];
+    const targetTemp = temps[targetIdx];
 
     if (conn.kind === 'rad') {
       return (Math.pow(sourceTemp, 4) - Math.pow(targetTemp, 4)) / conn.resistanceDegKPerW;
@@ -206,29 +204,29 @@ export function numTimesteps(timestepS: number, runTimeS: number) {
   return Math.ceil(runTimeS / timestepS);
 }
 
-export function getNewTemps(
+export function calculateNewTemps(
   timestepS: number,
-  temps: number[][],
+  temps: number[],
   A: number[][],
   A4: number[][],
-  B: number[][],
-): number[][] {
+  B: number[],
+): number[] {
   const temps4 = matrixUtils.pow(temps, 4);
   const aMult = matrixUtils.mult(A, temps);
   const a4Mult = matrixUtils.mult(A4, temps4);
   const sum = matrixUtils.add(aMult, matrixUtils.add(a4Mult, B));
   const deltaT = matrixUtils.multScalar(sum, timestepS);
   const result = matrixUtils.add(temps, deltaT);
-  return result as number[][];
+  return result;
 }
 
 export function shapeOutput(
   data: ModelInput,
   timeSeriesS: number[],
-  outputTemps: number[][][],
+  outputTemps: number[][],
   outputHeatTransfer: number[][],
 ): ModelOutput {
-  const flatTemps = outputTemps.map((temp) => toCelcius(matrixUtils.flatten(temp)));
+  const flatTemps = outputTemps.map((temp) => toCelcius(temp));
 
   const temps = data.nodes.map((node, idx) => {
     return {
@@ -258,7 +256,7 @@ export function run(data: ModelInput): ModelOutput {
   validateInputs(data);
   const [A, A4] = createAMatrix(data.nodes, data.connections);
   const B = createBVector(data.nodes);
-  const initialTemps = getNodeTemps(data.nodes);
+  const initialTemps = getNodeTempsDegK(data.nodes);
   const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
   const numSteps = numTimesteps(data.timestepS, data.runTimeS);
   const outputTemps = [initialTemps];
@@ -271,7 +269,7 @@ export function run(data: ModelInput): ModelOutput {
 
   timeStepRange.forEach((step) => {
     const mostRecentTemps = outputTemps[step];
-    const newTemps = getNewTemps(data.timestepS, mostRecentTemps, A, A4, B);
+    const newTemps = calculateNewTemps(data.timestepS, mostRecentTemps, A, A4, B);
     const adjustedTemps = tempsWithBoundary(data.nodes, mostRecentTemps, newTemps);
     const newHeatTransfer = getHeatTransfer(adjustedTemps, data.nodes, data.connections);
     outputTemps.push(adjustedTemps);
