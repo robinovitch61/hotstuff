@@ -1,6 +1,6 @@
 {
   "name": "hotstuff-network",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "State space thermal network simulation tool",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
