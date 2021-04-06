@@ -10,7 +10,7 @@ npm i hotstuff-network
 ```typescript
 import { run, makeNode, makeConnection } from "hotstuff-network";
 
-const firstNode = hs.makeNode({
+const firstNode = makeNode({
   name: "first",
   temperatureDegC: 10,
   capacitanceJPerDegK: 10000,
@@ -18,7 +18,7 @@ const firstNode = hs.makeNode({
   isBoundary: false,
 });
 
-const secondNode = hs.makeNode({
+const secondNode = makeNode({
   name: "second",
   temperatureDegC: 40,
   capacitanceJPerDegK: 40000,
@@ -26,14 +26,14 @@ const secondNode = hs.makeNode({
   isBoundary: true,
 });
 
-const connection = hs.makeConnection({
+const connection = makeConnection({
   source: firstNode,
   target: secondNode,
   resistanceDegKPerW: 100,
   kind: "bi",
 });
 
-const results = hs.run({
+const results = run({
   nodes: [firstNode, secondNode],
   connections: [connection],
   timeStepS: 0.01,
