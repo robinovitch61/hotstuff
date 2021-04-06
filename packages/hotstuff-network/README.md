@@ -1,13 +1,6 @@
 ## hotstuff-network
 This is the thermal simulation code that powers [hotstuff.network](https://hotstuff.network) [currently WIP].
 
-### TODO:
-- [] makeConnection function, add ID to connections
-- [] variable power inputs
-- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
-- [] information about instability
-- [] deal with encapsulation - how to expose only the relevant stuff?
-
 ### Installation
 ```sh
 npm i hotstuff-network
@@ -33,12 +26,12 @@ const secondNode = hs.makeNode({
   isBoundary: true,
 });
 
-const connection: hs.Connection = {
+const connection = hs.makeConnection({
   source: firstNode,
   target: secondNode,
   resistanceDegKPerW: 100,
   kind: "bi",
-};
+});
 
 const results = hs.run({
   nodes: [firstNode, secondNode],
@@ -47,7 +40,7 @@ const results = hs.run({
   totalTimeS: 0.03,
 });
 
-console.log(results); // output below:
+console.log(JSON.stringify(results, null, 2)); // output below:
 /*
 {
   "timeSeriesS": [
@@ -96,6 +89,7 @@ console.log(results); // output below:
   "heatTransfer": [
     {
       "connection": {
+        "id": "KN584CP5B36E3",
         "source": {
           "id": "KN584CP5B36LK",
           "name": "first",
@@ -126,3 +120,10 @@ console.log(results); // output below:
 }
  */
 ```
+
+### TODO
+- [] variable power inputs
+- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
+- [] information about instability
+- [] deal with encapsulation - how to expose only the relevant stuff?
+
