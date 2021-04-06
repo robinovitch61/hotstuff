@@ -1,4 +1,14 @@
 import { matrixUtils } from './matrixUtils';
+import {
+  CircularConnectionError,
+  NodeIdValidationError,
+  NodeNotFoundError,
+  TotalTimeValidationError,
+  TemperatureValidationError,
+  ThermalCapacitanceValidationError,
+  ThermalResistanceValidationError,
+  TimeStepValidationError,
+} from './errors';
 
 export const KELVIN = 273.15;
 
@@ -14,18 +24,22 @@ type Node = NodeParams & {
   id: string;
 };
 
-export type Connection = {
+export type ConnectionParams = {
   source: Node;
   target: Node;
   resistanceDegKPerW: number;
   kind: 'bi' | 'uni' | 'rad';
 };
 
+type Connection = ConnectionParams & {
+  id: string;
+};
+
 export type ModelInput = {
   nodes: Node[];
   connections: Connection[];
-  timestepS: number;
-  runTimeS: number;
+  timeStepS: number;
+  totalTimeS: number;
 };
 
 export type TempOutput = {
@@ -40,15 +54,14 @@ type HeatTransferOutput = {
 
 export type ModelOutput = {
   timeSeriesS: number[];
-  timestepS: number;
-  runTimeS: number;
-  numTimesteps: number;
+  timeStepS: number;
+  totalTimeS: number;
+  numTimeSteps: number;
   temps: TempOutput[];
   heatTransfer: HeatTransferOutput[];
-  errors?: [];
+  errors?: Error[];
 };
 
-// TODO: TEST
 export function makeId(): string {
   return (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
 }
@@ -64,6 +77,16 @@ export function makeNode({ name, temperatureDegC, capacitanceJPerDegK, powerGenW
   };
 }
 
+export function makeConnection({ source, target, resistanceDegKPerW, kind }: ConnectionParams): Connection {
+  return {
+    id: makeId(),
+    source,
+    target,
+    resistanceDegKPerW,
+    kind,
+  };
+}
+
 export function toKey(sourceId: string, targetId: string) {
   return `${sourceId}-${targetId}`;
 }
@@ -72,46 +95,54 @@ export function fromKey(key: string) {
   return key.split('-');
 }
 
-export function validateInputs(data: ModelInput) {
-  if (data.timestepS <= 0) {
-    throw Error('timestepS must be greater than 0');
+export function validateInputs(data: ModelInput): Error[] {
+  const errors = [];
+
+  if (data.timeStepS <= 0) {
+    errors.push(new TimeStepValidationError('TimeStep must be greater than 0 seconds'));
   }
 
-  if (data.runTimeS <= 0 || data.runTimeS < data.timestepS) {
-    throw Error('Runtime must be greater than 0 and greater than timestepS');
+  if (data.totalTimeS <= 0 || data.totalTimeS < data.timeStepS) {
+    errors.push(new TotalTimeValidationError('Total time must be greater than 0 and greater than timeStep'));
   }
 
   const uniqueIds = new Set(data.nodes.map((n) => n.id));
   if (uniqueIds.size !== data.nodes.length) {
-    throw Error('Not all node ids are unique');
+    errors.push(new NodeIdValidationError('Not all node ids are unique'));
   }
 
   Array.from(data.connections).forEach((conn) => {
     if (!uniqueIds.has(conn.source.id)) {
-      throw Error(`Id ${conn.source.id} does not correspond to a node`);
+      errors.push(new NodeNotFoundError(`Id ${conn.source.id} does not correspond to a node`));
     }
     if (!uniqueIds.has(conn.target.id)) {
-      throw Error(`Id ${conn.target.id} does not correspond to a node`);
+      errors.push(new NodeNotFoundError(`Id ${conn.target.id} does not correspond to a node`));
     }
   });
 
   data.nodes.forEach((node) => {
-    if (node.temperatureDegC < 0) {
-      throw Error(`Impossible temperatureDegC of ${node.temperatureDegC}`);
+    if (node.temperatureDegC < -KELVIN) {
+      errors.push(new TemperatureValidationError(`Impossible temperature of ${node.temperatureDegC} degC`));
     }
     if (node.capacitanceJPerDegK < 0) {
-      throw Error(`Impossible thermal capacitanceJPerDegK of ${node.capacitanceJPerDegK}`);
+      errors.push(
+        new ThermalCapacitanceValidationError(`Impossible thermal capacitance of ${node.capacitanceJPerDegK} J/degK`),
+      );
     }
   });
 
   data.connections.forEach((conn) => {
     if (conn.resistanceDegKPerW < 0) {
-      throw Error(`Impossible thermal resistanceDegKPerW of ${conn.resistanceDegKPerW}`);
+      errors.push(
+        new ThermalResistanceValidationError(`Impossible thermal resistance of ${conn.resistanceDegKPerW} degK/W`),
+      );
     }
     if (conn.source.id === conn.target.id) {
-      throw Error('Connection source and target are the same');
+      errors.push(new CircularConnectionError('Connection source and target are the same'));
     }
   });
+
+  return errors;
 }
 
 export function calculateTerm(capacitanceJPerDegK: number, resistanceDegKPerW: number): number {
@@ -195,15 +226,15 @@ export function getHeatTransfer(temps: number[], nodes: Node[], connections: Con
   });
 }
 
-export function numTimesteps(timestepS: number, runTimeS: number) {
-  if (timestepS > runTimeS) {
+export function numTimeSteps(timeStepS: number, totalTimeS: number) {
+  if (timeStepS > totalTimeS) {
     return 0;
   }
-  return Math.ceil(runTimeS / timestepS);
+  return Math.ceil(totalTimeS / timeStepS);
 }
 
 export function calculateNewTemps(
-  timestepS: number,
+  timeStepS: number,
   temps: number[],
   A: number[][],
   A4: number[][],
@@ -213,7 +244,7 @@ export function calculateNewTemps(
   const aMult = matrixUtils.mult(A, temps);
   const a4Mult = matrixUtils.mult(A4, temps4);
   const sum = matrixUtils.add(aMult, matrixUtils.add(a4Mult, B));
-  const deltaT = matrixUtils.multScalar(sum, timestepS);
+  const deltaT = matrixUtils.multScalar(sum, timeStepS);
   const result = matrixUtils.add(temps, deltaT);
   return result;
 }
@@ -242,32 +273,44 @@ export function shapeOutput(
 
   return {
     timeSeriesS,
-    timestepS: timeSeriesS[1],
-    runTimeS: timeSeriesS[timeSeriesS.length - 1],
-    numTimesteps: timeSeriesS.length,
+    timeStepS: timeSeriesS[1],
+    totalTimeS: timeSeriesS[timeSeriesS.length - 1],
+    numTimeSteps: timeSeriesS.length,
     temps,
     heatTransfer,
   };
 }
 
+export const emptyOutput = {
+  timeSeriesS: [],
+  timeStepS: 0,
+  totalTimeS: 0,
+  numTimeSteps: 0,
+  temps: [],
+  heatTransfer: [],
+};
+
 export function run(data: ModelInput): ModelOutput {
-  validateInputs(data);
+  const errors = validateInputs(data);
+  if (errors.length > 0) {
+    return { ...emptyOutput, errors };
+  }
   const [A, A4] = createAMatrix(data.nodes, data.connections);
   const B = createBVector(data.nodes);
   const initialTemps = getNodeTempsDegK(data.nodes);
   const initialHeatTransfer = getHeatTransfer(initialTemps, data.nodes, data.connections);
-  const numSteps = numTimesteps(data.timestepS, data.runTimeS);
+  const numSteps = numTimeSteps(data.timeStepS, data.totalTimeS);
   const outputTemps = [initialTemps];
   const outputHeatTransfer = [initialHeatTransfer];
   const timeStepRange = Array.from(Array(numSteps).keys());
-  const timeSeriesS = timeStepRange.map((t) => t * data.timestepS);
+  const timeSeriesS = timeStepRange.map((t) => t * data.timeStepS);
 
   // account for time 0 being input vals
-  timeSeriesS.push(timeSeriesS[timeSeriesS.length - 1] + data.timestepS);
+  timeSeriesS.push(timeSeriesS[timeSeriesS.length - 1] + data.timeStepS);
 
   timeStepRange.forEach((step) => {
     const mostRecentTemps = outputTemps[step];
-    const newTemps = calculateNewTemps(data.timestepS, mostRecentTemps, A, A4, B);
+    const newTemps = calculateNewTemps(data.timeStepS, mostRecentTemps, A, A4, B);
     const adjustedTemps = tempsWithBoundary(data.nodes, mostRecentTemps, newTemps);
     const newHeatTransfer = getHeatTransfer(adjustedTemps, data.nodes, data.connections);
     outputTemps.push(adjustedTemps);

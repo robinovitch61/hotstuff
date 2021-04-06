@@ -1,5 +1,5 @@
 import * as hs from '../hotstuff';
-import { Connection, KELVIN, ModelInput, ModelOutput, validateInputs } from '../hotstuff';
+import { emptyOutput, KELVIN, ModelInput, ModelOutput, validateInputs } from '../hotstuff';
 
 const firstNode = hs.makeNode({
   name: 'test',
@@ -25,39 +25,39 @@ const thirdNode = hs.makeNode({
   isBoundary: true,
 });
 
-const connFirstSecond: Connection = {
+const connFirstSecond = hs.makeConnection({
   source: firstNode,
   target: secondNode,
   resistanceDegKPerW: 100,
   kind: 'bi',
-};
+});
 
-const connSecondThird: Connection = {
+const connSecondThird = hs.makeConnection({
   source: secondNode,
   target: thirdNode,
   resistanceDegKPerW: 100,
   kind: 'uni',
-};
+});
 
-const connRadSecondThird: Connection = {
+const connRadSecondThird = hs.makeConnection({
   source: secondNode,
   target: thirdNode,
   resistanceDegKPerW: 50,
   kind: 'rad',
-};
+});
 
-const connFirstThird: Connection = {
+const connFirstThird = hs.makeConnection({
   source: firstNode,
   target: thirdNode,
   resistanceDegKPerW: 75,
   kind: 'uni',
-};
+});
 
 const modelInput: ModelInput = {
   nodes: [firstNode, secondNode],
   connections: [connFirstSecond],
-  timestepS: 0.1,
-  runTimeS: 10,
+  timeStepS: 0.1,
+  totalTimeS: 10,
 };
 
 describe('key serdes', () => {
@@ -78,99 +78,99 @@ describe('validate inputs', () => {
     expect(() => validateInputs(modelInput)).not.toThrow();
   });
 
-  test('timestepS is valid', () => {
-    expect(() => validateInputs({ ...modelInput, timestepS: 0 })).toThrow();
-    expect(() => validateInputs({ ...modelInput, timestepS: -1 })).toThrow();
+  test('timeStepS is valid', () => {
+    expect(validateInputs({ ...modelInput, timeStepS: 0 }).length).toBeGreaterThan(0);
+    expect(validateInputs({ ...modelInput, timeStepS: -1 }).length).toBeGreaterThan(0);
   });
 
-  test('runTimeS is valid', () => {
-    expect(() => validateInputs({ ...modelInput, runTimeS: 0 })).toThrow();
-    expect(() => validateInputs({ ...modelInput, runTimeS: -1 })).toThrow();
-    expect(() =>
+  test('totalTimeS is valid', () => {
+    expect(validateInputs({ ...modelInput, totalTimeS: 0 }).length).toBeGreaterThan(0);
+    expect(validateInputs({ ...modelInput, totalTimeS: -1 }).length).toBeGreaterThan(0);
+    expect(
       validateInputs({
         ...modelInput,
-        timestepS: 1,
-        runTimeS: 0.5,
-      }),
-    ).toThrow();
+        timeStepS: 1,
+        totalTimeS: 0.5,
+      }).length,
+    ).toBeGreaterThan(0);
   });
 
   test('nodes have unique ids', () => {
-    expect(() => validateInputs({ ...modelInput, nodes: [firstNode, firstNode] })).toThrow();
+    expect(validateInputs({ ...modelInput, nodes: [firstNode, firstNode] }).length).toBeGreaterThan(0);
   });
 
   test('temperatureDegC is valid', () => {
-    expect(() =>
-      validateInputs({ ...modelInput, nodes: [firstNode, { ...secondNode, temperatureDegC: -1 }] }),
-    ).toThrow();
+    expect(
+      validateInputs({ ...modelInput, nodes: [firstNode, { ...secondNode, temperatureDegC: -KELVIN - 1 }] }).length,
+    ).toBeGreaterThan(0);
   });
 
   test('capacitanceJPerDegK is valid', () => {
-    expect(() =>
-      validateInputs({ ...modelInput, nodes: [firstNode, { ...secondNode, capacitanceJPerDegK: -1 }] }),
-    ).toThrow();
+    expect(
+      validateInputs({ ...modelInput, nodes: [firstNode, { ...secondNode, capacitanceJPerDegK: -1 }] }).length,
+    ).toBeGreaterThan(0);
   });
 
   test('connections correspond to real node ids', () => {
-    expect(() =>
+    expect(
       validateInputs({
         ...modelInput,
         connections: [
-          {
+          hs.makeConnection({
             source: firstNode,
             target: { ...secondNode, id: 'notANode' },
             resistanceDegKPerW: 10,
             kind: 'bi',
-          },
+          }),
         ],
-      }),
-    ).toThrow();
+      }).length,
+    ).toBeGreaterThan(0);
 
-    expect(() =>
+    expect(
       validateInputs({
         ...modelInput,
         connections: [
-          {
+          hs.makeConnection({
             source: { ...firstNode, id: 'notANode' },
             target: secondNode,
             resistanceDegKPerW: 10,
             kind: 'bi',
-          },
+          }),
         ],
-      }),
-    ).toThrow();
+      }).length,
+    ).toBeGreaterThan(0);
   });
 
   test('connections have valid resistances', () => {
-    expect(() =>
+    expect(
       validateInputs({
         ...modelInput,
         connections: [
-          {
+          hs.makeConnection({
             source: firstNode,
             target: secondNode,
             resistanceDegKPerW: -1,
             kind: 'bi',
-          },
+          }),
         ],
-      }),
-    ).toThrow();
+      }).length,
+    ).toBeGreaterThan(0);
   });
 
   test("connections don't point to themselves", () => {
-    expect(() =>
+    expect(
       validateInputs({
         ...modelInput,
         connections: [
-          {
+          hs.makeConnection({
             source: firstNode,
             target: firstNode,
             resistanceDegKPerW: 10,
             kind: 'bi',
-          },
+          }),
         ],
-      }),
-    ).toThrow();
+      }).length,
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -350,27 +350,27 @@ describe('getHeatTransfer', () => {
   });
 });
 
-describe('numTimesteps', () => {
-  test('runTimeS < timestepS', () => {
-    expect(hs.numTimesteps(100, 10)).toEqual(0);
+describe('numTimeSteps', () => {
+  test('totalTimeS < timeStepS', () => {
+    expect(hs.numTimeSteps(100, 10)).toEqual(0);
   });
 
   test('same values', () => {
-    expect(hs.numTimesteps(10, 10)).toEqual(1);
+    expect(hs.numTimeSteps(10, 10)).toEqual(1);
   });
 
   test('double', () => {
-    expect(hs.numTimesteps(5, 10)).toEqual(2);
+    expect(hs.numTimeSteps(5, 10)).toEqual(2);
   });
 
   test('ceil', () => {
-    expect(hs.numTimesteps(4, 10)).toEqual(3);
+    expect(hs.numTimeSteps(4, 10)).toEqual(3);
   });
 });
 
 describe('getNewTemps', () => {
   test('2 node system temps', () => {
-    const timestepS = 0.1;
+    const timeStepS = 0.1;
     const temps = [1, 2];
     const A = [
       [-1, 2],
@@ -381,7 +381,7 @@ describe('getNewTemps', () => {
       [3, -4],
     ];
     const B = [4, 5];
-    const newTemps = hs.calculateNewTemps(timestepS, temps, A, A4, B);
+    const newTemps = hs.calculateNewTemps(timeStepS, temps, A, A4, B);
     expect(newTemps.length).toEqual(2);
     expect(newTemps[0]).toBeCloseTo(4.8);
     expect(newTemps[1]).toBeCloseTo(-4.1);
@@ -393,8 +393,8 @@ describe('shapeOutput', () => {
     const modelInput: ModelInput = {
       nodes: [firstNode, secondNode],
       connections: [connFirstSecond],
-      timestepS: 0.1,
-      runTimeS: 0.1,
+      timeStepS: 0.1,
+      totalTimeS: 0.1,
     };
     const timeSeriesS = [0, 0.1];
     const outputTemps = [
@@ -405,9 +405,9 @@ describe('shapeOutput', () => {
     const output = hs.shapeOutput(modelInput, timeSeriesS, outputTemps, outputHeatTransfer);
     const expectedOutput: ModelOutput = {
       timeSeriesS,
-      timestepS: modelInput.timestepS,
-      runTimeS: 0.1,
-      numTimesteps: 2,
+      timeStepS: modelInput.timeStepS,
+      totalTimeS: 0.1,
+      numTimeSteps: 2,
       temps: [
         {
           node: firstNode,
@@ -434,29 +434,26 @@ describe('run', () => {
     const input = {
       nodes: [],
       connections: [],
-      timestepS: 0,
-      runTimeS: 0,
+      timeStepS: 0,
+      totalTimeS: 0,
     };
-    const output = hs.run(input);
-    const expected: ModelOutput = {
-      timeSeriesS: [],
-      timestepS: 0,
-      runTimeS: 0,
-      numTimesteps: 0,
-      temps: [],
-      heatTransfer: [],
-    };
-    expect(output).toEqual(expected);
+    const { errors, ...output } = hs.run(input);
+    expect(errors).not.toBeUndefined();
+    expect(!!errors && errors.map((e) => e.name).sort()).toEqual([
+      'TimeStepValidationError',
+      'TotalTimeValidationError',
+    ]);
+    expect(output).toEqual(emptyOutput);
   });
 
-  test('real inputs, 10 timesteps', () => {
+  test('real inputs, 10 timeSteps', () => {
     const nodes = [firstNode, secondNode, thirdNode];
     const connections = [connFirstSecond, connRadSecondThird, connFirstThird];
     const input: ModelInput = {
       nodes,
       connections,
-      timestepS: 0.01,
-      runTimeS: 0.1,
+      timeStepS: 0.01,
+      totalTimeS: 0.1,
     };
     const output = hs.run(input);
     const expectedTemps = [

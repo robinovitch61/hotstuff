@@ -2,13 +2,11 @@
 This is the thermal simulation code that powers [hotstuff.network](https://hotstuff.network) [currently WIP].
 
 ### TODO:
-- [] address TODOs in Code
 - [] makeConnection function, add ID to connections
 - [] variable power inputs
-- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timestep
+- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
 - [] information about instability
-- [] clarify runTimeS naming
-- [] return errors instead of throwing
+- [] deal with encapsulation - how to expose only the relevant stuff?
 
 ### Installation
 ```sh
@@ -45,8 +43,8 @@ const connection: hs.Connection = {
 const results = hs.run({
   nodes: [firstNode, secondNode],
   connections: [connection],
-  timestepS: 0.01,
-  runTimeS: 0.03,
+  timeStepS: 0.01,
+  totalTimeS: 0.03,
 });
 
 console.log(results); // output below:
@@ -58,9 +56,9 @@ console.log(results); // output below:
     0.02,
     0.03
   ],
-  "timestepS": 0.01,
-  "runTimeS": 0.03,
-  "numTimesteps": 4,
+  "timeStepS": 0.01,
+  "totalTimeS": 0.03,
+  "numTimeSteps": 4,
   "temps": [
     {
       "node": {
