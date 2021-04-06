@@ -45,8 +45,10 @@ export type ModelOutput = {
   numTimesteps: number;
   temps: TempOutput[];
   heatTransfer: HeatTransferOutput[];
+  errors?: [];
 };
 
+// TODO: TEST
 export function makeId(): string {
   return (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
 }
@@ -112,7 +114,6 @@ export function validateInputs(data: ModelInput) {
   });
 }
 
-// TODO: Rename?
 export function calculateTerm(capacitanceJPerDegK: number, resistanceDegKPerW: number): number {
   return 1 / capacitanceJPerDegK / resistanceDegKPerW;
 }
@@ -155,12 +156,10 @@ export function createBVector(nodes: Node[]): number[] {
   return nodes.map((node) => node.powerGenW / node.capacitanceJPerDegK);
 }
 
-// TODO: TEST
 export function toKelvin(temps: number[]): number[] {
   return matrixUtils.addScalar(temps, KELVIN) as number[];
 }
 
-// TODO: TEST
 export function toCelcius(temps: number[]): number[] {
   return matrixUtils.addScalar(temps, -KELVIN) as number[];
 }
@@ -169,8 +168,7 @@ export function getNodeTempsDegK(nodes: Node[]): number[] {
   return toKelvin(nodes.map((node) => node.temperatureDegC));
 }
 
-// TODO: TEST
-export function tempsWithBoundary(nodes: Node[], recentTemps: number[], newTemps: number[]) {
+export function tempsWithBoundary(nodes: Node[], recentTemps: number[], newTemps: number[]): number[] {
   return newTemps.map((temp, idx) => {
     if (nodes[idx].isBoundary) {
       return recentTemps[idx];

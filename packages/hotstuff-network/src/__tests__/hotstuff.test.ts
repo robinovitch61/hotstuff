@@ -1,6 +1,5 @@
 import * as hs from '../hotstuff';
-import { Connection, KELVIN, makeId, ModelInput, ModelOutput, validateInputs } from '../hotstuff';
-import { matrixUtils } from '../matrixUtils';
+import { Connection, KELVIN, ModelInput, ModelOutput, validateInputs } from '../hotstuff';
 
 const firstNode = hs.makeNode({
   name: 'test',
@@ -273,6 +272,34 @@ describe('createBVector', () => {
   });
 });
 
+describe('toKelvin', () => {
+  test('empty input', () => {
+    expect(hs.toKelvin([])).toEqual([]);
+  });
+
+  test('single entry input', () => {
+    expect(hs.toKelvin([1])).toEqual([1 + KELVIN]);
+  });
+
+  test('two entry input', () => {
+    expect(hs.toKelvin([1, 2])).toEqual([1 + KELVIN, 2 + KELVIN]);
+  });
+});
+
+describe('toCelcius', () => {
+  test('empty input', () => {
+    expect(hs.toCelcius([])).toEqual([]);
+  });
+
+  test('single entry input', () => {
+    expect(hs.toCelcius([KELVIN])).toEqual([0]);
+  });
+
+  test('two entry input', () => {
+    expect(hs.toCelcius([KELVIN + 1, KELVIN + 2])).toEqual([1, 2]);
+  });
+});
+
 describe('getNodeTempsDegK', () => {
   test('empty input', () => {
     expect(hs.getNodeTempsDegK([])).toEqual([]);
@@ -284,6 +311,20 @@ describe('getNodeTempsDegK', () => {
 
   test('two node input', () => {
     expect(hs.getNodeTempsDegK([firstNode, secondNode])).toEqual([10 + KELVIN, 20 + KELVIN]);
+  });
+});
+
+describe('tempsWithBoundary', () => {
+  test('empty input', () => {
+    expect(hs.tempsWithBoundary([], [], [])).toEqual([]);
+  });
+
+  test('non-boundary node inputs', () => {
+    expect(hs.tempsWithBoundary([firstNode, secondNode], [1, 2], [3, 4])).toEqual([3, 4]);
+  });
+
+  test('with boundary node input', () => {
+    expect(hs.tempsWithBoundary([firstNode, secondNode, thirdNode], [1, 2, 3], [3, 4, 5])).toEqual([3, 4, 3]);
   });
 });
 
@@ -389,96 +430,117 @@ describe('shapeOutput', () => {
 });
 
 describe('run', () => {
-  const nodes = [firstNode, secondNode, thirdNode];
-  const connections = [connFirstSecond, connRadSecondThird, connFirstThird];
-  const input: ModelInput = {
-    nodes,
-    connections,
-    timestepS: 0.01,
-    runTimeS: 0.1,
-  };
-  const output = hs.run(input);
-  const expectedTemps = [
-    [
-      10.0,
-      10.000080099999991,
-      10.000160423117393,
-      10.00024071752108,
-      10.000321018777754,
-      10.000401318486126,
-      10.000481618547894,
-      10.000561918528035,
-      10.000642218525854,
-      10.000722518518671,
-      10.000802818511602,
-    ],
-    [
-      20.0,
-      42.3118211547,
-      39.44052646748196,
-      40.125908403220535,
-      39.971157107097724,
-      40.006580831277574,
-      39.99849695336371,
-      40.000343036625736,
-      39.999921521640374,
-      40.000017769415194,
-      39.99999579260151,
-    ],
-    [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0],
-  ];
-
-  output.temps.map((temps, nodeIdx) => {
-    temps.tempDegC.map((temp, tempIdx) => {
-      expect(temp).toBeCloseTo(expectedTemps[nodeIdx][tempIdx]);
-    });
+  test('empty input', () => {
+    const input = {
+      nodes: [],
+      connections: [],
+      timestepS: 0,
+      runTimeS: 0,
+    };
+    const output = hs.run(input);
+    const expected: ModelOutput = {
+      timeSeriesS: [],
+      timestepS: 0,
+      runTimeS: 0,
+      numTimesteps: 0,
+      temps: [],
+      heatTransfer: [],
+    };
+    expect(output).toEqual(expected);
   });
 
-  const expectedHeatTransfers = [
-    [
-      -0.1,
-      -0.32311741054700005,
-      -0.2944036604436457,
-      -0.30125667685699453,
-      -0.2997083608831997,
-      -0.3000617951279145,
-      -0.2999801533481582,
-      -0.299997811180977,
-      -0.2999927930311452,
-      -0.29999295250896524,
-      -0.29999192974089905,
-    ],
-    [
-      -44623642.409399986,
-      5742589.051318664,
-      -1370764.1658807755,
-      309502.290988884,
-      -70847.74806800843,
-      16167.455765914918,
-      -3692.4665042114257,
-      842.7299729156495,
-      -192.79554244995117,
-      43.65363441467285,
-      -10.336199264526368,
-    ],
-    [
-      -0.4,
-      -0.39999893200000014,
-      -0.39999786102510143,
-      -0.39999679043305225,
-      -0.39999571974962994,
-      -0.3999946490868517,
-      -0.3999935784193614,
-      -0.3999925077529595,
-      -0.39999143708632195,
-      -0.39999036641975105,
-      -0.39998929575317865,
-    ],
-  ];
+  test('real inputs, 10 timesteps', () => {
+    const nodes = [firstNode, secondNode, thirdNode];
+    const connections = [connFirstSecond, connRadSecondThird, connFirstThird];
+    const input: ModelInput = {
+      nodes,
+      connections,
+      timestepS: 0.01,
+      runTimeS: 0.1,
+    };
+    const output = hs.run(input);
+    const expectedTemps = [
+      [
+        10.0,
+        10.000080099999991,
+        10.000160423117393,
+        10.00024071752108,
+        10.000321018777754,
+        10.000401318486126,
+        10.000481618547894,
+        10.000561918528035,
+        10.000642218525854,
+        10.000722518518671,
+        10.000802818511602,
+      ],
+      [
+        20.0,
+        42.3118211547,
+        39.44052646748196,
+        40.125908403220535,
+        39.971157107097724,
+        40.006580831277574,
+        39.99849695336371,
+        40.000343036625736,
+        39.999921521640374,
+        40.000017769415194,
+        39.99999579260151,
+      ],
+      [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0],
+    ];
 
-  output.heatTransfer.map((hts, connIdx) => {
-    hts.heatTransferW.map((ht, htIdx) => {
-      expect(ht).toBeCloseTo(expectedHeatTransfers[connIdx][htIdx]);
+    output.temps.map((temps, nodeIdx) => {
+      temps.tempDegC.map((temp, tempIdx) => {
+        expect(temp).toBeCloseTo(expectedTemps[nodeIdx][tempIdx]);
+      });
+    });
+
+    const expectedHeatTransfers = [
+      [
+        -0.1,
+        -0.32311741054700005,
+        -0.2944036604436457,
+        -0.30125667685699453,
+        -0.2997083608831997,
+        -0.3000617951279145,
+        -0.2999801533481582,
+        -0.299997811180977,
+        -0.2999927930311452,
+        -0.29999295250896524,
+        -0.29999192974089905,
+      ],
+      [
+        -44623642.409399986,
+        5742589.051318664,
+        -1370764.1658807755,
+        309502.290988884,
+        -70847.74806800843,
+        16167.455765914918,
+        -3692.4665042114257,
+        842.7299729156495,
+        -192.79554244995117,
+        43.65363441467285,
+        -10.336199264526368,
+      ],
+      [
+        -0.4,
+        -0.39999893200000014,
+        -0.39999786102510143,
+        -0.39999679043305225,
+        -0.39999571974962994,
+        -0.3999946490868517,
+        -0.3999935784193614,
+        -0.3999925077529595,
+        -0.39999143708632195,
+        -0.39999036641975105,
+        -0.39998929575317865,
+      ],
+    ];
+
+    output.heatTransfer.map((hts, connIdx) => {
+      hts.heatTransferW.map((ht, htIdx) => {
+        expect(ht).toBeCloseTo(expectedHeatTransfers[connIdx][htIdx]);
+      });
     });
   });
 });
