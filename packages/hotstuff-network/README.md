@@ -8,7 +8,7 @@ npm i hotstuff-network
 
 ### Usage
 ```typescript
-import * as hs from "hotstuff-network";
+import run, { makeNode, makeConnection } from "hotstuff-network";
 
 const firstNode = hs.makeNode({
   name: "first",
@@ -55,7 +55,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
   "temps": [
     {
       "node": {
-        "id": "KN584CP5B36LK",
+        "id": "KN67LAR1MXNXS",
         "name": "first",
         "temperatureDegC": 10,
         "capacitanceJPerDegK": 10000,
@@ -71,7 +71,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
     },
     {
       "node": {
-        "id": "KN584CP5YHW78",
+        "id": "KN67LAR1ZBD56",
         "name": "second",
         "temperatureDegC": 40,
         "capacitanceJPerDegK": 40000,
@@ -89,9 +89,9 @@ console.log(JSON.stringify(results, null, 2)); // output below:
   "heatTransfer": [
     {
       "connection": {
-        "id": "KN584CP5B36E3",
+        "id": "KN67LAR1ZSRZK",
         "source": {
-          "id": "KN584CP5B36LK",
+          "id": "KN67LAR1MXNXS",
           "name": "first",
           "temperatureDegC": 10,
           "capacitanceJPerDegK": 10000,
@@ -99,7 +99,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
           "isBoundary": false
         },
         "target": {
-          "id": "KN584CP5YHW78",
+          "id": "KN67LAR1ZBD56",
           "name": "second",
           "temperatureDegC": 40,
           "capacitanceJPerDegK": 40000,
