@@ -290,7 +290,7 @@ export const emptyOutput = {
   heatTransfer: [],
 };
 
-export function run(data: ModelInput): ModelOutput {
+export default function run(data: ModelInput): ModelOutput {
   const errors = validateInputs(data);
   if (errors.length > 0) {
     return { ...emptyOutput, errors };

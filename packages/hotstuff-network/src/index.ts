@@ -1,3 +1,2 @@
-import { run } from './hotstuff';
 export { makeNode, makeConnection } from './hotstuff';
-export default { run };
+export { default as run } from './hotstuff';
