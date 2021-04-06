@@ -1,4 +1,4 @@
-import {RefObject, useEffect} from 'react';
+import { RefObject, useEffect } from "react";
 
 export default function useEventListener<
   K extends keyof GlobalEventHandlersEventMap
@@ -13,7 +13,8 @@ export default function useEventListener<
     if (!node) {
       return;
     }
-    const listenerWrapper = ((e: GlobalEventHandlersEventMap[K]) => listener(e)) as EventListener;
+    const listenerWrapper = ((e: GlobalEventHandlersEventMap[K]) =>
+      listener(e)) as EventListener;
     node.addEventListener(event, listenerWrapper, options);
     return () => node.removeEventListener(event, listenerWrapper);
   }, [ref, event, listener, options]);

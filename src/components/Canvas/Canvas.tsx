@@ -1,14 +1,14 @@
-import {HotNode} from "../App";
+import { HotNode } from "../App";
 import usePan from "./hooks/pan";
 import styled from "styled-components";
 import useScale from "./hooks/scale";
-import {useRef} from "react";
+import { useRef } from "react";
 import useNodes from "./hooks/nodes";
 
 type CanvasProps = {
-  nodes: HotNode[]
-  addNode: (node: HotNode) => void
-}
+  nodes: HotNode[];
+  addNode: (node: HotNode) => void;
+};
 
 const StyledCanvas = styled.div`
   width: 50vw;

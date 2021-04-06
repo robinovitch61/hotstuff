@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Qty from "js-quantities"; // https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities/definitions.js
 import Canvas from "./Canvas/Canvas";
-import * as hs from "hotstuff-network";
+import { run, makeNode, makeConnection } from "hotstuff-network";
 
 export type Point = {
   xPos: number;
@@ -17,7 +17,7 @@ export type HotNode = {
   isBoundary: boolean;
 };
 
-const firstNode = hs.makeNode({
+const firstNode = makeNode({
   name: "first",
   temperatureDegC: 10,
   capacitanceJPerDegK: 10000,
@@ -25,7 +25,7 @@ const firstNode = hs.makeNode({
   isBoundary: false,
 });
 
-const secondNode = hs.makeNode({
+const secondNode = makeNode({
   name: "second",
   temperatureDegC: 40,
   capacitanceJPerDegK: 40000,
@@ -33,21 +33,29 @@ const secondNode = hs.makeNode({
   isBoundary: true,
 });
 
-const connection: hs.Connection = {
+const connection = makeConnection({
   source: firstNode,
   target: secondNode,
   resistanceDegKPerW: 100,
   kind: "bi",
-};
+});
+
+const results = run({
+  nodes: [firstNode, secondNode],
+  connections: [connection],
+  timeStepS: 0.01,
+  totalTimeS: 0.03,
+});
+
+console.log(JSON.stringify(results, null, 2));
 
 export default function App() {
-  const results = hs.run({
+  const results = run({
     nodes: [firstNode, secondNode],
     connections: [connection],
-    timestepS: 0.01,
-    runTimeS: 0.03,
+    timeStepS: 0.01,
+    totalTimeS: 0.03,
   });
-  console.log(JSON.stringify(results, null, 2));
 
   const nodes: HotNode[] = [];
 
