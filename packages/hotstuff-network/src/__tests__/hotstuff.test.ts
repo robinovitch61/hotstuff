@@ -446,6 +446,26 @@ describe('run', () => {
     expect(output).toEqual(emptyOutput);
   });
 
+  test('single timestep input', () => {
+    const input = {
+      nodes: [firstNode, secondNode],
+      connections: [connFirstSecond],
+      timeStepS: 0.1,
+      totalTimeS: 0.1,
+    };
+    const output = hs.run(input);
+    expect(output.timeSeriesS).toEqual([0, 0.1]);
+    expect(output.numTimeSteps).toEqual(2);
+    expect(output.totalTimeS).toEqual(0.1);
+    expect(output.timeStepS).toEqual(0.1);
+    output.temps.forEach((temp) => {
+      expect(temp.tempDegC.length).toEqual(2);
+    });
+    output.heatTransfer.forEach((ht) => {
+      expect(ht.heatTransferW.length).toEqual(2);
+    });
+  });
+
   test('real inputs, 10 timeSteps', () => {
     const nodes = [firstNode, secondNode, thirdNode];
     const connections = [connFirstSecond, connRadSecondThird, connFirstThird];
