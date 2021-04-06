@@ -8,7 +8,7 @@ npm i hotstuff-network
 
 ### Usage
 ```typescript
-import run, { makeNode, makeConnection } from "hotstuff-network";
+import { run, makeNode, makeConnection } from "hotstuff-network";
 
 const firstNode = hs.makeNode({
   name: "first",
