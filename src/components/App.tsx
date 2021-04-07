@@ -191,7 +191,7 @@ export default function App() {
   const [nodes, setNodes] = useState<HSNode[]>(parseTextToNodes(DEFAULT_NODES));
   const [nodeText, setNodeText] = useState(DEFAULT_NODES);
   const [connections, setConnections] = useState<Connection[]>(
-    parseTextToConnections(DEFAULT_CONNECTIONS)
+    parseTextToConnections(parseTextToNodes(DEFAULT_NODES), DEFAULT_CONNECTIONS)
   );
   const [connectionText, setConnectionText] = useState(DEFAULT_CONNECTIONS);
   const [plot, setPlot] = useState<null | d3.Selection<
@@ -232,7 +232,7 @@ export default function App() {
     }
   }
 
-  function parseTextToConnections(text: string): Connection[] {
+  function parseTextToConnections(nodes: HSNode[], text: string): Connection[] {
     try {
       const parsed = JSON5.parse(text);
       return parsed.map((conn: any) => {
@@ -269,14 +269,17 @@ export default function App() {
 
   // run model once on load
   useEffect(() => {
+    setPlot(d3.select(plotRef.current));
     const results = runModel();
     setResults(results);
   }, []);
 
-  // update both nodes and connections on update
+  // update both nodes and connections on text update
   useEffect(() => {
-    setNodes(parseTextToNodes(nodeText));
-    setConnections(parseTextToConnections(connectionText));
+    const nodes = parseTextToNodes(nodeText);
+    setNodes(nodes);
+    const connections = parseTextToConnections(nodes, connectionText);
+    setConnections(connections);
   }, [nodeText, connectionText]);
 
   // plot
@@ -290,7 +293,7 @@ export default function App() {
 
     const [dataMin, dataMax] = getTempRange(results.temps);
 
-    // add margin
+    // add margin around plot
     const innerContent = plot
       .attr(
         "width",
@@ -400,11 +403,15 @@ export default function App() {
 
   return (
     <div>
-      <pre>{JSON.stringify(nodes, null, 2)}</pre>
-      <pre>{JSON.stringify(connections, null, 2)}</pre>
+      {/*<pre>{JSON.stringify(nodes, null, 2)}</pre>*/}
+      {/*<pre>{JSON.stringify(connections, null, 2)}</pre>*/}
       <StyledForm
         onSubmit={(event) => {
-          setResults(runModel());
+          try {
+            setResults(runModel());
+          } catch (e) {
+            console.error(e);
+          }
           event.preventDefault();
         }}
       >

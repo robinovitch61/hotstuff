@@ -126,4 +126,4 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 - [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
 - [] information about instability
 - [] rename Node to HSNode
-- [] include error messages in returned errors
+- [] include error messages in returned errors and make errors unique
