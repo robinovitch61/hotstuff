@@ -37,7 +37,7 @@ const colors = [
 
 const DEFAULT_TIMESTEP = 0.1;
 
-const DEFAULT_TOTAL_TIME = 10;
+const DEFAULT_TOTAL_TIME = 50;
 
 const DEFAULT_NODES = `[
   {
@@ -67,7 +67,7 @@ const DEFAULT_CONNECTIONS = `[
   {
     source: "first",
     target: "second",
-    resistanceDegKPerW: 3,
+    resistanceDegKPerW: 0.1,
     kind: "bi",
   },
   {
@@ -210,6 +210,20 @@ export default function App() {
     undefined
   >>(null);
 
+  // run model once on load
+  useEffect(() => {
+    const results = runModel();
+    setResults(results);
+  }, []);
+
+  // update both nodes and connections on text update
+  useEffect(() => {
+    const nodes = parseTextToNodes(nodeText);
+    setNodes(nodes);
+    const connections = parseTextToConnections(nodes, connectionText);
+    setConnections(connections);
+  }, [nodeText, connectionText]);
+
   function runModel(): ModelOutput {
     const start = performance.now();
     const results = run({
@@ -269,10 +283,10 @@ export default function App() {
     width: 700,
     height: 400,
     margin: {
-      left: 100,
-      right: 100,
-      top: 100,
-      bottom: 100,
+      left: 40,
+      right: 40,
+      top: 40,
+      bottom: 40,
     },
   };
 
@@ -283,14 +297,13 @@ export default function App() {
         reshaped[idx][nodeTemp.node.name] = t;
       });
     });
-    console.log(reshaped);
     return reshaped;
   }
 
   return (
     <div>
-      <pre>{JSON.stringify(nodes, null, 2)}</pre>
-      <pre>{JSON.stringify(connections, null, 2)}</pre>
+      {/*<pre>{JSON.stringify(nodes, null, 2)}</pre>*/}
+      {/*<pre>{JSON.stringify(connections, null, 2)}</pre>*/}
       <StyledForm
         onSubmit={(event) => {
           try {
@@ -301,36 +314,37 @@ export default function App() {
           event.preventDefault();
         }}
       >
-        {!!results && (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              width={500}
-              height={300}
-              data={plotShape(results)}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              {results.temps.map((nodeTemps, idx) => {
-                return (
-                  <Line
-                    type={"monotone"}
-                    dataKey={nodeTemps.node.name}
-                    stroke={colors[idx]}
-                    activeDot={{ r: 8 }}
-                  />
-                );
-              })}
-            </LineChart>
-          </ResponsiveContainer>
+        {!!results && results.temps.length > 0 ? (
+          <LineChart
+            width={plotParams.width}
+            height={plotParams.height}
+            data={plotShape(results)}
+            margin={{
+              top: plotParams.margin.top,
+              right: plotParams.margin.right,
+              left: plotParams.margin.left,
+              bottom: plotParams.margin.bottom,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {results.temps.map((nodeTemps, idx) => {
+              return (
+                <Line
+                  key={nodeTemps.node.id}
+                  type={"monotone"}
+                  dataKey={nodeTemps.node.name}
+                  stroke={colors[idx]}
+                  activeDot={{ r: 8 }}
+                />
+              );
+            })}
+          </LineChart>
+        ) : (
+          <h1>Welcome to hotstuff.network</h1>
         )}
         <StyledSubmit type="submit" value="Go" />
         <FormShortTextInput
