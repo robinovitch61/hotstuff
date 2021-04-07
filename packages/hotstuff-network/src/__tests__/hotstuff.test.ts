@@ -73,7 +73,7 @@ describe('key serdes', () => {
   });
 });
 
-describe('validate inputs', () => {
+describe('validateInputs', () => {
   test('valid input does not throw', () => {
     expect(() => validateInputs(modelInput)).not.toThrow();
   });
@@ -430,6 +430,7 @@ describe('shapeOutput', () => {
 });
 
 describe('run', () => {
+  // test('throws if')
   test('empty input', () => {
     const input = {
       nodes: [],

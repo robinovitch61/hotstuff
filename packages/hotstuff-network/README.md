@@ -125,4 +125,3 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 - [] variable power inputs
 - [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
 - [] information about instability
-
