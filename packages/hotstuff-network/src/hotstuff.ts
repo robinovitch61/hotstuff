@@ -12,7 +12,7 @@ import {
 
 export const KELVIN = 273.15;
 
-type NodeParams = {
+export type NodeParams = {
   name: string;
   temperatureDegC: number;
   capacitanceJPerDegK: number;
@@ -20,7 +20,7 @@ type NodeParams = {
   isBoundary: boolean;
 };
 
-type Node = NodeParams & {
+export type Node = NodeParams & {
   id: string;
 };
 
@@ -31,7 +31,7 @@ export type ConnectionParams = {
   kind: 'bi' | 'uni' | 'rad';
 };
 
-type Connection = ConnectionParams & {
+export type Connection = ConnectionParams & {
   id: string;
 };
 
@@ -47,7 +47,7 @@ export type TempOutput = {
   tempDegC: number[];
 };
 
-type HeatTransferOutput = {
+export type HeatTransferOutput = {
   connection: Connection;
   heatTransferW: number[];
 };
