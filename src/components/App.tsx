@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Qty from "js-quantities"; // https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities/definitions.js
 import Canvas from "./Canvas/Canvas";
-import { run, makeNode, makeConnection } from "hotstuff-network";
+import { run, makeNode, makeConnection, ModelOutput } from "hotstuff-network";
 import * as d3 from "d3";
 
 export type Point = {
@@ -18,63 +18,71 @@ export type HotNode = {
   isBoundary: boolean;
 };
 
-const firstNode = makeNode({
-  name: "first",
-  temperatureDegC: 10,
-  capacitanceJPerDegK: 100,
-  powerGenW: 80,
-  isBoundary: false,
-});
+function runModel() {
+  const firstNode = makeNode({
+    name: "first",
+    temperatureDegC: 10,
+    capacitanceJPerDegK: 100,
+    powerGenW: 80,
+    isBoundary: false,
+  });
 
-const secondNode = makeNode({
-  name: "second",
-  temperatureDegC: 40,
-  capacitanceJPerDegK: 40,
-  powerGenW: 0,
-  isBoundary: false,
-});
+  const secondNode = makeNode({
+    name: "second",
+    temperatureDegC: 40,
+    capacitanceJPerDegK: 40,
+    powerGenW: 0,
+    isBoundary: false,
+  });
 
-const thirdNode = makeNode({
-  name: "third",
-  temperatureDegC: 120,
-  capacitanceJPerDegK: 200,
-  powerGenW: 0,
-  isBoundary: false,
-});
+  const thirdNode = makeNode({
+    name: "third",
+    temperatureDegC: 120,
+    capacitanceJPerDegK: 200,
+    powerGenW: 0,
+    isBoundary: false,
+  });
 
-const conn12 = makeConnection({
-  source: firstNode,
-  target: secondNode,
-  resistanceDegKPerW: 1,
-  kind: "bi",
-});
+  const conn12 = makeConnection({
+    source: firstNode,
+    target: secondNode,
+    resistanceDegKPerW: 1,
+    kind: "bi",
+  });
 
-const conn23 = makeConnection({
-  source: secondNode,
-  target: thirdNode,
-  resistanceDegKPerW: 2,
-  kind: "bi",
-});
+  const conn23 = makeConnection({
+    source: secondNode,
+    target: thirdNode,
+    resistanceDegKPerW: 2,
+    kind: "bi",
+  });
 
-const conn31 = makeConnection({
-  source: thirdNode,
-  target: firstNode,
-  resistanceDegKPerW: 3,
-  kind: "bi",
-});
+  const conn31 = makeConnection({
+    source: thirdNode,
+    target: firstNode,
+    resistanceDegKPerW: 3,
+    kind: "bi",
+  });
 
-const results = run({
-  nodes: [firstNode, secondNode, thirdNode],
-  connections: [conn12, conn23, conn31],
-  timeStepS: 0.1,
-  totalTimeS: 10,
-});
+  const start = performance.now();
+  const results = run({
+    nodes: [firstNode, secondNode, thirdNode],
+    connections: [conn12, conn23, conn31],
+    timeStepS: 0.1,
+    totalTimeS: 1000,
+  });
+  const end = performance.now();
 
-console.log(JSON.stringify(results, null, 2));
+  console.log(JSON.stringify(results, null, 2));
+  console.log(`Model took ${end - start} ms`);
+
+  return results;
+}
 
 export default function App() {
   const plotRef = useRef<null | SVGSVGElement>(null);
-  const [selection, setSelection] = useState<null | d3.Selection<
+  const [results, setResults] = useState<ModelOutput | undefined>(undefined);
+  const [plot, setPlot] = useState<null | d3.Selection<
     SVGSVGElement | null,
     unknown,
     null,
@@ -93,18 +101,29 @@ export default function App() {
       bottom: 20,
     },
   };
-  const data = results.temps[0].tempDegC;
-  const [dataMin, dataMax] = d3.extent(data);
-  if (dataMin === undefined || dataMax === undefined) {
-    throw Error("data wack yo");
-  }
 
   useEffect(() => {
-    if (!selection) {
-      setSelection(d3.select(plotRef.current));
+    const results = runModel();
+    setResults(results);
+  }, []);
+
+  useEffect(() => {
+    if (results === undefined) {
+      return;
+    }
+
+    const data = results.temps[0].tempDegC;
+
+    if (!plot) {
+      setPlot(d3.select(plotRef.current));
     } else {
+      const [dataMin, dataMax] = d3.extent(data);
+      if (dataMin === undefined || dataMax === undefined) {
+        throw Error("data wack yo");
+      }
+
       // add margin
-      const innerContent = selection
+      const innerContent = plot
         .attr(
           "width",
           plotParams.width + plotParams.margin.left + plotParams.margin.right
@@ -121,7 +140,7 @@ export default function App() {
 
       const scaleX = d3
         .scaleLinear()
-        .domain([0, data.length])
+        .domain([0, data.length * results.timeStepS])
         .range([0, plotParams.width]);
       const xAxis = d3.axisBottom(scaleX);
 
@@ -146,9 +165,9 @@ export default function App() {
         .append("circle")
         .attr("r", 1)
         .attr("cy", (d) => scaleY(d))
-        .attr("cx", (_, idx) => scaleX(idx));
+        .attr("cx", (_, idx) => scaleX(idx * results.timeStepS));
     }
-  }, [selection]);
+  }, [plot, results]);
 
   return (
     <div>

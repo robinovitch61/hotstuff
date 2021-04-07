@@ -7,7 +7,7 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "d3": "^6.6.2",
-    "hotstuff-network": "^0.0.15",
+    "hotstuff-network": "^0.0.17",
     "js-quantities": "^1.7.6",
     "ramda": "^0.27.1",
     "react": "^17.0.1",
