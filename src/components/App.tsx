@@ -13,6 +13,16 @@ import {
 } from "hotstuff-network";
 import * as d3 from "d3";
 import styled from "styled-components";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const colors = [
   "#16a085",
@@ -184,7 +194,6 @@ function FormLongTextInput(props: FormLongTextInputProps) {
 }
 
 export default function App() {
-  const plotRef = useRef<null | SVGSVGElement>(null);
   const [results, setResults] = useState<ModelOutput | undefined>(undefined);
   const [totalTimeS, setTotalTimeS] = useState(DEFAULT_TOTAL_TIME);
   const [timeStepS, setTimeStepS] = useState(DEFAULT_TIMESTEP);
@@ -267,144 +276,21 @@ export default function App() {
     },
   };
 
-  // run model once on load
-  useEffect(() => {
-    setPlot(d3.select(plotRef.current));
-    const results = runModel();
-    setResults(results);
-  }, []);
-
-  // update both nodes and connections on text update
-  useEffect(() => {
-    const nodes = parseTextToNodes(nodeText);
-    setNodes(nodes);
-    const connections = parseTextToConnections(nodes, connectionText);
-    setConnections(connections);
-  }, [nodeText, connectionText]);
-
-  // plot
-  useEffect(() => {
-    if (results === undefined) {
-      return;
-    } else if (!plot) {
-      setPlot(d3.select(plotRef.current));
-      return;
-    }
-
-    const [dataMin, dataMax] = getTempRange(results.temps);
-
-    // add margin around plot
-    const innerContent = plot
-      .attr(
-        "width",
-        plotParams.width + plotParams.margin.left + plotParams.margin.right
-      )
-      .attr(
-        "height",
-        plotParams.height + plotParams.margin.top + plotParams.margin.bottom
-      )
-      .append("g")
-      .attr(
-        "transform",
-        `translate(${plotParams.margin.left}, ${plotParams.margin.top})`
-      );
-
-    const scaleX = d3
-      .scaleLinear()
-      .domain([0, results.totalTimeS])
-      .range([0, plotParams.width]);
-    const xAxis = d3.axisBottom(scaleX);
-
-    const scaleY = d3
-      .scaleLinear()
-      .domain([dataMin, dataMax])
-      .range([plotParams.height, 0]);
-    const yAxis = d3.axisLeft(scaleY);
-
-    // xAxis
-    innerContent
-      .append("g")
-      .attr("transform", `translate(0, ${plotParams.height})`)
-      .call(xAxis)
-      .append("text")
-      .text("Time [seconds]")
-      .attr("fill", "black")
-      .attr("font-size", 14)
-      .attr("text-anchor", "middle")
-      .attr(
-        "x",
-        plotParams.margin.left +
-          (plotParams.width -
-            plotParams.margin.left -
-            plotParams.margin.right) /
-            2
-      )
-      .attr("y", 50); // Relative to the x axis.
-
-    // yAxis
-    innerContent
-      .append("g")
-      .call(yAxis)
-      .append("text")
-      .text("Temperature [degC]")
-      .attr("fill", "black")
-      .attr("font-size", 14)
-      .attr("text-anchor", "middle")
-      .attr("transform", "rotate(-90)")
-      .attr(
-        "x",
-        -(
-          plotParams.margin.top +
-          (plotParams.height -
-            plotParams.margin.top -
-            plotParams.margin.bottom) /
-            2
-        )
-      )
-      .attr("y", -50); // Relative to the y axis.
-
-    const lineGen = d3
-      .line()
-      .x((d) => scaleX(d[0]))
-      .y((d) => scaleY(d[1]))
-      .curve(d3.curveMonotoneX);
-
-    // plot data
-    results.temps.map((temps, lineNum) => {
-      const data: [number, number][] = temps.tempDegC.map((val, idx) => [
-        idx * results.timeStepS,
-        val,
-      ]);
-      const lineData = lineGen(data);
-
-      if (!!lineData) {
-        const color = colors[lineNum];
-        const isAscending = data[1][1] - data[0][1] > 0;
-
-        // TODO: Add rect behind text for easier reading
-        innerContent
-          .append("text")
-          .text(results.temps[lineNum].node.name)
-          .attr("fill", color)
-          .attr("x", 5)
-          .attr("y", scaleY(data[0][1]) + (isAscending ? -15 : 15));
-
-        innerContent
-          .append("path")
-          .attr("fill", "none")
-          .attr("d", lineData)
-          .attr("stroke", color)
-          .attr("stroke-linejoin", "round")
-          .attr("stroke-linecap", "round")
-          .attr("stroke-width", 1.5);
-      }
+  function plotShape(data: ModelOutput) {
+    const reshaped: any[] = data.timeSeriesS.map((t) => ({ name: t }));
+    data.temps.map((nodeTemp) => {
+      nodeTemp.tempDegC.forEach((t, idx) => {
+        reshaped[idx][nodeTemp.node.name] = t;
+      });
     });
-  }, [plot, results]);
+    console.log(reshaped);
+    return reshaped;
+  }
 
   return (
     <div>
-      {/*<pre>{JSON.stringify(nodes, null, 2)}</pre>*/}
-      {/*<pre>{JSON.stringify(connections, null, 2)}</pre>*/}
+      <pre>{JSON.stringify(nodes, null, 2)}</pre>
+      <pre>{JSON.stringify(connections, null, 2)}</pre>
       <StyledForm
         onSubmit={(event) => {
           try {
@@ -415,7 +301,37 @@ export default function App() {
           event.preventDefault();
         }}
       >
-        <svg ref={plotRef} />
+        {!!results && (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              width={500}
+              height={300}
+              data={plotShape(results)}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              {results.temps.map((nodeTemps, idx) => {
+                return (
+                  <Line
+                    type={"monotone"}
+                    dataKey={nodeTemps.node.name}
+                    stroke={colors[idx]}
+                    activeDot={{ r: 8 }}
+                  />
+                );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
         <StyledSubmit type="submit" value="Go" />
         <FormShortTextInput
           label={"Time Step [seconds]"}
