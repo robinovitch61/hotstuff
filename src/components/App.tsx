@@ -75,7 +75,7 @@ console.log(JSON.stringify(results, null, 2));
 export default function App() {
   const plotRef = useRef<null | SVGSVGElement>(null);
   const [selection, setSelection] = useState<null | d3.Selection<
-    SVGGElement,
+    SVGSVGElement | null,
     unknown,
     null,
     undefined
@@ -98,44 +98,57 @@ export default function App() {
   if (dataMin === undefined || dataMax === undefined) {
     throw Error("data wack yo");
   }
-  const scaleY = d3
-    .scaleLinear()
-    .domain([dataMin, dataMax])
-    .range([0, plotParams.height]);
 
   useEffect(() => {
     if (!selection) {
-      setSelection(
-        d3
-          .select(plotRef.current)
-          .attr(
-            "width",
-            plotParams.width + plotParams.margin.left + plotParams.margin.right
-          )
-          .attr(
-            "height",
-            plotParams.height + plotParams.margin.top + plotParams.margin.bottom
-          )
-          .append("g")
-          .attr(
-            "transform",
-            `translate(${plotParams.margin.left}, ${plotParams.margin.top})`
-          )
-      );
+      setSelection(d3.select(plotRef.current));
     } else {
-      selection
-        .attr("width", plotParams.width)
-        .attr("height", plotParams.height)
+      // add margin
+      const innerContent = selection
+        .attr(
+          "width",
+          plotParams.width + plotParams.margin.left + plotParams.margin.right
+        )
+        .attr(
+          "height",
+          plotParams.height + plotParams.margin.top + plotParams.margin.bottom
+        )
         .append("g")
-        .attr("x", plotParams.width / 2)
+        .attr(
+          "transform",
+          `translate(${plotParams.margin.left}, ${plotParams.margin.top})`
+        );
+
+      const scaleX = d3
+        .scaleLinear()
+        .domain([0, data.length])
+        .range([0, plotParams.width]);
+      const xAxis = d3.axisBottom(scaleX);
+
+      const scaleY = d3
+        .scaleLinear()
+        .domain([dataMin, dataMax])
+        .range([plotParams.height, 0]);
+      const yAxis = d3.axisLeft(scaleY);
+
+      // add axis
+      const xAxisGroup = innerContent
+        .append("g")
+        .attr("transform", `translate(0, ${plotParams.height})`)
+        .call(xAxis);
+      const yAxisGroup = innerContent.append("g").call(yAxis);
+
+      // plot data
+      innerContent
         .selectAll("circle")
         .data(data)
         .enter()
         .append("circle")
         .attr("r", 1)
-        .attr("cy", (d) => scaleY(d));
+        .attr("cy", (d) => scaleY(d))
+        .attr("cx", (_, idx) => scaleX(idx));
     }
-  }, [selection, scaleY]);
+  }, [selection]);
 
   return (
     <div>
