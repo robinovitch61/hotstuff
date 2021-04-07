@@ -9,6 +9,7 @@
     "d3": "^6.6.2",
     "hotstuff-network": "^0.0.17",
     "js-quantities": "^1.7.6",
+    "json5": "^2.2.0",
     "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
