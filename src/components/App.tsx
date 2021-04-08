@@ -37,7 +37,7 @@ const colors = [
 
 const DEFAULT_TIMESTEP = 0.1;
 
-const DEFAULT_TOTAL_TIME = 50;
+const DEFAULT_TOTAL_TIME = 120;
 
 const DEFAULT_NODES = `[
   {
@@ -57,8 +57,8 @@ const DEFAULT_NODES = `[
   {
     "name": "third",
     "temperatureDegC": -10,
-    "capacitanceJPerDegK": 800,
-    "powerGenW": 0,
+    "capacitanceJPerDegK": 8,
+    "powerGenW": 10,
     "isBoundary": false
   },
 ]`;
