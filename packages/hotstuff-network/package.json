@@ -12,11 +12,9 @@
     "test": "jest",
     "build": "rm -rf ./dist/* && tsc",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run lint && git add -A src",
-    "postversion": "git push && git push --tags"
+    "preversion": "npm run build",
+    "version": "npm run test",
+    "postversion": "git add . && git commit -m $npm_package_version && git tag $npm_package_version && git push && git push --tags"
   },
   "author": "Leo Robinovitch",
   "keywords": [
