@@ -53,6 +53,11 @@ export type ConnectionResult = {
   heatTransferW: number[];
 };
 
+export type ErrorRepresentation = {
+  name: string;
+  message: string;
+};
+
 export type ModelOutput = {
   timeSeriesS: number[];
   timeStepS: number;
@@ -60,7 +65,7 @@ export type ModelOutput = {
   numTimeSteps: number;
   nodeResults: NodeResult[];
   connectionResults: ConnectionResult[];
-  errors?: HotStuffError[];
+  errors?: ErrorRepresentation[];
 };
 
 export function makeId(): string {
@@ -96,7 +101,7 @@ export function fromKey(key: string) {
   return key.split('-');
 }
 
-export function validateInputs(data: ModelInput): Error[] {
+export function validateInputs(data: ModelInput): HotStuffError[] {
   const errors = [];
 
   if (data.timeStepS <= 0) {
@@ -294,7 +299,7 @@ export const emptyOutput = {
 export function run(data: ModelInput): ModelOutput {
   const errors = validateInputs(data);
   if (errors.length > 0) {
-    return { ...emptyOutput, errors };
+    return { ...emptyOutput, errors: errors.map((e) => ({ name: e.name, message: e.message })) };
   }
   const [A, A4] = createAMatrix(data.nodes, data.connections);
   const B = createBVector(data.nodes);
