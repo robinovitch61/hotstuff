@@ -408,7 +408,7 @@ describe('shapeOutput', () => {
       timeStepS: modelInput.timeStepS,
       totalTimeS: 0.1,
       numTimeSteps: 2,
-      temps: [
+      nodeResults: [
         {
           node: firstNode,
           tempDegC: [firstNode.temperatureDegC, 10],
@@ -418,7 +418,7 @@ describe('shapeOutput', () => {
           tempDegC: [secondNode.temperatureDegC, 20],
         },
       ],
-      heatTransfer: [
+      connectionResults: [
         {
           connection: connFirstSecond,
           heatTransferW: [30, 40],
@@ -459,10 +459,10 @@ describe('run', () => {
     expect(output.numTimeSteps).toEqual(2);
     expect(output.totalTimeS).toEqual(0.1);
     expect(output.timeStepS).toEqual(0.1);
-    output.temps.forEach((temp) => {
+    output.nodeResults.forEach((temp) => {
       expect(temp.tempDegC.length).toEqual(2);
     });
-    output.heatTransfer.forEach((ht) => {
+    output.connectionResults.forEach((ht) => {
       expect(ht.heatTransferW.length).toEqual(2);
     });
   });
@@ -507,7 +507,7 @@ describe('run', () => {
       [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0],
     ];
 
-    output.temps.map((temps, nodeIdx) => {
+    output.nodeResults.map((temps, nodeIdx) => {
       temps.tempDegC.map((temp, tempIdx) => {
         expect(temp).toBeCloseTo(expectedTemps[nodeIdx][tempIdx]);
       });
@@ -555,7 +555,7 @@ describe('run', () => {
       ],
     ];
 
-    output.heatTransfer.map((hts, connIdx) => {
+    output.connectionResults.map((hts, connIdx) => {
       hts.heatTransferW.map((ht, htIdx) => {
         expect(ht).toBeCloseTo(expectedHeatTransfers[connIdx][htIdx]);
       });

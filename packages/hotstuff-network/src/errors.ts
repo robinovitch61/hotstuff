@@ -1,55 +1,22 @@
-export class TimeStepValidationError extends Error {
+export class HotStuffError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'TimeStepValidationError';
+    this.name = this.constructor.name;
   }
 }
 
-export class TotalTimeValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'TotalTimeValidationError';
-  }
-}
+export class TimeStepValidationError extends HotStuffError {}
 
-export class NodeIdValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NodeIdValidationError';
-  }
-}
+export class TotalTimeValidationError extends HotStuffError {}
 
-export class NodeNotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NodeNotFoundError';
-  }
-}
+export class NodeIdValidationError extends HotStuffError {}
 
-export class TemperatureValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'TemperatureValidationError';
-  }
-}
+export class NodeNotFoundError extends HotStuffError {}
 
-export class ThermalCapacitanceValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ThermalCapacitanceValidationError';
-  }
-}
+export class TemperatureValidationError extends HotStuffError {}
 
-export class ThermalResistanceValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ThermalResistanceValidationError';
-  }
-}
+export class ThermalCapacitanceValidationError extends HotStuffError {}
 
-export class CircularConnectionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'CircularConnectionError';
-  }
-}
+export class ThermalResistanceValidationError extends HotStuffError {}
+
+export class CircularConnectionError extends HotStuffError {}

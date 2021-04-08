@@ -8,11 +8,12 @@ import {
   ThermalCapacitanceValidationError,
   ThermalResistanceValidationError,
   TimeStepValidationError,
+  HotStuffError,
 } from './errors';
 
 export const KELVIN = 273.15;
 
-export type NodeParams = {
+export type HSNodeParams = {
   name: string;
   temperatureDegC: number;
   capacitanceJPerDegK: number;
@@ -20,35 +21,35 @@ export type NodeParams = {
   isBoundary: boolean;
 };
 
-export type Node = NodeParams & {
+export type HSNode = HSNodeParams & {
   id: string;
 };
 
-export type ConnectionParams = {
-  source: Node;
-  target: Node;
+export type HSConnectionParams = {
+  source: HSNode;
+  target: HSNode;
   resistanceDegKPerW: number;
   kind: 'bi' | 'uni' | 'rad';
 };
 
-export type Connection = ConnectionParams & {
+export type HSConnection = HSConnectionParams & {
   id: string;
 };
 
 export type ModelInput = {
-  nodes: Node[];
-  connections: Connection[];
+  nodes: HSNode[];
+  connections: HSConnection[];
   timeStepS: number;
   totalTimeS: number;
 };
 
-export type TempOutput = {
-  node: Node;
+export type NodeResult = {
+  node: HSNode;
   tempDegC: number[];
 };
 
-export type HeatTransferOutput = {
-  connection: Connection;
+export type ConnectionResult = {
+  connection: HSConnection;
   heatTransferW: number[];
 };
 
@@ -57,16 +58,16 @@ export type ModelOutput = {
   timeStepS: number;
   totalTimeS: number;
   numTimeSteps: number;
-  temps: TempOutput[];
-  heatTransfer: HeatTransferOutput[];
-  errors?: Error[];
+  nodeResults: NodeResult[];
+  connectionResults: ConnectionResult[];
+  errors?: HotStuffError[];
 };
 
 export function makeId(): string {
   return (Date.now().toString(36) + Math.random().toString(36).substr(2, 5)).toUpperCase();
 }
 
-export function makeNode({ name, temperatureDegC, capacitanceJPerDegK, powerGenW, isBoundary }: NodeParams): Node {
+export function makeNode({ name, temperatureDegC, capacitanceJPerDegK, powerGenW, isBoundary }: HSNodeParams): HSNode {
   return {
     id: makeId(),
     name,
@@ -77,7 +78,7 @@ export function makeNode({ name, temperatureDegC, capacitanceJPerDegK, powerGenW
   };
 }
 
-export function makeConnection({ source, target, resistanceDegKPerW, kind }: ConnectionParams): Connection {
+export function makeConnection({ source, target, resistanceDegKPerW, kind }: HSConnectionParams): HSConnection {
   return {
     id: makeId(),
     source,
@@ -149,7 +150,7 @@ export function calculateTerm(capacitanceJPerDegK: number, resistanceDegKPerW: n
   return 1 / capacitanceJPerDegK / resistanceDegKPerW;
 }
 
-export function createAMatrix(nodes: Node[], connections: Connection[]) {
+export function createAMatrix(nodes: HSNode[], connections: HSConnection[]) {
   const numNodes = nodes.length;
   const nodeIds = nodes.map((node) => node.id);
   const vals = matrixUtils.zeros2d(numNodes, numNodes);
@@ -183,7 +184,7 @@ export function createAMatrix(nodes: Node[], connections: Connection[]) {
   return [vals, vals4];
 }
 
-export function createBVector(nodes: Node[]): number[] {
+export function createBVector(nodes: HSNode[]): number[] {
   return nodes.map((node) => node.powerGenW / node.capacitanceJPerDegK);
 }
 
@@ -195,11 +196,11 @@ export function toCelcius(temps: number[]): number[] {
   return matrixUtils.addScalar(temps, -KELVIN) as number[];
 }
 
-export function getNodeTempsDegK(nodes: Node[]): number[] {
+export function getNodeTempsDegK(nodes: HSNode[]): number[] {
   return toKelvin(nodes.map((node) => node.temperatureDegC));
 }
 
-export function tempsWithBoundary(nodes: Node[], recentTemps: number[], newTemps: number[]): number[] {
+export function tempsWithBoundary(nodes: HSNode[], recentTemps: number[], newTemps: number[]): number[] {
   return newTemps.map((temp, idx) => {
     if (nodes[idx].isBoundary) {
       return recentTemps[idx];
@@ -209,7 +210,7 @@ export function tempsWithBoundary(nodes: Node[], recentTemps: number[], newTemps
   });
 }
 
-export function getHeatTransfer(temps: number[], nodes: Node[], connections: Connection[]): number[] {
+export function getHeatTransfer(temps: number[], nodes: HSNode[], connections: HSConnection[]): number[] {
   // const flatTemps = matrixUtils.flatten(temps);
   const nodeIds = nodes.map((n) => n.id);
   return connections.map((conn) => {
@@ -276,8 +277,8 @@ export function shapeOutput(
     timeStepS: timeSeriesS[1],
     totalTimeS: timeSeriesS[timeSeriesS.length - 1],
     numTimeSteps: timeSeriesS.length,
-    temps,
-    heatTransfer,
+    nodeResults: temps,
+    connectionResults: heatTransfer,
   };
 }
 
@@ -286,8 +287,8 @@ export const emptyOutput = {
   timeStepS: 0,
   totalTimeS: 0,
   numTimeSteps: 0,
-  temps: [],
-  heatTransfer: [],
+  nodeResults: [],
+  connectionResults: [],
 };
 
 export function run(data: ModelInput): ModelOutput {
