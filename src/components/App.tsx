@@ -318,7 +318,9 @@ export default function App() {
           <LineChart
             width={plotParams.width}
             height={plotParams.height}
-            data={plotShape(results)}
+            data={plotShape(results).filter(
+              (_, index) => index % Math.floor(results.numTimeSteps / 100) === 0
+            )}
             margin={{
               top: plotParams.margin.top,
               right: plotParams.margin.right,
