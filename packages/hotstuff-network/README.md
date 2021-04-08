@@ -52,7 +52,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
   "timeStepS": 0.01,
   "totalTimeS": 0.03,
   "numTimeSteps": 4,
-  "temps": [
+  "nodeResults": [
     {
       "node": {
         "id": "KN67LAR1MXNXS",
@@ -86,7 +86,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
       ]
     }
   ],
-  "heatTransfer": [
+  "connectionResults": [
     {
       "connection": {
         "id": "KN67LAR1ZSRZK",
@@ -125,5 +125,5 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 - [] variable power inputs
 - [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
 - [] information about instability
-- [] rename Node to HSNode
 - [] include error messages in returned errors and make errors unique
+- [] stream results rather than all at once return
