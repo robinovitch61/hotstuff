@@ -287,7 +287,7 @@ export function shapeOutput(
   };
 }
 
-export const emptyOutput = {
+export const emptyOutput: ModelOutput = {
   timeSeriesS: [],
   timeStepS: 0,
   totalTimeS: 0,
