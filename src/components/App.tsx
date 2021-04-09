@@ -98,6 +98,22 @@ const StyledForm = styled.form`
   align-items: center;
 `;
 
+const StyledCharts = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 2em 0;
+
+  .chart {
+    width: 70% !important;
+
+    @media only screen and (max-width: 600px) {
+      width: 95% !important;
+    }
+  }
+`;
+
 const StyledFormShortTextInput = styled.div`
   display: flex;
   width: 100%;
@@ -276,8 +292,7 @@ export default function App() {
 
   // show the temps of the first node as dots vertically along the svg
   const plotParams = {
-    width: 700,
-    height: 400,
+    height: 350,
     margin: {
       left: 40,
       right: 40,
@@ -286,7 +301,7 @@ export default function App() {
     },
   };
 
-  function plotShape(data: ModelOutput) {
+  function plotShape(data: ModelOutput): [any[], any[]] {
     const lowerMag = Math.floor(Math.log10(data.totalTimeS));
     const divisibleBy = Math.pow(10, lowerMag - 1);
 
@@ -295,29 +310,32 @@ export default function App() {
     }
 
     const includeAll = data.timeSeriesS.length < MAX_PLOT_POINTS_PER_NODE;
-    const reshaped: any[] = [];
+    const temps: any[] = [];
+    const heatTransfers: any[] = [];
     data.timeSeriesS.forEach((t, idx) => {
       if (includeAll || include(t)) {
-        const base: any = { name: t };
+        const temp: any = { name: t };
+        const ht: any = { name: t };
         data.nodeResults.forEach((nodeResult) => {
-          base[nodeResult.node.name] = nodeResult.tempDegC[idx];
+          temp[nodeResult.node.name] = nodeResult.tempDegC[idx];
         });
-        reshaped.push(base);
+        data.connectionResults.forEach((connectionResult) => {
+          ht[
+            `${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`
+          ] = connectionResult.heatTransferW[idx];
+        });
+        temps.push(temp);
+        heatTransfers.push(ht);
       }
     });
-    return reshaped;
-    // data.nodeResults.map((nodeResult) => {
-    //   nodeResult.tempDegC
-    //     .filter((_, idx) => include(data.timeSeriesS[idx]))
-    //     .forEach((t, idx) => (reshaped[idx][nodeResult.node.name] = t));
-    // });
-    // return reshaped;
+    return [temps, heatTransfers];
   }
+
+  const [tempPlotData, heatTransferPlotData] =
+    !!results && results.nodeResults.length > 0 ? plotShape(results) : [[], []];
 
   return (
     <div>
-      {/*<pre>{JSON.stringify(nodes, null, 2)}</pre>*/}
-      {/*<pre>{JSON.stringify(connections, null, 2)}</pre>*/}
       <StyledForm
         onSubmit={(event) => {
           try {
@@ -329,51 +347,108 @@ export default function App() {
         }}
       >
         {!!results && results.nodeResults.length > 0 ? (
-          <LineChart
-            width={plotParams.width}
-            height={plotParams.height}
-            data={plotShape(results)}
-            margin={{
-              top: plotParams.margin.top,
-              right: plotParams.margin.right,
-              left: plotParams.margin.left,
-              bottom: plotParams.margin.bottom,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="name"
-              label={{ value: "Time [seconds]", position: "middle", dy: 20 }}
-            />
-            <YAxis
-              label={{
-                value: "Temperature [degC]",
-                position: "middle",
-                angle: -90,
-                dx: -20,
-              }}
-            />
-            <Tooltip />
-            <Legend
-              layout="vertical"
-              verticalAlign="middle"
-              align="right"
-              wrapperStyle={{
-                paddingLeft: "10px",
-              }}
-            />
-            {results.nodeResults.map((nodeResult, idx) => {
-              return (
-                <Line
-                  key={nodeResult.node.id}
-                  type={"monotone"}
-                  dataKey={nodeResult.node.name}
-                  stroke={colors[idx]}
-                  activeDot={{ r: 8 }}
+          <StyledCharts>
+            <ResponsiveContainer height={plotParams.height} className={"chart"}>
+              <LineChart
+                data={tempPlotData}
+                margin={{
+                  top: 0,
+                  right: plotParams.margin.right,
+                  left: plotParams.margin.left,
+                  bottom: plotParams.margin.bottom,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  label={{
+                    value: "Time [seconds]",
+                    position: "middle",
+                    dy: 20,
+                  }}
                 />
-              );
-            })}
-          </LineChart>
+                <YAxis
+                  label={{
+                    value: "Temperature [degC]",
+                    position: "middle",
+                    angle: -90,
+                    dx: -20,
+                  }}
+                />
+                <Tooltip />
+                <Legend
+                  layout="horizontal"
+                  verticalAlign="top"
+                  align="center"
+                  wrapperStyle={{
+                    paddingLeft: "10px",
+                  }}
+                />
+                {results.nodeResults.map((nodeResult, idx) => {
+                  return (
+                    <Line
+                      key={nodeResult.node.id}
+                      type={"monotone"}
+                      dataKey={nodeResult.node.name}
+                      stroke={colors[idx]}
+                      activeDot={{ r: 8 }}
+                    />
+                  );
+                })}
+              </LineChart>
+            </ResponsiveContainer>
+            <ResponsiveContainer height={plotParams.height} className={"chart"}>
+              <LineChart
+                height={plotParams.height}
+                data={heatTransferPlotData}
+                margin={{
+                  top: 0,
+                  right: plotParams.margin.right,
+                  left: plotParams.margin.left,
+                  bottom: plotParams.margin.bottom,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  label={{
+                    value: "Time [seconds]",
+                    position: "middle",
+                    dy: 20,
+                  }}
+                />
+                <YAxis
+                  label={{
+                    value: "Heat Transfer [Watts]",
+                    position: "middle",
+                    angle: -90,
+                    dx: -20,
+                  }}
+                />
+                <Tooltip />
+                <Legend
+                  layout="horizontal"
+                  verticalAlign="top"
+                  align="center"
+                  wrapperStyle={{
+                    paddingLeft: "10px",
+                  }}
+                  fontSize={5}
+                />
+                {results.connectionResults.map((connectionResult, idx) => {
+                  return (
+                    <Line
+                      key={connectionResult.connection.id}
+                      type={"monotone"}
+                      dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
+                      stroke={colors[idx]}
+                      activeDot={{ r: 8 }}
+                    />
+                  );
+                })}
+              </LineChart>
+            </ResponsiveContainer>
+          </StyledCharts>
         ) : (
           <h1>Welcome to hotstuff.network</h1>
         )}
@@ -402,5 +477,4 @@ export default function App() {
       <pre>{JSON.stringify(results, null, 2)}</pre>
     </div>
   );
-  // return <Canvas nodes={nodes} addNode={addNode} />;
 }
