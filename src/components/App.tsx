@@ -292,8 +292,7 @@ export default function App() {
     const lowerMag = Math.floor(Math.log10(data.totalTimeS));
     const divisibleBy = Math.pow(10, lowerMag - 1);
     function include(val: number) {
-      const tol = 0.01;
-      return Math.abs(val % divisibleBy) < tol;
+      return Math.abs(val % divisibleBy) === 0;
     }
     const reshaped: any[] = data.timeSeriesS
       .filter((_, idx) => include(data.timeSeriesS[idx]))
