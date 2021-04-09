@@ -36,10 +36,9 @@ const colors = [
   "#e74c3c",
 ];
 
+const MAX_PLOT_POINTS_PER_NODE = 400;
 const DEFAULT_TIMESTEP = 0.1;
-
 const DEFAULT_TOTAL_TIME = 120;
-
 const DEFAULT_NODES = `[
   {
     "name": "first",
@@ -63,7 +62,6 @@ const DEFAULT_NODES = `[
     "isBoundary": false
   },
 ]`;
-
 const DEFAULT_CONNECTIONS = `[
   {
     source: "first",
@@ -296,15 +294,24 @@ export default function App() {
       return Math.abs(val % divisibleBy) === 0;
     }
 
-    const reshaped: any[] = data.timeSeriesS
-      .filter((_, idx) => include(data.timeSeriesS[idx]))
-      .map((t, idx) => ({ name: t }));
-    data.nodeResults.map((nodeResult) => {
-      nodeResult.tempDegC
-        .filter((_, idx) => include(data.timeSeriesS[idx]))
-        .forEach((t, idx) => (reshaped[idx][nodeResult.node.name] = t));
+    const includeAll = data.timeSeriesS.length < MAX_PLOT_POINTS_PER_NODE;
+    const reshaped: any[] = [];
+    data.timeSeriesS.forEach((t, idx) => {
+      if (includeAll || include(t)) {
+        const base: any = { name: t };
+        data.nodeResults.forEach((nodeResult) => {
+          base[nodeResult.node.name] = nodeResult.tempDegC[idx];
+        });
+        reshaped.push(base);
+      }
     });
     return reshaped;
+    // data.nodeResults.map((nodeResult) => {
+    //   nodeResult.tempDegC
+    //     .filter((_, idx) => include(data.timeSeriesS[idx]))
+    //     .forEach((t, idx) => (reshaped[idx][nodeResult.node.name] = t));
+    // });
+    // return reshaped;
   }
 
   return (
