@@ -291,9 +291,11 @@ export default function App() {
   function plotShape(data: ModelOutput) {
     const lowerMag = Math.floor(Math.log10(data.totalTimeS));
     const divisibleBy = Math.pow(10, lowerMag - 1);
+
     function include(val: number) {
       return Math.abs(val % divisibleBy) === 0;
     }
+
     const reshaped: any[] = data.timeSeriesS
       .filter((_, idx) => include(data.timeSeriesS[idx]))
       .map((t, idx) => ({ name: t }));
