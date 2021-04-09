@@ -136,8 +136,9 @@ const StyledLabelShort = styled.label`
 
 const StyledLabelLong = styled.label`
   display: flex;
+  flex-direction: column;
   width: 600px;
-  justify-content: space-between;
+  align-items: center;
 `;
 
 const StyledTextArea = styled.textarea`
@@ -294,8 +295,8 @@ export default function App() {
   const plotParams = {
     height: 350,
     margin: {
-      left: 40,
-      right: 40,
+      left: 5,
+      right: 5,
       top: 40,
       bottom: 40,
     },
