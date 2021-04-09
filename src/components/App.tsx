@@ -26,7 +26,6 @@ import {
 } from "recharts";
 
 const colors = [
-  "#16a085",
   "#2ecc71",
   "#3498db",
   "#9b59b6",
@@ -34,11 +33,12 @@ const colors = [
   "#f1c40f",
   "#e67e22",
   "#e74c3c",
+  "#16a085",
 ];
 
 const MAX_PLOT_POINTS_PER_NODE = 400;
 const DEFAULT_TIMESTEP = 0.1;
-const DEFAULT_TOTAL_TIME = 120;
+const DEFAULT_TOTAL_TIME = 50;
 const DEFAULT_NODES = `[
   {
     "name": "first",
@@ -70,9 +70,15 @@ const DEFAULT_CONNECTIONS = `[
     kind: "bi",
   },
   {
+    source: "first",
+    target: "third",
+    resistanceDegKPerW: 0.5,
+    kind: "uni",
+  },
+  {
     source: "second",
     target: "third",
-    resistanceDegKPerW: 10,
+    resistanceDegKPerW: 3,
     kind: "bi",
   },
 ]`;
@@ -91,6 +97,18 @@ export type HotNode = {
   isBoundary: boolean;
 };
 
+const StyledTitle = styled.h1`
+  width: 100%;
+  text-align: center;
+  padding: 1em 0 0.5em 0;
+  margin: 0;
+
+  &&:before,
+  &&:after {
+    content: "🔥";
+  }
+`;
+
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
@@ -103,13 +121,15 @@ const StyledCharts = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin: 2em 0;
+  margin-top: 2em;
 
   .chart {
-    width: 70% !important;
+    width: 60% !important;
+    max-width: 900px;
 
     @media only screen and (max-width: 600px) {
       width: 95% !important;
+      touch-action: none;
     }
   }
 `;
@@ -130,14 +150,16 @@ const StyledFormLongTextInput = styled.div`
 
 const StyledLabelShort = styled.label`
   display: flex;
-  width: 400px;
+  max-width: 400px;
+  width: 95%;
   justify-content: space-between;
 `;
 
 const StyledLabelLong = styled.label`
   display: flex;
   flex-direction: column;
-  width: 600px;
+  max-width: 600px;
+  width: 95%;
   align-items: center;
 `;
 
@@ -149,24 +171,20 @@ const StyledTextArea = styled.textarea`
 `;
 
 const StyledSubmit = styled.input`
-  width: 100px;
-  height: 30px;
-`;
+  display: flex;
+  align-items: center;
+  -webkit-appearance: none;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8em 3em;
+  margin: 1em;
+  font-size: 1.2em;
+  background: #dbdbdb;
 
-function getTempRange(nodeTemps: NodeResult[]): number[] {
-  const range = [0, 0];
-  nodeTemps.forEach((temps) => {
-    const min = Math.min(...temps.tempDegC);
-    const max = Math.max(...temps.tempDegC);
-    if (min < range[0]) {
-      range[0] = min;
-    }
-    if (max > range[1]) {
-      range[1] = max;
-    }
-  });
-  return range;
-}
+  &&:hover {
+    cursor: pointer;
+  }
+`;
 
 type FormShortTextInputProps = {
   label: string;
@@ -179,6 +197,11 @@ type FormLongTextInputProps = {
   defaultVal?: string;
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 };
+
+function adjustTextAreaHeight(element: HTMLTextAreaElement) {
+  element.style.height = "auto";
+  element.style.height = element.scrollHeight + "px";
+}
 
 function FormShortTextInput(props: FormShortTextInputProps) {
   return (
@@ -201,6 +224,9 @@ function FormLongTextInput(props: FormLongTextInputProps) {
       <StyledLabelLong>
         <div style={{ marginRight: "10px" }}>{props.label}</div>
         <StyledTextArea
+          onInput={(event) =>
+            adjustTextAreaHeight(event.target as HTMLTextAreaElement)
+          }
           defaultValue={props.defaultVal}
           onChange={(event) => props.onChange(event)}
         />
@@ -451,16 +477,16 @@ export default function App() {
             </ResponsiveContainer>
           </StyledCharts>
         ) : (
-          <h1>Welcome to hotstuff.network</h1>
+          <StyledTitle>Welcome to hotstuff.network</StyledTitle>
         )}
         <StyledSubmit type="submit" value="Go" />
         <FormShortTextInput
-          label={"Time Step [seconds]"}
+          label={"Timestep[sec]"}
           defaultVal={DEFAULT_TIMESTEP}
           onChange={(event) => setTimeStepS(parseFloat(event.target.value))}
         />
         <FormShortTextInput
-          label={"Total Run Time [seconds]"}
+          label={"Run Time [sec]"}
           defaultVal={DEFAULT_TOTAL_TIME}
           onChange={(event) => setTotalTimeS(parseFloat(event.target.value))}
         />
@@ -475,7 +501,7 @@ export default function App() {
           onChange={(event) => setConnectionText(event.target.value)}
         />
       </StyledForm>
-      <pre>{JSON.stringify(results, null, 2)}</pre>
+      {/*<pre>{JSON.stringify(results, null, 2)}</pre>*/}
     </div>
   );
 }
