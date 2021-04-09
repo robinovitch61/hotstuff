@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rm -rf ./docs && mv ./build ./docs",
+    "build": "react-scripts build && mv ./docs/CNAME . && rm -rf ./docs/* && mv CNAME ./build/* ./docs && rm -rf ./build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
