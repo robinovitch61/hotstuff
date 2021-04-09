@@ -278,7 +278,7 @@ export function shapeOutput(
   });
 
   return {
-    timeSeriesS,
+    timeSeriesS: matrixUtils.fixRoundOffErrors(timeSeriesS),
     timeStepS: timeSeriesS[1],
     totalTimeS: timeSeriesS[timeSeriesS.length - 1],
     numTimeSteps: timeSeriesS.length,

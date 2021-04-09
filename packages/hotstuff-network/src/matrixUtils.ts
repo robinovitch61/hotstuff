@@ -77,6 +77,14 @@ function zeros2d(width: number, height: number): number[][] {
   }
 }
 
+function fixRoundOffErrors(x: number[]): number[] {
+  try {
+    return x.map((v) => parseFloat(math.format(v, { precision: 14 })));
+  } catch {
+    throw Error('Failed to fix round-off errors');
+  }
+}
+
 export const matrixUtils = {
   add,
   addScalar,
@@ -84,4 +92,5 @@ export const matrixUtils = {
   multScalar,
   pow,
   zeros2d,
+  fixRoundOffErrors,
 };

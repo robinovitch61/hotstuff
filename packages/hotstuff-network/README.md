@@ -127,4 +127,4 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 - [] information about instability
 - [] include error messages in returned errors and make errors unique
 - [] stream results rather than all at once return
-- [] fix floating point errors
+- [] fix round-off floating point errors

@@ -108,3 +108,17 @@ describe('zeros2d', () => {
     ]);
   });
 });
+
+describe('fixRoundOffFPErrors', () => {
+  test('empty input', () => {
+    expect(matrixUtils.fixRoundOffErrors([])).toEqual([]);
+  });
+
+  test('single input', () => {
+    expect(matrixUtils.fixRoundOffErrors([0.1 + 0.2])).toEqual([0.3]);
+  });
+
+  test('double input', () => {
+    expect(matrixUtils.fixRoundOffErrors([0.1 + 0.2, 0.020000000000000004])).toEqual([0.3, 0.02]);
+  });
+});
