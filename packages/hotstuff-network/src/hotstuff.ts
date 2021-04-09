@@ -328,6 +328,6 @@ export function run(data: ModelInput): ModelOutput {
 
   return {
     ...shapeOutput(data, timeSeriesS, outputTemps, outputHeatTransfer),
-    computeTimeS: (performance.now() - start) * 1000,
+    computeTimeS: (performance.now() - start) / 1000,
   };
 }

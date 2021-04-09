@@ -561,5 +561,7 @@ describe('run', () => {
         expect(ht).toBeCloseTo(expectedHeatTransfers[connIdx][htIdx]);
       });
     });
+
+    expect(output.computeTimeS).toBeLessThan(0.01);
   });
 });
