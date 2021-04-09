@@ -10,6 +10,7 @@ import {
   NodeResult,
   HSNode,
   HSConnection,
+  emptyOutput,
 } from "hotstuff-network";
 import * as d3 from "d3";
 import styled from "styled-components";
@@ -29,10 +30,9 @@ const colors = [
   "#2ecc71",
   "#3498db",
   "#9b59b6",
-  "#34495e",
-  "#f1c40f",
-  "#e67e22",
   "#e74c3c",
+  "#e67e22",
+  "#34495e",
   "#16a085",
 ];
 
@@ -128,8 +128,8 @@ const StyledCharts = styled.div`
     max-width: 900px;
 
     @media only screen and (max-width: 600px) {
-      width: 95% !important;
-      touch-action: none;
+      width: 90% !important;
+      touch-action: pan-y;
     }
   }
 `;
@@ -245,12 +245,6 @@ export default function App() {
     parseTextToConnections(parseTextToNodes(DEFAULT_NODES), DEFAULT_CONNECTIONS)
   );
   const [connectionText, setConnectionText] = useState(DEFAULT_CONNECTIONS);
-  const [plot, setPlot] = useState<null | d3.Selection<
-    SVGSVGElement | null,
-    unknown,
-    null,
-    undefined
-  >>(null);
 
   // update both nodes and connections on text update
   useEffect(() => {
@@ -261,15 +255,12 @@ export default function App() {
   }, [nodeText, connectionText]);
 
   function runModel(): ModelOutput {
-    const start = performance.now();
     const results = run({
       nodes,
       connections,
       timeStepS,
       totalTimeS,
     });
-    const end = performance.now();
-    console.log(`Model took ${end - start} ms`);
     return results;
   }
 
@@ -358,8 +349,9 @@ export default function App() {
     return [temps, heatTransfers];
   }
 
-  const [tempPlotData, heatTransferPlotData] =
-    !!results && results.nodeResults.length > 0 ? plotShape(results) : [[], []];
+  const res =
+    !!results && results.nodeResults.length > 0 ? results : emptyOutput;
+  const [tempPlotData, heatTransferPlotData] = plotShape(res);
 
   return (
     <div>
@@ -373,109 +365,120 @@ export default function App() {
           event.preventDefault();
         }}
       >
-        {!!results && results.nodeResults.length > 0 ? (
-          <StyledCharts>
-            <ResponsiveContainer height={plotParams.height} className={"chart"}>
-              <LineChart
-                data={tempPlotData}
-                margin={{
-                  top: 0,
-                  right: plotParams.margin.right,
-                  left: plotParams.margin.left,
-                  bottom: plotParams.margin.bottom,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  label={{
-                    value: "Time [seconds]",
-                    position: "middle",
-                    dy: 20,
-                  }}
-                />
-                <YAxis
-                  label={{
-                    value: "Temperature [degC]",
-                    position: "middle",
-                    angle: -90,
-                    dx: -20,
-                  }}
-                />
-                <Tooltip />
-                <Legend
-                  layout="horizontal"
-                  verticalAlign="top"
-                  align="center"
-                  wrapperStyle={{
-                    paddingLeft: "10px",
-                  }}
-                />
-                {results.nodeResults.map((nodeResult, idx) => {
-                  return (
-                    <Line
-                      key={nodeResult.node.id}
-                      type={"monotone"}
-                      dataKey={nodeResult.node.name}
-                      stroke={colors[idx]}
-                      activeDot={{ r: 8 }}
-                    />
-                  );
-                })}
-              </LineChart>
-            </ResponsiveContainer>
-            <ResponsiveContainer height={plotParams.height} className={"chart"}>
-              <LineChart
+        {res.timeSeriesS.length > 0 ? (
+          <>
+            <StyledTitle>
+              {`Completed in ${res.computeTimeS.toFixed(2)} seconds`}
+            </StyledTitle>
+            <StyledCharts>
+              <ResponsiveContainer
                 height={plotParams.height}
-                data={heatTransferPlotData}
-                margin={{
-                  top: 0,
-                  right: plotParams.margin.right,
-                  left: plotParams.margin.left,
-                  bottom: plotParams.margin.bottom,
-                }}
+                className={"chart"}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  label={{
-                    value: "Time [seconds]",
-                    position: "middle",
-                    dy: 20,
+                <LineChart
+                  data={tempPlotData}
+                  margin={{
+                    top: 0,
+                    right: plotParams.margin.right,
+                    left: plotParams.margin.left,
+                    bottom: plotParams.margin.bottom,
                   }}
-                />
-                <YAxis
-                  label={{
-                    value: "Heat Transfer [Watts]",
-                    position: "middle",
-                    angle: -90,
-                    dx: -20,
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    label={{
+                      value: "Time [seconds]",
+                      position: "middle",
+                      dy: 20,
+                    }}
+                  />
+                  <YAxis
+                    label={{
+                      value: "Temperature [degC]",
+                      position: "middle",
+                      angle: -90,
+                      dx: -20,
+                    }}
+                  />
+                  <Tooltip />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="top"
+                    align="center"
+                    wrapperStyle={{
+                      paddingLeft: "10px",
+                    }}
+                  />
+                  {res.nodeResults.map((nodeResult, idx) => {
+                    return (
+                      <Line
+                        key={nodeResult.node.id}
+                        type={"monotone"}
+                        dataKey={nodeResult.node.name}
+                        stroke={colors[idx]}
+                        activeDot={{ r: 8 }}
+                      />
+                    );
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+              <ResponsiveContainer
+                height={plotParams.height}
+                className={"chart"}
+              >
+                <LineChart
+                  height={plotParams.height}
+                  data={heatTransferPlotData}
+                  margin={{
+                    top: 0,
+                    right: plotParams.margin.right,
+                    left: plotParams.margin.left,
+                    bottom: plotParams.margin.bottom,
                   }}
-                />
-                <Tooltip />
-                <Legend
-                  layout="horizontal"
-                  verticalAlign="top"
-                  align="center"
-                  wrapperStyle={{
-                    paddingLeft: "10px",
-                  }}
-                  fontSize={5}
-                />
-                {results.connectionResults.map((connectionResult, idx) => {
-                  return (
-                    <Line
-                      key={connectionResult.connection.id}
-                      type={"monotone"}
-                      dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
-                      stroke={colors[idx]}
-                      activeDot={{ r: 8 }}
-                    />
-                  );
-                })}
-              </LineChart>
-            </ResponsiveContainer>
-          </StyledCharts>
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    label={{
+                      value: "Time [seconds]",
+                      position: "middle",
+                      dy: 20,
+                    }}
+                  />
+                  <YAxis
+                    label={{
+                      value: "Heat Transfer [Watts]",
+                      position: "middle",
+                      angle: -90,
+                      dx: -20,
+                    }}
+                  />
+                  <Tooltip />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="top"
+                    align="center"
+                    wrapperStyle={{
+                      paddingLeft: "10px",
+                    }}
+                    fontSize={5}
+                  />
+                  {res.connectionResults.map((connectionResult, idx) => {
+                    return (
+                      <Line
+                        key={connectionResult.connection.id}
+                        type={"monotone"}
+                        dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
+                        stroke={colors[idx]}
+                        activeDot={{ r: 8 }}
+                      />
+                    );
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+            </StyledCharts>
+          </>
         ) : (
           <StyledTitle>Welcome to hotstuff.network</StyledTitle>
         )}
