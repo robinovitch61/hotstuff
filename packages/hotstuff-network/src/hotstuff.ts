@@ -65,6 +65,7 @@ export type ModelOutput = {
   numTimeSteps: number;
   nodeResults: NodeResult[];
   connectionResults: ConnectionResult[];
+  computeTimeS: number;
   errors?: ErrorRepresentation[];
 };
 
@@ -260,7 +261,7 @@ export function shapeOutput(
   timeSeriesS: number[],
   outputTemps: number[][],
   outputHeatTransfer: number[][],
-): ModelOutput {
+): Omit<ModelOutput, 'computeTimeS'> {
   const flatTemps = outputTemps.map((temp) => toCelcius(temp));
 
   const temps = data.nodes.map((node, idx) => {
@@ -294,9 +295,11 @@ export const emptyOutput: ModelOutput = {
   numTimeSteps: 0,
   nodeResults: [],
   connectionResults: [],
+  computeTimeS: 0,
 };
 
 export function run(data: ModelInput): ModelOutput {
+  const start = performance.now();
   const errors = validateInputs(data);
   if (errors.length > 0) {
     return { ...emptyOutput, errors: errors.map((e) => ({ name: e.name, message: e.message })) };
@@ -323,5 +326,8 @@ export function run(data: ModelInput): ModelOutput {
     outputHeatTransfer.push(newHeatTransfer);
   });
 
-  return shapeOutput(data, timeSeriesS, outputTemps, outputHeatTransfer);
+  return {
+    ...shapeOutput(data, timeSeriesS, outputTemps, outputHeatTransfer),
+    computeTimeS: (performance.now() - start) * 1000,
+  };
 }

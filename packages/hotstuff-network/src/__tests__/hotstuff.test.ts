@@ -403,7 +403,7 @@ describe('shapeOutput', () => {
     ];
     const outputHeatTransfer = [[30], [40]];
     const output = hs.shapeOutput(modelInput, timeSeriesS, outputTemps, outputHeatTransfer);
-    const expectedOutput: ModelOutput = {
+    const expectedOutput: Omit<ModelOutput, 'computeTimeS'> = {
       timeSeriesS,
       timeStepS: modelInput.timeStepS,
       totalTimeS: 0.1,
