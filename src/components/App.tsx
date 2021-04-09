@@ -7,9 +7,9 @@ import {
   makeNode,
   makeConnection,
   ModelOutput,
-  TempOutput,
-  Node as HSNode,
-  Connection,
+  NodeResult,
+  HSNode,
+  HSConnection,
 } from "hotstuff-network";
 import * as d3 from "d3";
 import styled from "styled-components";
@@ -22,6 +22,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Label,
 } from "recharts";
 
 const colors = [
@@ -137,7 +138,7 @@ const StyledSubmit = styled.input`
   height: 30px;
 `;
 
-function getTempRange(nodeTemps: TempOutput[]): number[] {
+function getTempRange(nodeTemps: NodeResult[]): number[] {
   const range = [0, 0];
   nodeTemps.forEach((temps) => {
     const min = Math.min(...temps.tempDegC);
@@ -199,7 +200,7 @@ export default function App() {
   const [timeStepS, setTimeStepS] = useState(DEFAULT_TIMESTEP);
   const [nodes, setNodes] = useState<HSNode[]>(parseTextToNodes(DEFAULT_NODES));
   const [nodeText, setNodeText] = useState(DEFAULT_NODES);
-  const [connections, setConnections] = useState<Connection[]>(
+  const [connections, setConnections] = useState<HSConnection[]>(
     parseTextToConnections(parseTextToNodes(DEFAULT_NODES), DEFAULT_CONNECTIONS)
   );
   const [connectionText, setConnectionText] = useState(DEFAULT_CONNECTIONS);
@@ -209,12 +210,6 @@ export default function App() {
     null,
     undefined
   >>(null);
-
-  // run model once on load
-  useEffect(() => {
-    const results = runModel();
-    setResults(results);
-  }, []);
 
   // update both nodes and connections on text update
   useEffect(() => {
@@ -255,7 +250,10 @@ export default function App() {
     }
   }
 
-  function parseTextToConnections(nodes: HSNode[], text: string): Connection[] {
+  function parseTextToConnections(
+    nodes: HSNode[],
+    text: string
+  ): HSConnection[] {
     try {
       const parsed = JSON5.parse(text);
       return parsed.map((conn: any) => {
@@ -291,11 +289,19 @@ export default function App() {
   };
 
   function plotShape(data: ModelOutput) {
-    const reshaped: any[] = data.timeSeriesS.map((t) => ({ name: t }));
-    data.temps.map((nodeTemp) => {
-      nodeTemp.tempDegC.forEach((t, idx) => {
-        reshaped[idx][nodeTemp.node.name] = t;
-      });
+    const lowerMag = Math.floor(Math.log10(data.totalTimeS));
+    const divisibleBy = Math.pow(10, lowerMag - 1);
+    function include(val: number) {
+      const tol = 0.01;
+      return Math.abs(val % divisibleBy) < tol;
+    }
+    const reshaped: any[] = data.timeSeriesS
+      .filter((_, idx) => include(data.timeSeriesS[idx]))
+      .map((t, idx) => ({ name: t }));
+    data.nodeResults.map((nodeResult) => {
+      nodeResult.tempDegC
+        .filter((_, idx) => include(data.timeSeriesS[idx]))
+        .forEach((t, idx) => (reshaped[idx][nodeResult.node.name] = t));
     });
     return reshaped;
   }
@@ -314,13 +320,11 @@ export default function App() {
           event.preventDefault();
         }}
       >
-        {!!results && results.temps.length > 0 ? (
+        {!!results && results.nodeResults.length > 0 ? (
           <LineChart
             width={plotParams.width}
             height={plotParams.height}
-            data={plotShape(results).filter(
-              (_, index) => index % Math.floor(results.numTimeSteps / 100) === 0
-            )}
+            data={plotShape(results)}
             margin={{
               top: plotParams.margin.top,
               right: plotParams.margin.right,
@@ -329,16 +333,33 @@ export default function App() {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
+            <XAxis
+              dataKey="name"
+              label={{ value: "Time [seconds]", position: "middle", dy: 20 }}
+            />
+            <YAxis
+              label={{
+                value: "Temperature [degC]",
+                position: "middle",
+                angle: -90,
+                dx: -20,
+              }}
+            />
             <Tooltip />
-            <Legend />
-            {results.temps.map((nodeTemps, idx) => {
+            <Legend
+              layout="vertical"
+              verticalAlign="middle"
+              align="right"
+              wrapperStyle={{
+                paddingLeft: "10px",
+              }}
+            />
+            {results.nodeResults.map((nodeResult, idx) => {
               return (
                 <Line
-                  key={nodeTemps.node.id}
+                  key={nodeResult.node.id}
                   type={"monotone"}
-                  dataKey={nodeTemps.node.name}
+                  dataKey={nodeResult.node.name}
                   stroke={colors[idx]}
                   activeDot={{ r: 8 }}
                 />
@@ -375,64 +396,3 @@ export default function App() {
   );
   // return <Canvas nodes={nodes} addNode={addNode} />;
 }
-
-// function runModel() {
-//   const firstNode = makeNode({
-//     name: "first",
-//     temperatureDegC: 10,
-//     capacitanceJPerDegK: 100,
-//     powerGenW: 0,
-//     isBoundary: false,
-//   });
-//
-//   const secondNode = makeNode({
-//     name: "second",
-//     temperatureDegC: 40,
-//     capacitanceJPerDegK: 40,
-//     powerGenW: 0,
-//     isBoundary: false,
-//   });
-//
-//   const thirdNode = makeNode({
-//     name: "third",
-//     temperatureDegC: 120,
-//     capacitanceJPerDegK: 200,
-//     powerGenW: 0,
-//     isBoundary: false,
-//   });
-//
-//   const conn12 = makeConnection({
-//     source: firstNode,
-//     target: secondNode,
-//     resistanceDegKPerW: 1,
-//     kind: "bi",
-//   });
-//
-//   const conn23 = makeConnection({
-//     source: secondNode,
-//     target: thirdNode,
-//     resistanceDegKPerW: 2,
-//     kind: "bi",
-//   });
-//
-//   const conn31 = makeConnection({
-//     source: thirdNode,
-//     target: firstNode,
-//     resistanceDegKPerW: 3,
-//     kind: "bi",
-//   });
-//
-//   const start = performance.now();
-//   const results = run({
-//     nodes: [firstNode, secondNode, thirdNode],
-//     connections: [conn12, conn23, conn31],
-//     timeStepS: 0.1,
-//     totalTimeS: 100,
-//   });
-//   const end = performance.now();
-//
-//   console.log(JSON.stringify(results, null, 2));
-//   console.log(`Model took ${end - start} ms`);
-//
-//   return results;
-// }

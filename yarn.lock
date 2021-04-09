@@ -5908,10 +5908,10 @@ hosted-git-info@^2.1.4:
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.8.tgz#7539bd4bc1e0e0a895815a2e0262420b12858488"
   integrity sha512-f/wzC2QaWBs7t9IYqB4T3sR1xviIViXJRJTWBlx2Gf3g0Xi5vI7Yy4koXQ1c9OYDGHN9sBy1DQ2AB8fqZBWhUg==
 
-hotstuff-network@^0.0.17:
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/hotstuff-network/-/hotstuff-network-0.0.17.tgz#b1a5272b10c9ce1f326b0cc6a7b91ac2a8faecb2"
-  integrity sha512-RptPruLLBai9cbPSXt0hZyLuf1KcAEHCPKzYBJJpQWquefjZgVuFXa5NXqm0NLh2cLwcr28LGfQAbeT5wpE9lA==
+hotstuff-network@^0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/hotstuff-network/-/hotstuff-network-0.0.22.tgz#8ace1a6b1e743daf65b3cdf9ea24d598ea0a127d"
+  integrity sha512-4X4v5CVPBqKcYFChV/8PRZAFTkocTrzHwuXFOB2tavYZ9I1lPNxH4PXXYlC+qhoCpTLk5g4RdRhhpyLKC2YreA==
 
 hpack.js@^2.1.6:
   version "2.1.6"
