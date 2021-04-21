@@ -1,29 +1,28 @@
-import { HotNode } from "../App";
-import usePan from "./hooks/pan";
+import { useRef, useState } from "react";
 import styled from "styled-components";
+import { AppNode } from "../App";
+import usePan from "./hooks/pan";
 import useScale from "./hooks/scale";
-import { useRef } from "react";
-import useNodes from "./hooks/nodes";
 
 type CanvasProps = {
-  nodes: HotNode[];
-  addNode: (node: HotNode) => void;
+  nodes: AppNode[];
+  addNode: (node: AppNode) => void;
 };
 
 const StyledCanvas = styled.div`
-  width: 50vw;
+  /* width: 50vw;
   height: 50vh;
-  border: 1px solid black;
+  border: 1px solid black; */
 `;
 
 export default function Canvas(props: CanvasProps) {
   const [offset, startPan] = usePan();
   const ref = useRef<HTMLDivElement | null>(null);
   const scale = useScale(ref);
-  const [nodes, addNode] = useNodes(props.nodes);
+  const [nodes, setNodes] = useState<AppNode[]>([]);
 
   return (
-    <StyledCanvas ref={ref} onMouseDown={startPan} onDoubleClick={addNode}>
+    <StyledCanvas ref={ref} onMouseDown={startPan}>
       <div>{JSON.stringify(offset)}</div>
       <div>{scale}</div>
       <div>{JSON.stringify(nodes)}</div>
