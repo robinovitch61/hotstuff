@@ -7,12 +7,10 @@ import {
   makeNode,
   makeConnection,
   ModelOutput,
-  NodeResult,
   HSNode,
   HSConnection,
   emptyOutput,
 } from "hotstuff-network";
-import * as d3 from "d3";
 import styled from "styled-components";
 import {
   CartesianGrid,
@@ -23,7 +21,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Label,
 } from "recharts";
 
 const colors = [
@@ -51,7 +48,7 @@ const DEFAULT_NODES = `[
     "name": "second",
     "temperatureDegC": 40,
     "capacitanceJPerDegK": 10,
-    "powerGenW": 3,
+    "powerGenW": 0,
     "isBoundary": true
   },
   {
@@ -261,6 +258,9 @@ export default function App() {
       timeStepS,
       totalTimeS,
     });
+    if (results.errors) {
+      results.errors.map((err) => console.error(`${err.name}: ${err.message}`));
+    }
     return results;
   }
 
