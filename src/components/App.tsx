@@ -4,10 +4,13 @@ import styled from "styled-components";
 import Canvas from "./Canvas/Canvas";
 import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
+import config from "../config";
 
-const MAX_PLOT_POINTS_PER_NODE = 400;
-const DEFAULT_TIMESTEP = 0.1;
-const DEFAULT_TOTAL_TIME = 50;
+const {
+  defaultTimeStepSeconds,
+  defaultTotalTimeSeconds,
+  editorWidthPerc,
+} = config;
 
 export type Point = {
   xPos: number;
@@ -20,33 +23,31 @@ export type AppNode = HSNode & {
   color: string;
 };
 
-export type AppConnection = HSConnection & {
-  center: Point;
-  radius: number;
-  color: string;
-};
+export type AppConnection = HSConnection;
 
-const StyledWorkspace = styled.div``;
+const StyledWorkspace = styled.div`
+  width: ${(1 - editorWidthPerc) * 100}vw;
+`;
 
 export default function App() {
   const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
     undefined
   );
-  const [totalTimeS, setTotalTimeS] = useState(DEFAULT_TOTAL_TIME);
-  const [timeStepS, setTimeStepS] = useState(DEFAULT_TIMESTEP);
+  const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
+  const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
 
   return (
-    <div>
+    <>
       <StyledWorkspace>
         <Canvas
-          nodes={[]}
+          nodes={appNodes}
           addNode={(node: AppNode) => setAppNodes([...appNodes, node])}
         />
         <Plot />
       </StyledWorkspace>
       <Editor />
-    </div>
+    </>
   );
 }

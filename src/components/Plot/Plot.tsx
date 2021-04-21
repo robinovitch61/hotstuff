@@ -9,7 +9,10 @@ import {
   YAxis,
 } from "recharts";
 import styled from "styled-components";
+import config from "../../config";
 
+const { canvasHeightPerc } = config;
+const MAX_PLOT_POINTS_PER_NODE = 400;
 const colors = [
   "#2ecc71",
   "#3498db",
@@ -20,25 +23,26 @@ const colors = [
   "#16a085",
 ];
 
-const StyledCharts = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin-top: 2em;
+// const StyledCharts = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   width: 100%;
+//   margin-top: 2em;
 
-  .chart {
-    width: 60% !important;
-    max-width: 900px;
+//   .chart {
+//     width: 60% !important;
+//     max-width: 900px;
 
-    @media only screen and (max-width: 600px) {
-      width: 90% !important;
-      touch-action: pan-y;
-    }
-  }
-`;
-/**
-<StyledCharts>
+//     @media only screen and (max-width: 600px) {
+//       width: 90% !important;
+//       touch-action: pan-y;
+//     }
+//   }
+// `;
+
+{
+  /* <StyledCharts>
   <ResponsiveContainer
     height={plotParams.height}
     className={"chart"}
@@ -145,8 +149,13 @@ const StyledCharts = styled.div`
       })}
     </LineChart>
   </ResponsiveContainer>
-</StyledCharts>
-*/
+</StyledCharts> */
+}
+
+const StyledPlot = styled.div`
+  width: 100%;
+  height: ${(1 - canvasHeightPerc) * 100}vh;
+`;
 
 export default function Plot() {
   // // show the temps of the first node as dots vertically along the svg
@@ -193,5 +202,5 @@ export default function Plot() {
   // const res =
   //   !!results && results.nodeResults.length > 0 ? results : emptyOutput;
   // const [tempPlotData, heatTransferPlotData] = plotShape(res);
-  return <div>PLOT</div>;
+  return <StyledPlot>PLOT</StyledPlot>;
 }
