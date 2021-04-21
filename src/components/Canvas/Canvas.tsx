@@ -16,7 +16,6 @@ const StyledCanvas = styled.div`
   border: 1px solid black;
 `;
 
-// TODO: CONTINUE READING https://reactjs.org/docs/hooks-effect.html#tips-for-using-effects
 export default function Canvas(props: CanvasProps) {
   const [offset, startPan] = usePan();
   const ref = useRef<HTMLDivElement | null>(null);
