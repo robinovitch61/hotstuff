@@ -18,6 +18,8 @@ export class TemperatureValidationError extends HotStuffError {}
 
 export class ThermalCapacitanceValidationError extends HotStuffError {}
 
+export class PowerGenerationAtBoundaryError extends HotStuffError {}
+
 export class ThermalResistanceValidationError extends HotStuffError {}
 
 export class CircularConnectionError extends HotStuffError {}

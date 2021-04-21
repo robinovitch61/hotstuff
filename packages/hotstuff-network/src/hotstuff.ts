@@ -9,6 +9,7 @@ import {
   ThermalResistanceValidationError,
   TimeStepValidationError,
   HotStuffError,
+  PowerGenerationAtBoundaryError,
 } from './errors';
 
 export const KELVIN = 273.15;
@@ -94,11 +95,11 @@ export function makeConnection({ source, target, resistanceDegKPerW, kind }: HSC
   };
 }
 
-export function toKey(sourceId: string, targetId: string) {
+export function toKey(sourceId: string, targetId: string): string {
   return `${sourceId}-${targetId}`;
 }
 
-export function fromKey(key: string) {
+export function fromKey(key: string): string[] {
   return key.split('-');
 }
 
@@ -122,6 +123,7 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
     if (!uniqueIds.has(conn.source.id)) {
       errors.push(new NodeNotFoundError(`Id ${conn.source.id} does not correspond to a node`));
     }
+
     if (!uniqueIds.has(conn.target.id)) {
       errors.push(new NodeNotFoundError(`Id ${conn.target.id} does not correspond to a node`));
     }
@@ -131,10 +133,15 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
     if (node.temperatureDegC < -KELVIN) {
       errors.push(new TemperatureValidationError(`Impossible temperature of ${node.temperatureDegC} degC`));
     }
+
     if (node.capacitanceJPerDegK < 0) {
       errors.push(
         new ThermalCapacitanceValidationError(`Impossible thermal capacitance of ${node.capacitanceJPerDegK} J/degK`),
       );
+    }
+
+    if (node.isBoundary && node.powerGenW !== 0) {
+      errors.push(new PowerGenerationAtBoundaryError(`Non-zero power generation at boundary condition`));
     }
   });
 
@@ -156,7 +163,7 @@ export function calculateTerm(capacitanceJPerDegK: number, resistanceDegKPerW: n
   return 1 / capacitanceJPerDegK / resistanceDegKPerW;
 }
 
-export function createAMatrix(nodes: HSNode[], connections: HSConnection[]) {
+export function createAMatrix(nodes: HSNode[], connections: HSConnection[]): number[][][] {
   const numNodes = nodes.length;
   const nodeIds = nodes.map((node) => node.id);
   const vals = matrixUtils.zeros2d(numNodes, numNodes);
@@ -233,7 +240,7 @@ export function getHeatTransfer(temps: number[], nodes: HSNode[], connections: H
   });
 }
 
-export function numTimeSteps(timeStepS: number, totalTimeS: number) {
+export function numTimeSteps(timeStepS: number, totalTimeS: number): number {
   if (timeStepS > totalTimeS) {
     return 0;
   }
