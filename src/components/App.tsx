@@ -259,6 +259,7 @@ export default function App() {
       totalTimeS,
     });
     if (results.errors) {
+      // TODO: minification removes err.name
       results.errors.map((err) => console.error(`${err.name}: ${err.message}`));
     }
     return results;
