@@ -4,8 +4,6 @@ import styled from "styled-components";
 import { AppConnection, AppNode, Point } from "../App";
 import usePan from "./hooks/pan";
 import useScale from "./hooks/scale";
-import useMousePos from "./hooks/useMousePos";
-import useLast from "./hooks/useLast";
 import useWindowSize from "./hooks/resize";
 import config from "../../config";
 import { makeNode } from "hotstuff-network";
@@ -53,77 +51,12 @@ function draw(
 }
 
 export default function Canvas(props: CanvasProps) {
-  console.log("RERENDER");
   const [offset, startPan] = usePan();
   const [windowWidth, windowHeight] = useWindowSize();
   const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement);
-  const mousePosRef = useMousePos(ref);
-  const lastOffset = useLast<Point>(offset);
-  const lastScale = useLast<number>(scale);
 
   const { nodes, connections } = props;
-
-  // Calculate the delta between the current and last offset—how far the user has panned.
-  // const delta = pointUtils.diff(offset, lastOffset)
-  const delta = { x: offset.x - lastOffset.x, y: offset.y - lastOffset.y };
-  console.log(`delta: ${JSON.stringify(delta)}`);
-
-  // Since scale also affects offset, we track our own "real" offset that's
-  // changed by both panning and zooming.
-  // const adjustedOffset = useRef(pointUtils.sum(offset, delta));
-  const adjustedOffset = useRef<Point>({
-    x: offset.x + delta.x,
-    y: offset.y + delta.y,
-  });
-
-  if (lastScale === scale) {
-    // No change in scale—just apply the delta between the last and new offset
-    // to the adjusted offset.
-    // adjustedOffset.current = pointUtils.sum(
-    //   adjustedOffset.current,
-    //   pointUtils.scale(delta, scale)
-    // );
-    const scaledDelta = { x: delta.x / scale, y: delta.y / scale };
-
-    console.log(
-      `adjustedOffset.current: ${JSON.stringify(adjustedOffset.current)}`
-    );
-    console.log(`scaledDelta.x: ${scaledDelta.x}`);
-    const nextAdjOffset = {
-      x: adjustedOffset.current.x + scaledDelta.x,
-      y: adjustedOffset.current.y + scaledDelta.y,
-    };
-    console.log(`next should be ${JSON.stringify(nextAdjOffset)}`);
-    adjustedOffset.current = nextAdjOffset;
-  }
-  // } else {
-  //   // The scale has changed—adjust the offset to compensate for the change in
-  //   // relative position of the pointer to the canvas.
-  //   // const lastMouse = pointUtils.scale(mousePosRef.current, lastScale);
-  //   // const newMouse = pointUtils.scale(mousePosRef.current, scale);
-  //   // const mouseOffset = pointUtils.diff(lastMouse, newMouse);
-  //   // adjustedOffset.current = pointUtils.sum(
-  //   //   adjustedOffset.current,
-  //   //   mouseOffset
-  //   // );
-  //   const lastMouse = {
-  //     x: mousePosRef.current.x / lastScale,
-  //     y: mousePosRef.current.y / lastScale,
-  //   };
-  //   const newMouse = {
-  //     x: mousePosRef.current.x / scale,
-  //     y: mousePosRef.current.y / scale,
-  //   };
-  //   const mouseOffset = {
-  //     x: lastMouse.x - newMouse.x,
-  //     y: lastMouse.y - newMouse.y,
-  //   };
-  //   adjustedOffset.current = {
-  //     x: adjustedOffset.current.x + mouseOffset.x,
-  //     y: adjustedOffset.current.y + mouseOffset.y,
-  //   };
-  // }
 
   useLayoutEffect(() => {
     const canvas = ref.current;
@@ -137,12 +70,7 @@ export default function Canvas(props: CanvasProps) {
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
     context.translate(-offset.x, -offset.y);
     // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react)
-    context.translate(-adjustedOffset.current.x, -adjustedOffset.current.y);
     context.scale(scale, scale);
-    // context.translate(
-    //   adjustedOffset.current.x / scale,
-    //   adjustedOffset.current.y / scale
-    // );
     draw(context, nodes, connections);
   }, [
     nodes,
@@ -197,9 +125,7 @@ export default function Canvas(props: CanvasProps) {
         }}
       />
       <div>offset: {JSON.stringify(offset)}</div>
-      <div>adjustedOffset: {JSON.stringify(adjustedOffset.current)}</div>
       <div>{scale}</div>
-      <div>{JSON.stringify(mousePosRef.current)}</div>
       <div>{JSON.stringify(nodes)}</div>
     </>
   );
