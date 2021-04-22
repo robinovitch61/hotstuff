@@ -5,15 +5,15 @@ import {
   useState,
 } from "react";
 
-type Point = {
+type Offset = {
   x: number;
   y: number;
 };
 
 const ORIGIN = Object.freeze({ x: 0, y: 0 });
 
-export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
-  const [panState, setPanState] = useState<Point>(ORIGIN);
+export default function usePan(): [Offset, (e: SyntheticMouseEvent) => void] {
+  const [panState, setPanState] = useState<Offset>(ORIGIN);
 
   // Track the last observed mouse position on pan.
   const lastPointRef = useRef(ORIGIN);
@@ -35,8 +35,8 @@ export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
         y: lastPoint.y - currentPoint.y,
       };
       const offset = {
-        x: panState.x + delta.x,
-        y: panState.y + delta.y,
+        x: panState.x - delta.x,
+        y: panState.y - delta.y,
       };
       return offset;
     });

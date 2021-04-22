@@ -16,6 +16,7 @@ const {
   defaultTimeStepSeconds,
   defaultTotalTimeSeconds,
   editorWidthPerc,
+  defaultNodeRadius,
 } = config;
 
 export type Point = {
@@ -55,13 +56,13 @@ const testAppNodes: AppNode[] = [
   {
     ...test1,
     center: { xPos: 100, yPos: 100 },
-    radius: 20,
+    radius: defaultNodeRadius,
     color: "red",
   },
   {
     ...test2,
     center: { xPos: 200, yPos: 200 },
-    radius: 20,
+    radius: defaultNodeRadius,
     color: "red",
   },
 ];
