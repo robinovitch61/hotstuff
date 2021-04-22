@@ -5,6 +5,7 @@ const config = {
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 15,
   newNodeNamePrefix: "New Node ",
+  zoomIncrement: 0.01,
 };
 
 export default config;

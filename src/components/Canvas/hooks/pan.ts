@@ -5,24 +5,23 @@ import {
   useState,
 } from "react";
 
-type Offset = {
-  x: number;
-  y: number;
-};
-
+type Point = { x: number; y: number };
 const ORIGIN = Object.freeze({ x: 0, y: 0 });
 
-export default function usePan(): [Offset, (e: SyntheticMouseEvent) => void] {
-  const [panState, setPanState] = useState<Offset>(ORIGIN);
+/**
+ * Track the user's intended panning offset by listening to `mousemove` events
+ * once the user has started panning.
+ */
+export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
+  const [panState, setPanState] = useState<Point>(ORIGIN);
 
   // Track the last observed mouse position on pan.
   const lastPointRef = useRef(ORIGIN);
 
   const pan = useCallback((e: MouseEvent) => {
     const lastPoint = lastPointRef.current;
-
-    const currentPoint = { x: e.pageX, y: e.pageY };
-    lastPointRef.current = currentPoint;
+    const point = { x: e.pageX, y: e.pageY };
+    lastPointRef.current = point;
 
     // Find the delta between the last mouse position on `mousemove` and the
     // current mouse position.
@@ -31,13 +30,15 @@ export default function usePan(): [Offset, (e: SyntheticMouseEvent) => void] {
     // state.
     setPanState((panState) => {
       const delta = {
-        x: lastPoint.x - currentPoint.x,
-        y: lastPoint.y - currentPoint.y,
+        x: lastPoint.x - point.x,
+        y: lastPoint.y - point.y,
       };
+      console.log(`delta in pan: ${JSON.stringify(delta)}`);
       const offset = {
-        x: panState.x - delta.x,
-        y: panState.y - delta.y,
+        x: panState.x + delta.x,
+        y: panState.y + delta.y,
       };
+
       return offset;
     });
   }, []);
@@ -57,5 +58,6 @@ export default function usePan(): [Offset, (e: SyntheticMouseEvent) => void] {
     },
     [pan, endPan]
   );
+
   return [panState, startPan];
 }

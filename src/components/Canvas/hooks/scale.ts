@@ -1,5 +1,4 @@
 import { RefObject, useState } from "react";
-import { Point } from "../../App";
 import useEventListener from "./useEventListener";
 
 type ScaleOpts = {
@@ -17,9 +16,8 @@ const MAX_SCALE = 3;
 export default function useScale(
   ref: RefObject<HTMLElement | null>,
   interval: number
-): [number, Point] {
+) {
   const [scale, setScale] = useState(1);
-  const [mousePos, setMousePos] = useState<Point>({ xPos: 0, yPos: 0 });
 
   const updateScale = ({ direction, interval }: ScaleOpts) => {
     setScale((currentScale) => {
@@ -48,7 +46,6 @@ export default function useScale(
       direction: e.deltaY > 0 ? "down" : "up",
       interval,
     });
-    setMousePos({ xPos: e.pageX, yPos: e.pageY });
   });
-  return [scale, mousePos];
+  return scale;
 }

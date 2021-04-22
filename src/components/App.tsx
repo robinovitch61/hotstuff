@@ -20,8 +20,8 @@ const {
 } = config;
 
 export type Point = {
-  xPos: number;
-  yPos: number;
+  x: number;
+  y: number;
 };
 
 export type AppNode = HSNode & {
@@ -55,13 +55,13 @@ const test2 = makeNode({
 const testAppNodes: AppNode[] = [
   {
     ...test1,
-    center: { xPos: 100, yPos: 100 },
+    center: { x: 100, y: 100 },
     radius: defaultNodeRadius,
     color: "red",
   },
   {
     ...test2,
-    center: { xPos: 200, yPos: 200 },
+    center: { x: 200, y: 200 },
     radius: defaultNodeRadius,
     color: "red",
   },
