@@ -9,10 +9,12 @@ export function rescaleCanvas(
   windowWidth: number,
   windowHeight: number
 ) {
+  context.save();
   const { devicePixelRatio: ratio = 1 } = window;
   canvas.width = windowWidth * (1 - editorWidthPerc) * ratio;
   canvas.height = windowHeight * canvasHeightPerc * ratio;
   context.scale(ratio, ratio);
+  context.restore();
 }
 
 export function drawCircle(
@@ -22,10 +24,12 @@ export function drawCircle(
   radius: number,
   color: string
 ) {
+  context.save();
   context.beginPath();
   context.arc(x, y, radius, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
+  context.restore();
 }
 
 export function drawArrow(
@@ -34,14 +38,11 @@ export function drawArrow(
   end: Point,
   color: string
 ) {
+  context.save();
   context.strokeStyle = color;
   context.lineWidth = 2;
   const headLength = 9;
   const headWidth = 4;
-  // const xStartCorrection =
-  //   end.center.x > start.center.x ? start.radius : -start.radius;
-  // const yStartCorrection =
-  //   end.center.y > start.center.y ? start.radius : -start.radius;
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const angle = Math.atan2(dy, dx);
@@ -55,7 +56,7 @@ export function drawArrow(
   context.lineTo(length, 0);
   context.lineTo(length - headLength, headWidth);
   context.stroke();
-  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.restore();
 }
 
 export function drawConnection(

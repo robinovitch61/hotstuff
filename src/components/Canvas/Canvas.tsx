@@ -58,7 +58,7 @@ export default function Canvas(props: CanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement);
   // const lastScale = useLast(scale);
-  // const mousePosRef = useMousePos(ref);
+  const mousePosRef = useMousePos(ref);
 
   const { nodes, connections } = props;
 
@@ -71,10 +71,36 @@ export default function Canvas(props: CanvasProps) {
     if (context === null) {
       return;
     }
+
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
     context.translate(-offset.x, -offset.y);
     // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
+    const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
+    const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
     context.scale(scale, scale);
+
+    // TODO: remove, helpful for debugging
+    // origin and axis
+    context.save();
+    context.fillStyle = "black";
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.arc(0, 0, 5, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(40, 0);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(0, 40);
+    context.stroke();
+    // mouse pos
+    context.beginPath();
+    context.arc(currentMouseX, currentMouseY, 5, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
+
     draw(context, nodes, connections);
   }, [
     nodes,
@@ -130,7 +156,7 @@ export default function Canvas(props: CanvasProps) {
       <div>offset: {JSON.stringify(offset)}</div>
       <div>scale: {scale}</div>
       {/* <div>lastScale: {lastScale}</div> */}
-      {/* <div>mouse: {JSON.stringify(mousePosRef.current)}</div> */}
+      <div>mouse: {JSON.stringify(mousePosRef.current)}</div>
       <div>{JSON.stringify(nodes)}</div>
     </>
   );
