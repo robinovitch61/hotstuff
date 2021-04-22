@@ -5,6 +5,8 @@ import { AppConnection, AppNode, Point } from "../App";
 import usePan from "./hooks/pan";
 import useScale from "./hooks/scale";
 import useWindowSize from "./hooks/resize";
+import useMousePos from "./hooks/useMousePos";
+import useLast from "./hooks/useLast";
 import config from "../../config";
 import { makeNode } from "hotstuff-network";
 
@@ -55,6 +57,8 @@ export default function Canvas(props: CanvasProps) {
   const [windowWidth, windowHeight] = useWindowSize();
   const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement);
+  // const lastScale = useLast(scale);
+  // const mousePosRef = useMousePos(ref);
 
   const { nodes, connections } = props;
 
@@ -69,7 +73,7 @@ export default function Canvas(props: CanvasProps) {
     }
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
     context.translate(-offset.x, -offset.y);
-    // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react)
+    // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
     context.scale(scale, scale);
     draw(context, nodes, connections);
   }, [
@@ -110,7 +114,6 @@ export default function Canvas(props: CanvasProps) {
     props.addNode(newAppNode);
   }
 
-  console.log("DONE RERENDER");
   return (
     <>
       <StyledCanvas
@@ -125,7 +128,9 @@ export default function Canvas(props: CanvasProps) {
         }}
       />
       <div>offset: {JSON.stringify(offset)}</div>
-      <div>{scale}</div>
+      <div>scale: {scale}</div>
+      {/* <div>lastScale: {lastScale}</div> */}
+      {/* <div>mouse: {JSON.stringify(mousePosRef.current)}</div> */}
       <div>{JSON.stringify(nodes)}</div>
     </>
   );

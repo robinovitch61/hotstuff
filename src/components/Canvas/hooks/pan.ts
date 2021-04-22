@@ -33,7 +33,6 @@ export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
         x: lastPoint.x - point.x,
         y: lastPoint.y - point.y,
       };
-      console.log(`delta in pan: ${JSON.stringify(delta)}`);
       const offset = {
         x: panState.x + delta.x,
         y: panState.y + delta.y,
