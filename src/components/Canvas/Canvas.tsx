@@ -66,29 +66,6 @@ export default function Canvas(props: CanvasProps) {
 
   const { nodes, connections } = props;
 
-  // // Calculate the delta between the current and last offset—how far the user has panned.
-  // const delta = diffPoints(offset, lastOffset || ORIGIN);
-
-  // // Since scale also affects offset, we track our own "real" offset that's
-  // // changed by both panning and zooming.
-  // const adjustedOffset = useRef(addPoints(offset, delta));
-
-  // if (lastScale === scale) {
-  //   // No change in scale—just apply the delta between the last and new offset
-  //   // to the adjusted offset.
-  //   adjustedOffset.current = addPoints(
-  //     adjustedOffset.current,
-  //     scalePoint(delta, scale)
-  //   );
-  // } else {
-  //   // The scale has changed—adjust the offset to compensate for the change in
-  //   // relative position of the pointer to the canvas.
-  //   const lastMouse = scalePoint(mousePosRef.current, lastScale || 1);
-  //   const newMouse = scalePoint(mousePosRef.current, scale);
-  //   const mouseOffset = diffPoints(lastMouse, newMouse);
-  //   adjustedOffset.current = addPoints(adjustedOffset.current, mouseOffset);
-  // }
-
   useLayoutEffect(() => {
     const canvas = ref.current;
     if (canvas === null) {
@@ -102,33 +79,31 @@ export default function Canvas(props: CanvasProps) {
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
     context.translate(-offset.x, -offset.y);
     // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
-    const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
-    const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
-    // context.translate(currentMouseX, currentMouseY);
     context.scale(scale, scale);
-    // context.translate(-currentMouseX, -currentMouseY);
 
-    // TODO: remove, helpful for debugging
-    // origin and axis
-    context.save();
-    context.fillStyle = "black";
-    context.strokeStyle = "black";
-    context.lineWidth = 2;
-    context.arc(0, 0, 5, 0, Math.PI * 2);
-    context.fill();
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(40, 0);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(0, 40);
-    context.stroke();
-    // mouse pos
-    context.beginPath();
-    context.arc(currentMouseX, currentMouseY, 5, 0, Math.PI * 2);
-    context.fill();
-    context.restore();
+    // // TODO: remove, helpful for debugging
+    // // origin and axis
+    // const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
+    // const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
+    // context.save();
+    // context.fillStyle = "black";
+    // context.strokeStyle = "black";
+    // context.lineWidth = 2;
+    // context.arc(0, 0, 5, 0, Math.PI * 2);
+    // context.fill();
+    // context.beginPath();
+    // context.moveTo(0, 0);
+    // context.lineTo(40, 0);
+    // context.stroke();
+    // context.beginPath();
+    // context.moveTo(0, 0);
+    // context.lineTo(0, 40);
+    // context.stroke();
+    // // mouse pos
+    // context.beginPath();
+    // context.arc(currentMouseX, currentMouseY, 5, 0, Math.PI * 2);
+    // context.fill();
+    // context.restore();
 
     draw(context, nodes, connections);
   }, [
@@ -184,7 +159,6 @@ export default function Canvas(props: CanvasProps) {
       />
       <div>offset: {JSON.stringify(offset)}</div>
       <div>lastOffset: {JSON.stringify(lastOffset)}</div>
-      {/* <div>adjustedOffset: {JSON.stringify(adjustedOffset.current)}</div> */}
       <div>mouse: {JSON.stringify(mousePosRef.current)}</div>
       <div>scale: {scale}</div>
       <div>lastScale: {lastScale}</div>
