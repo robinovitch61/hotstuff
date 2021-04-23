@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as canvasUtils from "./canvasUtils";
 import styled from "styled-components";
-import { AppConnection, AppNode, Point } from "../App";
+import { AppConnection, AppNode } from "../App";
+import { Point, addPoints, diffPoints, scalePoint, ORIGIN } from "./pointUtils";
 import usePan from "./hooks/pan";
 import useScale from "./hooks/scale";
 import useWindowSize from "./hooks/resize";
@@ -15,6 +16,8 @@ const {
   defaultNodeRadius,
   newNodeNamePrefix,
   zoomIncrement,
+  minZoom,
+  maxZoom,
 } = config;
 
 type CanvasProps = {
@@ -54,13 +57,37 @@ function draw(
 
 export default function Canvas(props: CanvasProps) {
   const [offset, startPan] = usePan();
-  const [windowWidth, windowHeight] = useWindowSize();
   const ref = useRef<HTMLCanvasElement | null>(null);
-  const scale = useScale(ref, zoomIncrement);
-  // const lastScale = useLast(scale);
+  const [windowWidth, windowHeight] = useWindowSize();
+  const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
   const mousePosRef = useMousePos(ref);
+  const lastOffset = useLast(offset);
+  const lastScale = useLast(scale);
 
   const { nodes, connections } = props;
+
+  // // Calculate the delta between the current and last offset—how far the user has panned.
+  // const delta = diffPoints(offset, lastOffset || ORIGIN);
+
+  // // Since scale also affects offset, we track our own "real" offset that's
+  // // changed by both panning and zooming.
+  // const adjustedOffset = useRef(addPoints(offset, delta));
+
+  // if (lastScale === scale) {
+  //   // No change in scale—just apply the delta between the last and new offset
+  //   // to the adjusted offset.
+  //   adjustedOffset.current = addPoints(
+  //     adjustedOffset.current,
+  //     scalePoint(delta, scale)
+  //   );
+  // } else {
+  //   // The scale has changed—adjust the offset to compensate for the change in
+  //   // relative position of the pointer to the canvas.
+  //   const lastMouse = scalePoint(mousePosRef.current, lastScale || 1);
+  //   const newMouse = scalePoint(mousePosRef.current, scale);
+  //   const mouseOffset = diffPoints(lastMouse, newMouse);
+  //   adjustedOffset.current = addPoints(adjustedOffset.current, mouseOffset);
+  // }
 
   useLayoutEffect(() => {
     const canvas = ref.current;
@@ -77,7 +104,9 @@ export default function Canvas(props: CanvasProps) {
     // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
     const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
     const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
+    // context.translate(currentMouseX, currentMouseY);
     context.scale(scale, scale);
+    // context.translate(-currentMouseX, -currentMouseY);
 
     // TODO: remove, helpful for debugging
     // origin and axis
@@ -154,9 +183,11 @@ export default function Canvas(props: CanvasProps) {
         }}
       />
       <div>offset: {JSON.stringify(offset)}</div>
-      <div>scale: {scale}</div>
-      {/* <div>lastScale: {lastScale}</div> */}
+      <div>lastOffset: {JSON.stringify(lastOffset)}</div>
+      {/* <div>adjustedOffset: {JSON.stringify(adjustedOffset.current)}</div> */}
       <div>mouse: {JSON.stringify(mousePosRef.current)}</div>
+      <div>scale: {scale}</div>
+      <div>lastScale: {lastScale}</div>
       <div>{JSON.stringify(nodes)}</div>
     </>
   );

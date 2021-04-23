@@ -6,16 +6,15 @@ type ScaleOpts = {
   interval: number;
 };
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 3;
-
 /**
  * Listen for `wheel` events on the given element ref and update the reported
  * scale state, accordingly.
  */
 export default function useScale(
   ref: RefObject<HTMLElement | null>,
-  interval: number
+  interval: number,
+  minScale: number,
+  maxScale: number
 ) {
   const [scale, setScale] = useState(1);
 
@@ -23,16 +22,16 @@ export default function useScale(
     setScale((currentScale) => {
       // Adjust up to or down to the maximum or minimum scale levels by `interval`.
       if (direction === "up") {
-        if (currentScale + interval < MAX_SCALE) {
+        if (currentScale + interval < maxScale) {
           return currentScale + interval;
         } else {
-          return MAX_SCALE;
+          return maxScale;
         }
       } else if (direction === "down") {
-        if (currentScale - interval > MIN_SCALE) {
+        if (currentScale - interval > minScale) {
           return currentScale - interval;
         } else {
-          MIN_SCALE;
+          return minScale;
         }
       }
       return currentScale;

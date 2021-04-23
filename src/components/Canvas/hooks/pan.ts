@@ -4,9 +4,7 @@ import {
   useRef,
   useState,
 } from "react";
-
-type Point = { x: number; y: number };
-const ORIGIN = Object.freeze({ x: 0, y: 0 });
+import { ORIGIN, Point } from "../pointUtils";
 
 /**
  * Track the user's intended panning offset by listening to `mousemove` events

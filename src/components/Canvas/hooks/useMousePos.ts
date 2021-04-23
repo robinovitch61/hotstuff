@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect, RefObject, useRef } from "react";
-import { Point } from "../../App";
+import { Point } from "../pointUtils";
 
 export default function useMousePos(ref: RefObject<HTMLElement | null>) {
   const mousePosRef = useRef<Point>({ x: 0, y: 0 });

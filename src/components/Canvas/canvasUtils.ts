@@ -1,4 +1,4 @@
-import { Point } from "../App";
+import { Point } from "./pointUtils";
 import config from "../../config";
 
 const { canvasHeightPerc, editorWidthPerc } = config;

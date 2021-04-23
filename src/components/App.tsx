@@ -7,6 +7,7 @@ import {
 } from "hotstuff-network";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Point } from "./Canvas/pointUtils";
 import Canvas from "./Canvas/Canvas";
 import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
@@ -18,11 +19,6 @@ const {
   editorWidthPerc,
   defaultNodeRadius,
 } = config;
-
-export type Point = {
-  x: number;
-  y: number;
-};
 
 export type AppNode = HSNode & {
   center: Point;
