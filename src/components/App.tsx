@@ -5,7 +5,7 @@ import {
   makeNode,
   ModelOutput,
 } from "hotstuff-network";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./Canvas/pointUtils";
 import Canvas from "./Canvas/Canvas";
@@ -98,12 +98,18 @@ export default function App() {
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
   const [windowWidth, windowHeight] = useWindowSize();
 
+  // // oh shit https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
+  // const test = useRef(0);
+  // alert(test.current);
+  // test.current = 1;
+  // alert(test.current);
+
   // width/heights
   const workspaceWidth = windowWidth;
   const workspaceHeight = windowHeight;
   const canvasHeight = windowHeight * canvasHeightPerc;
+  const canvasWidth = windowWidth * (1 - editorWidthPerc);
   const plotHeight = (1 - canvasHeightPerc) * windowHeight;
-  const editorHeight = windowHeight;
   const editorWidth = editorWidthPerc * windowWidth;
 
   // TODO: REMOVE
@@ -120,6 +126,8 @@ export default function App() {
             nodes={appNodes}
             connections={appConnections}
             addNode={(node: AppNode) => setAppNodes([...appNodes, node])}
+            canvasHeight={canvasHeight}
+            canvasWidth={canvasWidth}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />

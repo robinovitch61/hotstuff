@@ -4,57 +4,53 @@ import {
   useRef,
   useState,
 } from "react";
-import { ORIGIN, Point } from "../pointUtils";
+import { addPoints, diffPoints, ORIGIN, Point } from "../pointUtils";
 
 /**
  * Track the user's intended panning offset by listening to `mousemove` events
  * once the user has started panning.
  */
-export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
-  const [offset, setPanState] = useState<Point>({ x: -100, y: -100 });
+export default function usePan(): [
+  Point,
+  React.Dispatch<React.SetStateAction<Point>>,
+  (e: SyntheticMouseEvent) => void
+] {
+  const [offset, setOffset] = useState<Point>(ORIGIN);
 
   // Track the last observed mouse position on pan.
-  const lastPointRef = useRef(ORIGIN);
+  const lastMousePos = useRef(ORIGIN);
 
-  const pan = useCallback((e: MouseEvent) => {
-    const lastPoint = lastPointRef.current;
-    const point = { x: e.pageX, y: e.pageY };
-    lastPointRef.current = point;
+  const mouseMove = useCallback((e: MouseEvent) => {
+    const lastPoint = lastMousePos.current;
+    const currMousePos = { x: e.pageX, y: e.pageY }; // page is for the document, https://jsfiddle.net/robinovitch61/eL9q10zj/
+    lastMousePos.current = currMousePos;
 
     // Find the delta between the last mouse position on `mousemove` and the
     // current mouse position.
     //
     // Then, apply that delta to the current pan offset and set that as the new
     // state.
-    setPanState((panState) => {
-      const delta = {
-        x: lastPoint.x - point.x,
-        y: lastPoint.y - point.y,
-      };
-      const offset = {
-        x: panState.x + delta.x,
-        y: panState.y + delta.y,
-      };
-
-      return offset;
+    setOffset((prevOffset) => {
+      const delta = diffPoints(lastPoint, currMousePos);
+      return addPoints(prevOffset, delta);
     });
   }, []);
 
   // Tear down listeners.
-  const endPan = useCallback(() => {
-    document.removeEventListener("mousemove", pan);
-    document.removeEventListener("mouseup", endPan);
-  }, [pan]);
+  const mouseUp = useCallback(() => {
+    document.removeEventListener("mousemove", mouseMove);
+    document.removeEventListener("mouseup", mouseUp);
+  }, [mouseMove]);
 
   // Set up listeners.
-  const startPan = useCallback(
+  const startMouseMove = useCallback(
     (e: SyntheticMouseEvent) => {
-      document.addEventListener("mousemove", pan);
-      document.addEventListener("mouseup", endPan);
-      lastPointRef.current = { x: e.pageX, y: e.pageY };
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
+      lastMousePos.current = { x: e.pageX, y: e.pageY };
     },
-    [pan, endPan]
+    [mouseMove, mouseUp]
   );
 
-  return [offset, startPan];
+  return [offset, setOffset, startMouseMove];
 }

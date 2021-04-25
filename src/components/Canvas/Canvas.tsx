@@ -14,6 +14,7 @@ import { makeNode } from "hotstuff-network";
 const {
   canvasHeightPerc,
   defaultNodeRadius,
+  editorWidthPerc,
   newNodeNamePrefix,
   zoomIncrement,
   minZoom,
@@ -24,6 +25,8 @@ type CanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
   addNode: (node: AppNode) => void;
+  canvasWidth: number;
+  canvasHeight: number;
 };
 
 const StyledCanvas = styled.canvas`
@@ -57,13 +60,18 @@ function draw(
 }
 
 export default function Canvas(props: CanvasProps) {
-  const [offset, startPan] = usePan();
-  const ref = useRef<HTMLCanvasElement | null>(null);
   const [windowWidth, windowHeight] = useWindowSize();
+  const [offset, setOffset, startPan] = usePan();
+  const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
-  // const mousePosRef = useMousePos(ref);
+  const mousePosRef = useMousePos(ref);
 
   const { nodes, connections } = props;
+
+  // set offset to middle of canvas to zoom about center
+  useEffect(() => {
+    setOffset({ x: -props.canvasWidth / 2, y: -props.canvasHeight / 2 });
+  }, [props.canvasHeight, props.canvasWidth]);
 
   useLayoutEffect(() => {
     const canvas = ref.current;
@@ -75,36 +83,35 @@ export default function Canvas(props: CanvasProps) {
       return;
     }
 
-    // context.translate(canvas.width / 2, canvas.height / 2);
-
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
+
     context.translate(-offset.x, -offset.y);
     // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
     context.scale(scale, scale);
 
-    // // TODO: remove, helpful for debugging
-    // // origin and axis
-    // const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
-    // const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
-    // context.save();
-    // context.fillStyle = "black";
-    // context.strokeStyle = "black";
-    // context.lineWidth = 2;
-    // context.arc(0, 0, 5, 0, Math.PI * 2);
-    // context.fill();
-    // context.beginPath();
-    // context.moveTo(0, 0);
-    // context.lineTo(40, 0);
-    // context.stroke();
-    // context.beginPath();
-    // context.moveTo(0, 0);
-    // context.lineTo(0, 40);
-    // context.stroke();
-    // // mouse pos
-    // context.beginPath();
-    // context.arc(currentMouseX, currentMouseY, 5, 0, Math.PI * 2);
-    // context.fill();
-    // context.restore();
+    // TODO: remove, helpful for debugging
+    // origin and axis
+    const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
+    const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
+    context.save();
+    context.fillStyle = "black";
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.arc(0, 0, 5, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(40, 0);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(0, 40);
+    context.stroke();
+    // mouse pos
+    context.beginPath();
+    context.arc(currentMouseX, currentMouseY, 5, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
 
     draw(context, nodes, connections);
   }, [
