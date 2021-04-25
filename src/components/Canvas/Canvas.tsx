@@ -41,6 +41,7 @@ type CanvasProps = {
   addNode: (node: AppNode) => void;
   updateNode: (node: AppNode) => void;
   setActiveNode: (nodeId: string) => void;
+  clearActiveNode: () => void;
   canvasWidth: number;
   canvasHeight: number;
 };
@@ -256,6 +257,7 @@ export default function Canvas(props: CanvasProps) {
     });
 
     if (!nodeClicked) {
+      props.clearActiveNode();
       startPan(event);
     }
   }
