@@ -122,12 +122,19 @@ export default function App() {
   }, []);
 
   function addNode(node: AppNode) {
-    const newAppNodes: AppNode[] = appNodes.map((node) => ({
+    const newNodes: AppNode[] = appNodes.map((node) => ({
       ...node,
       isActive: false,
     }));
-    newAppNodes.push({ ...node, isActive: true });
-    setAppNodes(newAppNodes);
+    newNodes.push({ ...node, isActive: true });
+    setAppNodes(newNodes);
+  }
+
+  function updateNode(updatedNode: AppNode) {
+    const newNodes = appNodes.map((node) =>
+      node.id === updatedNode.id ? updatedNode : node
+    );
+    setAppNodes(newNodes);
   }
 
   function setNodeActive(nodeId: string) {
@@ -150,6 +157,7 @@ export default function App() {
             nodes={appNodes}
             connections={appConnections}
             addNode={addNode}
+            updateNode={updateNode}
             setNodeActive={setNodeActive}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}

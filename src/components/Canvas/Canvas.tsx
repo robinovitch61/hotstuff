@@ -23,6 +23,7 @@ import {
   intersectsCircle,
   toNodeCoords,
 } from "./canvasUtils";
+import useNodeMove from "./hooks/useNodeMove";
 
 const {
   defaultNodeRadius,
@@ -36,6 +37,7 @@ type CanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
   addNode: (node: AppNode) => void;
+  updateNode: (node: AppNode) => void;
   setNodeActive: (nodeId: string) => void;
   canvasWidth: number;
   canvasHeight: number;
@@ -73,6 +75,7 @@ export default function Canvas(props: CanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
   const mousePosRef = useMousePos(ref);
+  const [nodeMoveOffset, startNodeMove] = useNodeMove();
 
   const { nodes, connections } = props;
 
@@ -80,6 +83,20 @@ export default function Canvas(props: CanvasProps) {
   useLayoutEffect(() => {
     setOffset(makePoint(-props.canvasWidth / 2, -props.canvasHeight / 2));
   }, [props.canvasHeight, props.canvasWidth]);
+
+  // move active node if it's moving
+  useLayoutEffect(() => {
+    // TODO: maybe store the active node in state?
+    const filteredNodes = nodes.filter((node) => node.isActive);
+    if (filteredNodes.length !== 1) {
+      return;
+    }
+    const activeNode = filteredNodes[0];
+    props.updateNode({
+      ...activeNode,
+      center: diffPoints(activeNode.center, scalePoint(nodeMoveOffset, scale)),
+    });
+  }, [nodeMoveOffset]);
 
   // main canvas update hook
   useLayoutEffect(() => {
@@ -179,7 +196,9 @@ export default function Canvas(props: CanvasProps) {
     if (canvas === null) {
       return;
     }
-    nodes.forEach((node) => {
+
+    let nodeClicked = false;
+    nodes.some((node) => {
       if (
         intersectsCircle(
           toNodeCoords(
@@ -192,17 +211,21 @@ export default function Canvas(props: CanvasProps) {
           node.radius
         )
       ) {
+        nodeClicked = true;
         if (event.altKey) {
           console.log(`MAKE NEW CONN FOR ${node.name}`);
         } else {
           props.setNodeActive(node.id);
+          startNodeMove(event);
           console.log(`SET ACTIVE ${node.name}`);
         }
-        return;
+        return true; // short circuits the rest of the some loop
       }
     });
 
-    startPan(event);
+    if (!nodeClicked) {
+      startPan(event);
+    }
   }
 
   return (
