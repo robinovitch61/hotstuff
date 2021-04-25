@@ -55,7 +55,7 @@ function draw(
 ) {
   nodes.map((node) => {
     const { x, y } = node.center;
-    drawCircle(context, x, y, node.radius, node.color);
+    drawCircle(context, x, y, node.radius, node.color, node.isActive);
   });
 
   connections.map((conn) => {

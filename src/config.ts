@@ -8,6 +8,7 @@ const config = {
   zoomIncrement: 0.03,
   minZoom: 0.25,
   maxZoom: 3,
+  activeNodeStrokeWidth: 2.5,
 };
 
 export default config;

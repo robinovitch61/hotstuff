@@ -1,7 +1,7 @@
 import { makePoint, Point } from "./pointUtils";
 import config from "../../config";
 
-const { canvasHeightPerc, editorWidthPerc } = config;
+const { canvasHeightPerc, editorWidthPerc, activeNodeStrokeWidth } = config;
 
 export function rescaleCanvas(
   canvas: HTMLCanvasElement,
@@ -20,13 +20,20 @@ export function drawCircle(
   x: number,
   y: number,
   radius: number,
-  color: string
+  color: string,
+  isActive: boolean
 ) {
   context.save();
   context.beginPath();
   context.arc(x, y, radius, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
+  if (isActive) {
+    // inset
+    context.arc(x, y, radius - activeNodeStrokeWidth / 2, 0, 2 * Math.PI);
+    context.lineWidth = activeNodeStrokeWidth;
+    context.stroke();
+  }
   context.restore();
 }
 
