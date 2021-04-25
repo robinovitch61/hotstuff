@@ -158,7 +158,7 @@ export default function App() {
             connections={appConnections}
             addNode={addNode}
             updateNode={updateNode}
-            setNodeActive={setNodeActive}
+            setActiveNode={setNodeActive}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
           />

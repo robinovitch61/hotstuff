@@ -22,8 +22,10 @@ import {
   drawConnection,
   intersectsCircle,
   toNodeCoords,
+  drawArrow,
 } from "./canvasUtils";
 import useNodeMove from "./hooks/useNodeMove";
+import useMakeConnection from "./hooks/useMakeConnection";
 
 const {
   defaultNodeRadius,
@@ -38,7 +40,7 @@ type CanvasProps = {
   connections: AppConnection[];
   addNode: (node: AppNode) => void;
   updateNode: (node: AppNode) => void;
-  setNodeActive: (nodeId: string) => void;
+  setActiveNode: (nodeId: string) => void;
   canvasWidth: number;
   canvasHeight: number;
 };
@@ -74,8 +76,14 @@ export default function Canvas(props: CanvasProps) {
   const [offset, setOffset, startPan] = usePan();
   const ref = useRef<HTMLCanvasElement | null>(null);
   const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
-  const mousePosRef = useMousePos(ref);
+  const activeNodeRef = useRef<AppNode>();
+  // const mousePosRef = useMousePos(ref);
   const [nodeMoveOffset, startNodeMove] = useNodeMove();
+  const [
+    makeConnectionMouse,
+    makeConnectionDone,
+    startMakeConnection,
+  ] = useMakeConnection();
 
   const { nodes, connections } = props;
 
@@ -86,17 +94,41 @@ export default function Canvas(props: CanvasProps) {
 
   // move active node if it's moving
   useLayoutEffect(() => {
-    // TODO: maybe store the active node in state?
-    const filteredNodes = nodes.filter((node) => node.isActive);
-    if (filteredNodes.length !== 1) {
+    if (activeNodeRef.current === undefined) {
       return;
     }
-    const activeNode = filteredNodes[0];
-    props.updateNode({
-      ...activeNode,
-      center: diffPoints(activeNode.center, scalePoint(nodeMoveOffset, scale)),
-    });
+    activeNodeRef.current = {
+      ...activeNodeRef.current,
+      center: diffPoints(
+        activeNodeRef.current.center,
+        scalePoint(nodeMoveOffset, scale)
+      ),
+    };
+    props.updateNode(activeNodeRef.current);
   }, [nodeMoveOffset]);
+
+  // draw connection if it's being made
+  useLayoutEffect(() => {
+    if (activeNodeRef.current === undefined) {
+      return;
+    }
+    // get context and canvas
+    const canvas = ref.current;
+    if (canvas === null) {
+      return;
+    }
+    const context = canvas.getContext("2d");
+    if (context === null) {
+      return;
+    }
+
+    drawArrow(
+      context,
+      activeNodeRef.current.center,
+      toNodeCoords(canvas, makeConnectionMouse, offset, scale),
+      "grey"
+    );
+  }, [makeConnectionMouse, makeConnectionDone]);
 
   // main canvas update hook
   useLayoutEffect(() => {
@@ -212,12 +244,12 @@ export default function Canvas(props: CanvasProps) {
         )
       ) {
         nodeClicked = true;
+        props.setActiveNode(node.id);
+        activeNodeRef.current = { ...node, isActive: true };
         if (event.altKey) {
-          console.log(`MAKE NEW CONN FOR ${node.name}`);
+          startMakeConnection(event);
         } else {
-          props.setNodeActive(node.id);
           startNodeMove(event);
-          console.log(`SET ACTIVE ${node.name}`);
         }
         return true; // short circuits the rest of the some loop
       }
