@@ -1,4 +1,4 @@
-import { Point } from "./pointUtils";
+import { makePoint, Point } from "./pointUtils";
 import config from "../../config";
 
 const { canvasHeightPerc, editorWidthPerc } = config;
@@ -63,4 +63,28 @@ export function drawConnection(
   target: Point
 ) {
   drawArrow(context, source, target, "black");
+}
+
+export function intersectsCircle(
+  click: Point,
+  circleCenter: Point,
+  radius: number
+): boolean {
+  const deltaX = click.x - circleCenter.x;
+  const deltaY = click.y - circleCenter.y;
+  return Math.pow(deltaX, 2) + Math.pow(deltaY, 2) <= Math.pow(radius, 2);
+}
+
+// transforms clicked coordinates to what gets stored in node data
+export function toNodeCoords(
+  canvas: HTMLCanvasElement,
+  point: Point,
+  offset: Point,
+  scale: number
+) {
+  const boundingRect = canvas.getBoundingClientRect();
+  return makePoint(
+    (point.x - boundingRect.left + offset.x) / scale,
+    (point.y - boundingRect.top + offset.y) / scale
+  );
 }

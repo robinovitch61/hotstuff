@@ -17,11 +17,15 @@ import useMousePos from "./hooks/useMousePos";
 import useLast from "./hooks/useLast";
 import config from "../../config";
 import { makeNode } from "hotstuff-network";
+import {
+  drawCircle,
+  drawConnection,
+  intersectsCircle,
+  toNodeCoords,
+} from "./canvasUtils";
 
 const {
-  canvasHeightPerc,
   defaultNodeRadius,
-  editorWidthPerc,
   newNodeNamePrefix,
   zoomIncrement,
   minZoom,
@@ -50,7 +54,7 @@ function draw(
 ) {
   nodes.map((node) => {
     const { x, y } = node.center;
-    canvasUtils.drawCircle(context, x, y, node.radius, node.color);
+    drawCircle(context, x, y, node.radius, node.color);
   });
 
   connections.map((conn) => {
@@ -58,11 +62,7 @@ function draw(
     // TODO: Smarter way to do this?
     const sourceAppNode = nodes.filter((node) => node.id === source.id)[0];
     const targetAppNode = nodes.filter((node) => node.id === target.id)[0];
-    canvasUtils.drawConnection(
-      context,
-      sourceAppNode.center,
-      targetAppNode.center
-    );
+    drawConnection(context, sourceAppNode.center, targetAppNode.center);
   });
 }
 
@@ -149,18 +149,22 @@ export default function Canvas(props: CanvasProps) {
       node.name.startsWith(newNodeNamePrefix)
     ).length;
     const newNode = makeNode({
-      name: `${newNodeNamePrefix}${numNewNodes + 1}`,
+      name:
+        numNewNodes === 0
+          ? `${newNodeNamePrefix}`
+          : `${newNodeNamePrefix} (${numNewNodes + 1})`,
       temperatureDegC: 0,
       capacitanceJPerDegK: 0,
       powerGenW: 0,
       isBoundary: false,
     });
-    const boundingRect = canvas.getBoundingClientRect();
     const newAppNode = {
       ...newNode,
-      center: makePoint(
-        (event.clientX - boundingRect.left + offset.x) / scale,
-        (event.clientY - boundingRect.top + offset.y) / scale
+      center: toNodeCoords(
+        canvas,
+        makePoint(event.clientX, event.clientY),
+        offset,
+        scale
       ),
       radius: defaultNodeRadius,
       color: "red",
@@ -168,11 +172,41 @@ export default function Canvas(props: CanvasProps) {
     props.addNode(newAppNode);
   }
 
+  function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
+    const canvas = ref.current;
+    if (canvas === null) {
+      return;
+    }
+    nodes.forEach((node) => {
+      if (
+        intersectsCircle(
+          toNodeCoords(
+            canvas,
+            makePoint(event.clientX, event.clientY),
+            offset,
+            scale
+          ),
+          node.center,
+          node.radius
+        )
+      ) {
+        if (event.altKey) {
+          console.log(`MAKE NEW CONN FOR ${node.name}`);
+        } else {
+          console.log(`SET ACTIVE ${node.name}`);
+        }
+        return;
+      }
+    });
+
+    startPan(event);
+  }
+
   return (
     <>
       <StyledCanvas
         ref={ref}
-        onMouseDown={startPan}
+        onMouseDown={handleOnMouseDown}
         onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) => {
           const canvas = ref.current;
           if (canvas === null) {
@@ -182,9 +216,9 @@ export default function Canvas(props: CanvasProps) {
         }}
       />
       <div style={{ position: "absolute", top: 0 }}>
-        {nodes.map((node) => (
+        {/* {nodes.map((node) => (
           <pre>{JSON.stringify(node, null, 2)}</pre>
-        ))}
+        ))} */}
       </div>
     </>
   );
