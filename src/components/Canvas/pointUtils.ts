@@ -5,6 +5,10 @@ export type Point = {
 
 export const ORIGIN = Object.freeze({ x: 0, y: 0 });
 
+export function makePoint(x: number, y: number) {
+  return { x, y };
+}
+
 export function diffPoints(p1: Point, p2: Point) {
   return { x: p1.x - p2.x, y: p1.y - p2.y };
 }

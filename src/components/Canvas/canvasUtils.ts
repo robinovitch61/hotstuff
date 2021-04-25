@@ -6,12 +6,12 @@ const { canvasHeightPerc, editorWidthPerc } = config;
 export function rescaleCanvas(
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
-  windowWidth: number,
-  windowHeight: number
+  canvasWidth: number,
+  canvasHeight: number
 ) {
   const { devicePixelRatio: ratio = 1 } = window;
-  canvas.width = windowWidth * (1 - editorWidthPerc) * ratio;
-  canvas.height = windowHeight * canvasHeightPerc * ratio;
+  canvas.width = canvasWidth * ratio;
+  canvas.height = canvasHeight * ratio;
   context.scale(ratio, ratio);
 }
 

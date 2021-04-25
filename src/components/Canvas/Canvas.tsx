@@ -2,7 +2,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as canvasUtils from "./canvasUtils";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
-import { Point, addPoints, diffPoints, scalePoint, ORIGIN } from "./pointUtils";
+import {
+  Point,
+  addPoints,
+  diffPoints,
+  scalePoint,
+  ORIGIN,
+  makePoint,
+} from "./pointUtils";
 import usePan from "./hooks/usePan";
 import useScale from "./hooks/useScale";
 import useWindowSize from "./hooks/useWindowSize";
@@ -70,10 +77,12 @@ export default function Canvas(props: CanvasProps) {
 
   // set offset to middle of canvas to zoom about center
   useEffect(() => {
-    setOffset({ x: -props.canvasWidth / 2, y: -props.canvasHeight / 2 });
+    setOffset(makePoint(-props.canvasWidth / 2, -props.canvasHeight / 2));
   }, [props.canvasHeight, props.canvasWidth]);
 
+  // main canvas update hook
   useLayoutEffect(() => {
+    // get context and canvas
     const canvas = ref.current;
     if (canvas === null) {
       return;
@@ -83,13 +92,20 @@ export default function Canvas(props: CanvasProps) {
       return;
     }
 
-    canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
+    // adjust for pixel clarity based on screen
+    canvasUtils.rescaleCanvas(
+      canvas,
+      context,
+      props.canvasWidth,
+      props.canvasHeight
+    );
 
     context.translate(-offset.x, -offset.y);
-    // TODO: scale about mouse (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
+
+    // TODO: scale about mouse?? (http://phrogz.net/tmp/canvas_zoom_to_cursor.html, https://www.jclem.net/posts/pan-zoom-canvas-react, https://stackoverflow.com/questions/2916081/zoom-in-on-a-point-using-scale-and-translate)
     context.scale(scale, scale);
 
-    // TODO: remove, helpful for debugging
+    // TODO: can remove, helpful for debugging
     // origin and axis
     const currentMouseX = (mousePosRef.current.x + offset.x) / scale;
     const currentMouseY = (mousePosRef.current.y + offset.y) / scale;
@@ -142,10 +158,10 @@ export default function Canvas(props: CanvasProps) {
     const boundingRect = canvas.getBoundingClientRect();
     const newAppNode = {
       ...newNode,
-      center: {
-        x: (event.clientX - boundingRect.left + offset.x) / scale,
-        y: (event.clientY - boundingRect.top + offset.y) / scale,
-      },
+      center: makePoint(
+        (event.clientX - boundingRect.left + offset.x) / scale,
+        (event.clientY - boundingRect.top + offset.y) / scale
+      ),
       radius: defaultNodeRadius,
       color: "red",
     };
