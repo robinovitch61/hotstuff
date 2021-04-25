@@ -169,28 +169,28 @@ export default function Canvas(props: CanvasProps) {
     props.updateNode(activeNodeRef.current);
   }, [nodeMoveOffset]);
 
-  // draw connection if it's being made
-  useLayoutEffect(() => {
-    if (activeNodeRef.current === undefined) {
-      return;
-    }
-    // get context and canvas
-    const canvas = canvasRef.current;
-    if (canvas === null) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (context === null) {
-      return;
-    }
+  // // draw connection if it's being made
+  // useLayoutEffect(() => {
+  //   if (activeNodeRef.current === undefined) {
+  //     return;
+  //   }
+  //   // get context and canvas
+  //   const canvas = canvasRef.current;
+  //   if (canvas === null) {
+  //     return;
+  //   }
+  //   const context = canvas.getContext("2d");
+  //   if (context === null) {
+  //     return;
+  //   }
 
-    drawArrow(
-      context,
-      activeNodeRef.current.center,
-      toNodeCoords(canvas, makeConnectionMouse, offset, scale),
-      "grey"
-    );
-  }, [makeConnectionMouse, makeConnectionDone]);
+  //   drawArrow(
+  //     context,
+  //     activeNodeRef.current.center,
+  //     toNodeCoords(canvas, makeConnectionMouse, offset, scale),
+  //     "grey"
+  //   );
+  // }, [makeConnectionMouse, makeConnectionDone]);
 
   function handleDoubleClick(
     canvas: HTMLCanvasElement,
