@@ -36,6 +36,7 @@ type CanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
   addNode: (node: AppNode) => void;
+  setNodeActive: (nodeId: string) => void;
   canvasWidth: number;
   canvasHeight: number;
 };
@@ -168,6 +169,7 @@ export default function Canvas(props: CanvasProps) {
       ),
       radius: defaultNodeRadius,
       color: "red",
+      isActive: false,
     };
     props.addNode(newAppNode);
   }
@@ -193,6 +195,7 @@ export default function Canvas(props: CanvasProps) {
         if (event.altKey) {
           console.log(`MAKE NEW CONN FOR ${node.name}`);
         } else {
+          props.setNodeActive(node.id);
           console.log(`SET ACTIVE ${node.name}`);
         }
         return;
@@ -216,9 +219,9 @@ export default function Canvas(props: CanvasProps) {
         }}
       />
       <div style={{ position: "absolute", top: 0 }}>
-        {/* {nodes.map((node) => (
+        {nodes.map((node) => (
           <pre>{JSON.stringify(node, null, 2)}</pre>
-        ))} */}
+        ))}
       </div>
     </>
   );

@@ -26,6 +26,7 @@ export type AppNode = HSNode & {
   center: Point;
   radius: number;
   color: string;
+  isActive: boolean;
 };
 
 export type AppConnection = HSConnection;
@@ -64,15 +65,17 @@ const test2 = makeNode({
 const testAppNodes: AppNode[] = [
   {
     ...test1,
-    center: { x: 100, y: 100 },
+    center: { x: 0, y: 0 },
     radius: defaultNodeRadius,
     color: "red",
+    isActive: false,
   },
   {
     ...test2,
-    center: { x: 200, y: 200 },
+    center: { x: 150, y: 150 },
     radius: defaultNodeRadius,
     color: "red",
+    isActive: false,
   },
 ];
 
@@ -118,6 +121,27 @@ export default function App() {
     setAppConnections(testAppConnections);
   }, []);
 
+  function addNode(node: AppNode) {
+    const newAppNodes: AppNode[] = appNodes.map((node) => ({
+      ...node,
+      isActive: false,
+    }));
+    newAppNodes.push({ ...node, isActive: true });
+    setAppNodes(newAppNodes);
+  }
+
+  function setNodeActive(nodeId: string) {
+    const newAppNodes: AppNode[] = [];
+    appNodes.forEach((node) => {
+      if (node.id === nodeId) {
+        newAppNodes.push({ ...node, isActive: true });
+      } else {
+        newAppNodes.push({ ...node, isActive: false });
+      }
+    });
+    setAppNodes(newAppNodes);
+  }
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -125,7 +149,8 @@ export default function App() {
           <Canvas
             nodes={appNodes}
             connections={appConnections}
-            addNode={(node: AppNode) => setAppNodes([...appNodes, node])}
+            addNode={addNode}
+            setNodeActive={setNodeActive}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
           />
