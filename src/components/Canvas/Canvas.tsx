@@ -3,9 +3,9 @@ import * as canvasUtils from "./canvasUtils";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import { Point, addPoints, diffPoints, scalePoint, ORIGIN } from "./pointUtils";
-import usePan from "./hooks/pan";
-import useScale from "./hooks/scale";
-import useWindowSize from "./hooks/resize";
+import usePan from "./hooks/usePan";
+import useScale from "./hooks/useScale";
+import useWindowSize from "./hooks/useWindowSize";
 import useMousePos from "./hooks/useMousePos";
 import useLast from "./hooks/useLast";
 import config from "../../config";
@@ -27,9 +27,10 @@ type CanvasProps = {
 };
 
 const StyledCanvas = styled.canvas`
-  width: 100%;
-  height: ${canvasHeightPerc * 100}vh;
-  border: 1px solid black;
+  position: relative;
+  border: 1px solid red;
+  max-height: 100%;
+  max-width: 100%;
 `;
 
 function draw(
@@ -60,9 +61,7 @@ export default function Canvas(props: CanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const [windowWidth, windowHeight] = useWindowSize();
   const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
-  const mousePosRef = useMousePos(ref);
-  const lastOffset = useLast(offset);
-  const lastScale = useLast(scale);
+  // const mousePosRef = useMousePos(ref);
 
   const { nodes, connections } = props;
 
@@ -75,6 +74,8 @@ export default function Canvas(props: CanvasProps) {
     if (context === null) {
       return;
     }
+
+    // context.translate(canvas.width / 2, canvas.height / 2);
 
     canvasUtils.rescaleCanvas(canvas, context, windowWidth, windowHeight);
     context.translate(-offset.x, -offset.y);
@@ -157,12 +158,11 @@ export default function Canvas(props: CanvasProps) {
           handleDoubleClick(canvas, event, nodes);
         }}
       />
-      <div>offset: {JSON.stringify(offset)}</div>
-      <div>lastOffset: {JSON.stringify(lastOffset)}</div>
-      <div>mouse: {JSON.stringify(mousePosRef.current)}</div>
-      <div>scale: {scale}</div>
-      <div>lastScale: {lastScale}</div>
-      <div>{JSON.stringify(nodes)}</div>
+      <div style={{ position: "absolute", top: 0 }}>
+        {nodes.map((node) => (
+          <pre>{JSON.stringify(node, null, 2)}</pre>
+        ))}
+      </div>
     </>
   );
 }

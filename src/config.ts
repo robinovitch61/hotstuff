@@ -1,6 +1,6 @@
 const config = {
-  canvasHeightPerc: 0.8,
-  editorWidthPerc: 0.2,
+  canvasHeightPerc: 0.75,
+  editorWidthPerc: 0.25,
   defaultTotalTimeSeconds: 10,
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 15,

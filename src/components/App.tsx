@@ -12,11 +12,13 @@ import Canvas from "./Canvas/Canvas";
 import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
 import config from "../config";
+import useWindowSize from "./Canvas/hooks/useWindowSize";
 
 const {
   defaultTimeStepSeconds,
   defaultTotalTimeSeconds,
   editorWidthPerc,
+  canvasHeightPerc,
   defaultNodeRadius,
 } = config;
 
@@ -28,8 +30,19 @@ export type AppNode = HSNode & {
 
 export type AppConnection = HSConnection;
 
-const StyledWorkspace = styled.div`
-  width: ${(1 - editorWidthPerc) * 100}vw;
+const StyledApp = styled.div<{ height: number }>`
+  display: flex;
+  height: ${(props) => props.height}px;
+`;
+
+const StyledWorkspace = styled.div<{ height: number; width: number }>`
+  height: ${(props) => props.height}px;
+  width: ${(props) => (1 - editorWidthPerc) * props.width}px;
+`;
+
+const StyledCanvas = styled.div<{ height: number }>`
+  width: 100%;
+  height: ${(props) => props.height}px;
 `;
 
 const test1 = makeNode({
@@ -78,10 +91,20 @@ export default function App() {
   const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
     undefined
   );
+  // hooks
   const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
   const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
+  const [windowWidth, windowHeight] = useWindowSize();
+
+  // width/heights
+  const workspaceWidth = windowWidth;
+  const workspaceHeight = windowHeight;
+  const canvasHeight = windowHeight * canvasHeightPerc;
+  const plotHeight = (1 - canvasHeightPerc) * windowHeight;
+  const editorHeight = windowHeight;
+  const editorWidth = editorWidthPerc * windowWidth;
 
   // TODO: REMOVE
   useEffect(() => {
@@ -90,16 +113,18 @@ export default function App() {
   }, []);
 
   return (
-    <>
-      <StyledWorkspace>
-        <Canvas
-          nodes={appNodes}
-          connections={appConnections}
-          addNode={(node: AppNode) => setAppNodes([...appNodes, node])}
-        />
-        <Plot />
+    <StyledApp height={windowHeight}>
+      <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
+        <StyledCanvas height={canvasHeight}>
+          <Canvas
+            nodes={appNodes}
+            connections={appConnections}
+            addNode={(node: AppNode) => setAppNodes([...appNodes, node])}
+          />
+        </StyledCanvas>
+        <Plot height={plotHeight} />
       </StyledWorkspace>
-      <Editor />
-    </>
+      <Editor height={windowHeight} width={editorWidth} />
+    </StyledApp>
   );
 }

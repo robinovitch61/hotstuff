@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import styled from "styled-components";
 import config from "../../config";
+import useWindowSize from "../Canvas/hooks/useWindowSize";
 
 const { canvasHeightPerc } = config;
 const MAX_PLOT_POINTS_PER_NODE = 400;
@@ -152,12 +153,19 @@ const colors = [
 </StyledCharts> */
 }
 
-const StyledPlot = styled.div`
+const StyledPlot = styled.div<{ height: number }>`
   width: 100%;
-  height: ${(1 - canvasHeightPerc) * 100}vh;
+  height: ${(props) => props.height}px;
+  border: 1px solid green;
+  margin: 0;
+  padding: 0;
 `;
 
-export default function Plot() {
+type PlotProps = {
+  height: number;
+};
+
+export default function Plot(props: PlotProps) {
   // // show the temps of the first node as dots vertically along the svg
   // const plotParams = {
   //   height: 350,
@@ -202,5 +210,5 @@ export default function Plot() {
   // const res =
   //   !!results && results.nodeResults.length > 0 ? results : emptyOutput;
   // const [tempPlotData, heatTransferPlotData] = plotShape(res);
-  return <StyledPlot>PLOT</StyledPlot>;
+  return <StyledPlot height={props.height}>PLOT</StyledPlot>;
 }

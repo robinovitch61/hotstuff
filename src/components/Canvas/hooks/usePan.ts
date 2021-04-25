@@ -11,7 +11,7 @@ import { ORIGIN, Point } from "../pointUtils";
  * once the user has started panning.
  */
 export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
-  const [panState, setPanState] = useState<Point>(ORIGIN);
+  const [offset, setPanState] = useState<Point>({ x: -100, y: -100 });
 
   // Track the last observed mouse position on pan.
   const lastPointRef = useRef(ORIGIN);
@@ -56,5 +56,5 @@ export default function usePan(): [Point, (e: SyntheticMouseEvent) => void] {
     [pan, endPan]
   );
 
-  return [panState, startPan];
+  return [offset, startPan];
 }

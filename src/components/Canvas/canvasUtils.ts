@@ -9,12 +9,10 @@ export function rescaleCanvas(
   windowWidth: number,
   windowHeight: number
 ) {
-  context.save();
   const { devicePixelRatio: ratio = 1 } = window;
   canvas.width = windowWidth * (1 - editorWidthPerc) * ratio;
   canvas.height = windowHeight * canvasHeightPerc * ratio;
   context.scale(ratio, ratio);
-  context.restore();
 }
 
 export function drawCircle(
