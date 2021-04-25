@@ -75,8 +75,8 @@ function draw(
 export default function Canvas(props: CanvasProps) {
   const [windowWidth, windowHeight] = useWindowSize();
   const [offset, setOffset, startPan] = usePan();
-  const ref = useRef<HTMLCanvasElement | null>(null);
-  const scale = useScale(ref, zoomIncrement, minZoom, maxZoom);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scale = useScale(canvasRef, zoomIncrement, minZoom, maxZoom);
   const activeNodeRef = useRef<AppNode>();
   // const mousePosRef = useMousePos(ref);
   const [nodeMoveOffset, startNodeMove] = useNodeMove();
@@ -93,48 +93,10 @@ export default function Canvas(props: CanvasProps) {
     setOffset(makePoint(-props.canvasWidth / 2, -props.canvasHeight / 2));
   }, [props.canvasHeight, props.canvasWidth]);
 
-  // move active node if it's moving
-  useLayoutEffect(() => {
-    if (activeNodeRef.current === undefined) {
-      return;
-    }
-    activeNodeRef.current = {
-      ...activeNodeRef.current,
-      center: diffPoints(
-        activeNodeRef.current.center,
-        scalePoint(nodeMoveOffset, scale)
-      ),
-    };
-    props.updateNode(activeNodeRef.current);
-  }, [nodeMoveOffset]);
-
-  // draw connection if it's being made
-  useLayoutEffect(() => {
-    if (activeNodeRef.current === undefined) {
-      return;
-    }
-    // get context and canvas
-    const canvas = ref.current;
-    if (canvas === null) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (context === null) {
-      return;
-    }
-
-    drawArrow(
-      context,
-      activeNodeRef.current.center,
-      toNodeCoords(canvas, makeConnectionMouse, offset, scale),
-      "grey"
-    );
-  }, [makeConnectionMouse, makeConnectionDone]);
-
   // main canvas update hook
   useLayoutEffect(() => {
     // get context and canvas
-    const canvas = ref.current;
+    const canvas = canvasRef.current;
     if (canvas === null) {
       return;
     }
@@ -184,12 +146,51 @@ export default function Canvas(props: CanvasProps) {
   }, [
     nodes,
     connections,
+    makeConnectionMouse,
     windowWidth,
     windowHeight,
     offset.x,
     offset.y,
     scale,
   ]);
+
+  // move active node if it's moving
+  useLayoutEffect(() => {
+    if (activeNodeRef.current === undefined) {
+      return;
+    }
+    activeNodeRef.current = {
+      ...activeNodeRef.current,
+      center: diffPoints(
+        activeNodeRef.current.center,
+        scalePoint(nodeMoveOffset, scale)
+      ),
+    };
+    props.updateNode(activeNodeRef.current);
+  }, [nodeMoveOffset]);
+
+  // draw connection if it's being made
+  useLayoutEffect(() => {
+    if (activeNodeRef.current === undefined) {
+      return;
+    }
+    // get context and canvas
+    const canvas = canvasRef.current;
+    if (canvas === null) {
+      return;
+    }
+    const context = canvas.getContext("2d");
+    if (context === null) {
+      return;
+    }
+
+    drawArrow(
+      context,
+      activeNodeRef.current.center,
+      toNodeCoords(canvas, makeConnectionMouse, offset, scale),
+      "grey"
+    );
+  }, [makeConnectionMouse, makeConnectionDone]);
 
   function handleDoubleClick(
     canvas: HTMLCanvasElement,
@@ -225,7 +226,7 @@ export default function Canvas(props: CanvasProps) {
   }
 
   function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
-    const canvas = ref.current;
+    const canvas = canvasRef.current;
     if (canvas === null) {
       return;
     }
@@ -246,6 +247,7 @@ export default function Canvas(props: CanvasProps) {
       ) {
         nodeClicked = true;
         props.setActiveNode(node.id);
+        // TODO: Make less janky
         activeNodeRef.current = { ...node, isActive: true };
         if (event.altKey) {
           startMakeConnection(event);
@@ -265,10 +267,10 @@ export default function Canvas(props: CanvasProps) {
   return (
     <>
       <StyledCanvas
-        ref={ref}
+        ref={canvasRef}
         onMouseDown={handleOnMouseDown}
         onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) => {
-          const canvas = ref.current;
+          const canvas = canvasRef.current;
           if (canvas === null) {
             return;
           }
