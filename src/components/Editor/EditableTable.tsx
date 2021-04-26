@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styled from "styled-components";
 
 type NumericInputProps = {
   value: number;
@@ -56,10 +57,9 @@ function TableRow(props: TableRowProps) {
         <NumericInput value={props.value} onBlur={handleInputBlur} />
       </td>
       <td>
-        <span
-          className="glyphicon glyphicon-remove remove-btn"
-          onClick={props.onDeleteRow}
-        />
+        <span className="remove-btn" onClick={props.onDeleteRow}>
+          X
+        </span>
       </td>
     </tr>
   );
@@ -76,14 +76,12 @@ type SortableHeaderProps = {
 
 function SortableHeader(props: SortableHeaderProps) {
   function renderSortArrow() {
-    if (props.sortState.key !== props.sortKey) return;
-    const glyphClass =
-      props.sortState.direction === "ASC"
-        ? "glyphicon glyphicon-chevron-down"
-        : "glyphicon glyphicon-chevron-up";
-
-    return <span className={glyphClass} aria-hidden="true"></span>;
+    if (props.sortState.key !== props.sortKey) {
+      return;
+    }
+    return <span>{props.sortState.direction === "ASC" ? "🔼" : "🔽"}</span>;
   }
+
   return (
     <th onClick={() => props.toggleSortDirection(props.sortKey)}>
       <h4>{props.label}</h4>
@@ -106,6 +104,56 @@ type EditableTableProps = {
   sortState: SortState;
 };
 
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  box-sizing: content-box;
+
+  th {
+    border: 1px solid lightgrey;
+    cursor: pointer;
+  }
+
+  td {
+    border: 1px solid #ddd;
+    width: 45%;
+    height: 1.5em;
+    text-align: start;
+
+    &:first-of-type {
+      padding: 10px 15px;
+    }
+
+    &:last-of-type {
+      border: none;
+      width: 10%;
+    }
+  }
+
+  input {
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: center;
+  }
+
+  .remove-btn {
+    margin-left: 10px;
+    padding: 10px;
+    color: red;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 1.7rem;
+  }
+
+  tr:hover .remove-btn {
+    opacity: 1;
+  }
+`;
+
+const StyledTableWrapper = styled.div``;
+
 export default function EditableTable(props: EditableTableProps) {
   function renderTableRows() {
     return props.regionData.map((data, index) => {
@@ -121,24 +169,26 @@ export default function EditableTable(props: EditableTableProps) {
     });
   }
   return (
-    <table>
-      <thead>
-        <tr>
-          <SortableHeader
-            label="STATE NAME"
-            sortState={props.sortState}
-            sortKey="regionName"
-            toggleSortDirection={props.toggleSortDirection}
-          />
-          <SortableHeader
-            label="VALUE"
-            sortState={props.sortState}
-            sortKey="value"
-            toggleSortDirection={props.toggleSortDirection}
-          />
-        </tr>
-      </thead>
-      <tbody>{renderTableRows()}</tbody>
-    </table>
+    <StyledTableWrapper>
+      <StyledTable>
+        <thead>
+          <tr>
+            <SortableHeader
+              label="STATE NAME"
+              sortState={props.sortState}
+              sortKey="regionName"
+              toggleSortDirection={props.toggleSortDirection}
+            />
+            <SortableHeader
+              label="VALUE"
+              sortState={props.sortState}
+              sortKey="value"
+              toggleSortDirection={props.toggleSortDirection}
+            />
+          </tr>
+        </thead>
+        <tbody>{renderTableRows()}</tbody>
+      </StyledTable>
+    </StyledTableWrapper>
   );
 }
