@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { RegionData } from "./Editor";
 
 type NumericInputProps = {
   value: number;
@@ -65,42 +66,48 @@ function TableRow(props: TableRowProps) {
   );
 }
 
-type SortState = { key: string; direction: "ASC" | "DESC" };
+export type SortDirection = "ASC" | "DESC";
+
+export type SortState = { key: keyof RegionData; direction: SortDirection };
 
 type SortableHeaderProps = {
   label: string;
   sortState: SortState;
-  sortKey: string;
-  toggleSortDirection: any; // TODO func sig
+  sortKey: keyof RegionData;
+  toggleSortDirection: (
+    sortKey: keyof RegionData,
+    direction: SortDirection
+  ) => void;
 };
 
 function SortableHeader(props: SortableHeaderProps) {
-  function renderSortArrow() {
-    if (props.sortState.key !== props.sortKey) {
-      return;
-    }
-    return <span>{props.sortState.direction === "ASC" ? "🔼" : "🔽"}</span>;
-  }
+  const isSortedColumn = props.sortKey === props.sortState.key;
+  const reverseDirection = props.sortState.direction === "ASC" ? "DESC" : "ASC";
+  const sortIcon = props.sortState.direction === "ASC" ? "🔼" : "🔽";
+  const headerLabel = `${props.label} ${isSortedColumn ? sortIcon : ""}`;
 
   return (
-    <th onClick={() => props.toggleSortDirection(props.sortKey)}>
-      <h4>{props.label}</h4>
-      {renderSortArrow()}
+    <th
+      onClick={() =>
+        props.toggleSortDirection(
+          props.sortKey,
+          !isSortedColumn ? "ASC" : reverseDirection
+        )
+      }
+    >
+      <h4>{headerLabel}</h4>
     </th>
   );
 }
-
-type RegionData = {
-  regionName: string;
-  value: number;
-  code: string;
-};
 
 type EditableTableProps = {
   regionData: RegionData[];
   onEditRow: (regionName: string, newValue: number) => void;
   onDeleteRow: (regionName: string, code: string) => void;
-  toggleSortDirection: (sortKey: any) => void;
+  toggleSortDirection: (
+    sortKey: keyof RegionData,
+    sortDirection: SortDirection
+  ) => void;
   sortState: SortState;
 };
 

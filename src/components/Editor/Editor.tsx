@@ -1,7 +1,8 @@
+import { sort } from "d3";
 import { useState } from "react";
 import styled from "styled-components";
 import config from "../../config";
-import EditableTable from "./EditableTable";
+import EditableTable, { SortDirection, SortState } from "./EditableTable";
 
 const { editorWidthPerc } = config;
 
@@ -16,7 +17,13 @@ type EditorProps = {
   height: number;
 };
 
-const defaultRegionData = [
+export type RegionData = {
+  regionName: string;
+  code: string;
+  value: number;
+};
+
+const defaultRegionData: RegionData[] = [
   { regionName: "Alabama", code: "AL", value: 89 },
   { regionName: "Alaska", code: "AK", value: 112 },
   { regionName: "Arizona", code: "AZ", value: 101 },
@@ -69,8 +76,11 @@ const defaultRegionData = [
   { regionName: "Wyoming", code: "WY", value: 94 },
 ];
 
+const defaultSortState: SortState = { key: "regionName", direction: "ASC" };
+
 export default function Editor(props: EditorProps) {
   const [regionData, setRegionData] = useState(defaultRegionData);
+  const [sortState, setSortState] = useState<SortState>(defaultSortState);
 
   function onEditRow(regionName: string, newValue: number) {
     setRegionData(
@@ -88,22 +98,35 @@ export default function Editor(props: EditorProps) {
     );
   }
 
-  function toggleSortDirection(sortKey: string) {
-    // setRegionData(
-    //   regionData.filter(
-    //     (data) => !(data.regionName === regionName && data.code === code)
-    //   )
-    // );
+  function toggleSortDirection(
+    sortKey: keyof RegionData,
+    direction: SortDirection
+  ) {
+    if (direction === "ASC") {
+      setRegionData(
+        [...regionData].sort((first, second) =>
+          first[sortKey] > second[sortKey] ? 1 : -1
+        )
+      );
+    } else {
+      setRegionData(
+        [...regionData].sort((first, second) =>
+          first[sortKey] > second[sortKey] ? -1 : 1
+        )
+      );
+    }
+    setSortState({ key: sortKey, direction });
   }
 
   return (
     <StyledEditor width={props.width} height={props.height}>
+      <pre>{JSON.stringify(sortState)}</pre>
       <EditableTable
         regionData={regionData}
         onEditRow={onEditRow}
         onDeleteRow={onDeleteRow}
         toggleSortDirection={toggleSortDirection}
-        sortState={{ key: "lol", direction: "ASC" }}
+        sortState={sortState}
       />
     </StyledEditor>
   );
