@@ -82,7 +82,7 @@ export default function Editor(props: EditorProps) {
   const [regionData, setRegionData] = useState(defaultRegionData);
   const [sortState, setSortState] = useState<SortState>(defaultSortState);
 
-  function onEditRow(regionName: string, newValue: number) {
+  function updateRow(regionName: string, newValue: number) {
     setRegionData(
       regionData.map((data) =>
         data.regionName === regionName ? { ...data, value: newValue } : data
@@ -120,10 +120,9 @@ export default function Editor(props: EditorProps) {
 
   return (
     <StyledEditor width={props.width} height={props.height}>
-      <pre>{JSON.stringify(sortState)}</pre>
       <EditableTable
         regionData={regionData}
-        onEditRow={onEditRow}
+        updateRow={updateRow}
         onDeleteRow={onDeleteRow}
         toggleSortDirection={toggleSortDirection}
         sortState={sortState}

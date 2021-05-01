@@ -2,37 +2,53 @@ import { useState } from "react";
 import styled from "styled-components";
 import { RegionData } from "./Editor";
 
-type NumericInputProps = {
+// TODO:
+// [] sticky default values, with escape to edit input and keep default value
+// [] StringBox, BooleanBox
+// [] Generic type inputs
+
+type NumberBoxProps = {
   value: number;
-  onBlur: any; // TODO: function sig
+  onBlur: (newValue: number) => void;
 };
 
-function NumericInput(props: NumericInputProps) {
+function NumberBox(props: NumberBoxProps) {
   const [value, setValue] = useState<number>();
 
+  function isFloatParseable(val: string) {
+    return !isNaN(parseFloat(val));
+  }
+
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const newValue = event.target.value;
-    if (newValue === undefined || parseFloat(newValue) === value) {
+    const newValueText = event.target.value;
+    const newValueFloat = parseFloat(event.target.value);
+    console.log(newValueFloat);
+    if (newValueText === undefined || newValueFloat === value) {
       return;
     }
-    if (!/^[+-]?\d*(\.\d*)?$/.test(newValue)) {
-      return;
-    }
-    setValue(parseFloat(newValue));
+    // // this isn't foolproof (e.g. '123.1abc' will parse), but ok for my purposes
+    // if (isNaN(newValueFloat)) {
+    //   return;
+    // }
+    setValue(newValueFloat);
   }
 
   function handleOnBlur(event: React.ChangeEvent<HTMLInputElement>) {
-    const newValue = parseFloat(event.target.value) || 0;
-    if (props.value === newValue) {
+    const newValueText = event.target.value;
+    const newValueFloat = parseFloat(event.target.value);
+    if (newValueText === undefined || newValueFloat === value) {
       return;
     }
-    setValue(newValue);
-    props.onBlur(newValue);
+    // this isn't foolproof (e.g. '123.1abc' will parse), but ok for my purposes
+    if (isNaN(newValueFloat)) {
+      return;
+    }
+    props.onBlur(newValueFloat);
   }
 
   return (
     <input
-      type="text"
+      type="number"
       value={value}
       onChange={handleOnChange}
       onBlur={handleOnBlur}
@@ -41,25 +57,24 @@ function NumericInput(props: NumericInputProps) {
 }
 
 type TableRowProps = {
-  value: number;
-  regionName: string;
   onDeleteRow: any; // TODO func sig
-  onEditRow: (regionName: string, newVal: number) => void;
+  data: RegionData;
+  updateRow: (regionName: string, newValue: number) => void;
 };
 
 function TableRow(props: TableRowProps) {
-  function handleInputBlur(newValue: number) {
-    props.onEditRow(props.regionName, newValue);
+  function handleBlur(newValue: number) {
+    props.updateRow(props.data.regionName, newValue);
   }
   return (
     <tr>
-      <td>{props.regionName}</td>
+      <td>{props.data.regionName}</td>
       <td>
-        <NumericInput value={props.value} onBlur={handleInputBlur} />
+        <NumberBox value={props.data.value} onBlur={handleBlur} />
       </td>
       <td>
         <span className="remove-btn" onClick={props.onDeleteRow}>
-          X
+          ❌
         </span>
       </td>
     </tr>
@@ -102,7 +117,7 @@ function SortableHeader(props: SortableHeaderProps) {
 
 type EditableTableProps = {
   regionData: RegionData[];
-  onEditRow: (regionName: string, newValue: number) => void;
+  updateRow: (regionName: string, newValue: number) => void;
   onDeleteRow: (regionName: string, code: string) => void;
   toggleSortDirection: (
     sortKey: keyof RegionData,
@@ -137,12 +152,18 @@ const StyledTable = styled.table`
     }
   }
 
-  input {
+  input[type="number"] {
     border: none;
     width: 100%;
     height: 100%;
     padding: 0;
     text-align: center;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   }
 
   .remove-btn {
@@ -167,9 +188,8 @@ export default function EditableTable(props: EditableTableProps) {
       return (
         <TableRow
           key={index}
-          regionName={data.regionName}
-          value={data.value}
-          onEditRow={props.onEditRow}
+          data={data}
+          updateRow={props.updateRow}
           onDeleteRow={() => props.onDeleteRow(data.regionName, data.code)}
         />
       );
