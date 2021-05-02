@@ -1,8 +1,9 @@
-import { useState, useLayoutEffect, RefObject, useRef } from "react";
+import { useLayoutEffect, RefObject, useRef, useState } from "react";
 import { Point } from "../pointUtils";
 
 export default function useMousePos(ref: RefObject<HTMLElement | null>) {
-  const mousePosRef = useRef<Point>({ x: 0, y: 0 });
+  // const mousePosRef = useRef<Point>({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
 
   useLayoutEffect(() => {
     if (!ref.current) {
@@ -11,10 +12,11 @@ export default function useMousePos(ref: RefObject<HTMLElement | null>) {
 
     function handleMouseMove(event: MouseEvent) {
       if (ref.current) {
-        mousePosRef.current = {
+        // mousePosRef.current = {
+        setMousePos({
           x: event.clientX - ref.current.offsetLeft,
           y: event.clientY - ref.current.offsetTop,
-        };
+        });
       }
     }
 
@@ -37,5 +39,5 @@ export default function useMousePos(ref: RefObject<HTMLElement | null>) {
     };
   }, [ref]);
 
-  return mousePosRef;
+  return mousePos;
 }

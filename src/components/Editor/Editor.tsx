@@ -120,13 +120,13 @@ export default function Editor(props: EditorProps) {
 
   return (
     <StyledEditor width={props.width} height={props.height}>
-      <EditableTable
+      {/* <EditableTable
         regionData={regionData}
         updateRow={updateRow}
         onDeleteRow={onDeleteRow}
         toggleSortDirection={toggleSortDirection}
         sortState={sortState}
-      />
+      /> */}
     </StyledEditor>
   );
 }

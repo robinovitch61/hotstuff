@@ -15,7 +15,7 @@ export default function useScale(
   interval: number,
   minScale: number,
   maxScale: number
-) {
+): [number, React.Dispatch<React.SetStateAction<number>>] {
   const [scale, setScale] = useState(1);
 
   const updateScale = ({ direction, interval }: ScaleOpts) => {
@@ -46,5 +46,5 @@ export default function useScale(
       interval,
     });
   });
-  return scale;
+  return [scale, setScale];
 }

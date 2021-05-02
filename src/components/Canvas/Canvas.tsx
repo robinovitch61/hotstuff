@@ -47,6 +47,7 @@ type CanvasProps = {
 };
 
 const StyledCanvas = styled.canvas`
+  box-sizing: content-box;
   position: relative;
   border: 1px solid red;
   max-height: 100%;
@@ -76,7 +77,12 @@ export default function Canvas(props: CanvasProps) {
   const [windowWidth, windowHeight] = useWindowSize();
   const [offset, setOffset, startPan] = usePan();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const scale = useScale(canvasRef, zoomIncrement, minZoom, maxZoom);
+  const [scale, setScale] = useScale(
+    canvasRef,
+    zoomIncrement,
+    minZoom,
+    maxZoom
+  );
   const activeNodeRef = useRef<AppNode>();
   // const mousePosRef = useMousePos(ref);
   const [nodeMoveOffset, startNodeMove] = useNodeMove();
