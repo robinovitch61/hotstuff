@@ -1,9 +1,9 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import useEventListener from "./hooks/useEventListener";
 import useLast from "./hooks/useLast";
 import useMousePos from "./hooks/useMousePos";
 import useScale from "./hooks/useScale";
-import { addPoints, Point } from "./pointUtils";
+import { addPoints, diffPoints, ORIGIN, Point } from "./pointUtils";
 
 export type SimpleCanvasProps = {
   canvasWidth: number;
@@ -13,32 +13,40 @@ export type SimpleCanvasProps = {
 export default function SimpleCanvas(props: SimpleCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-  const mousePos = useMousePos(canvasRef);
-  const adjustedOrigin = useRef<Point>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
+  const adjustedOrigin = useRef<Point>(ORIGIN);
+  const mousePosRef = useRef<Point>(ORIGIN);
 
-  // setup canvas and set context
-  useLayoutEffect(() => {
+  function reset() {
     if (canvasRef.current) {
+      // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
 
       if (renderCtx) {
-        // // scale for pixels
-        // const { devicePixelRatio: ratio = 1 } = window;
-        // renderCtx.canvas.width = props.canvasWidth * ratio;
-        // renderCtx.canvas.height = props.canvasHeight * ratio;
-        // renderCtx.scale(ratio, ratio);
+        // scale for pixels
+        const { devicePixelRatio: ratio = 1 } = window;
+        renderCtx.canvas.width = props.canvasWidth * ratio;
+        renderCtx.canvas.height = props.canvasHeight * ratio;
+        renderCtx.scale(ratio, ratio);
+        setScale(ratio);
+
         setContext(renderCtx);
+        adjustedOrigin.current = ORIGIN;
       }
     }
-  }, [context]);
+  }
+
+  // setup canvas and set context
+  useLayoutEffect(() => {
+    reset();
+  }, [canvasRef]);
 
   // draw
   useLayoutEffect(() => {
     if (context) {
       const squareSize = 50;
 
-      // reset canvas but maintain transform
+      // clear canvas but maintain transform
       const storedTransform = context.getTransform();
       context.canvas.width = context.canvas.width;
       context.setTransform(storedTransform);
@@ -50,48 +58,71 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         squareSize
       );
     }
-  }, [context, scale]);
+  }, [canvasRef, scale]);
 
-  // zoom when scale changes
-  useEventListener(canvasRef, "wheel", (event: WheelEvent) => {
-    if (context) {
-      event.preventDefault();
-      const zoom = 1 - event.deltaY / 240;
-      console.log(zoom);
-      const adjustedOriginDelta = {
-        x: (mousePos.x / scale) * (1 - 1 / zoom),
-        y: (mousePos.y / scale) * (1 - 1 / zoom),
-      };
-      const newAdjustedOrigin = addPoints(
-        adjustedOrigin.current,
-        adjustedOriginDelta
-      );
-
-      context.translate(adjustedOrigin.current.x, adjustedOrigin.current.y);
-      context.scale(zoom, zoom);
-      context.translate(-newAdjustedOrigin.x, -newAdjustedOrigin.y);
-
-      adjustedOrigin.current = newAdjustedOrigin;
-      setScale(scale * zoom);
+  // add event listener on canvas for mouse position
+  useEffect(() => {
+    const canvasElem = canvasRef.current;
+    if (canvasElem === null) {
+      return;
     }
-  });
-  // useLayoutEffect(() => {
-  //   if (context) {
-  //     // a bit above 1 when zooming in, a bit below one when zooming out
-  //     const scaleFactor = 1 + scale - lastScale;
-  //     context.translate(adjustedOrigin.current.x, adjustedOrigin.current.y);
-  //     context.scale(scaleFactor, scaleFactor);
-  //   }
-  // }, [scale]);
+
+    function handleUpdateMouse(event: MouseEvent) {
+      if (canvasRef.current) {
+        const viewportMousePos = { x: event.clientX, y: event.clientY };
+        const topLeftCanvasPos = {
+          x: canvasRef.current.offsetLeft,
+          y: canvasRef.current.offsetTop,
+        };
+        mousePosRef.current = diffPoints(viewportMousePos, topLeftCanvasPos);
+      }
+    }
+
+    canvasElem.addEventListener("mousemove", handleUpdateMouse);
+    canvasElem.addEventListener("wheel", handleUpdateMouse);
+    return () => {
+      canvasElem.removeEventListener("mousemove", handleUpdateMouse);
+      canvasElem.removeEventListener("wheel", handleUpdateMouse);
+    };
+  }, [canvasRef]);
+
+  // add event listener on canvas for zoom
+  useEffect(() => {
+    const canvasElem = canvasRef.current;
+    if (canvasElem === null) {
+      return;
+    }
+
+    // this is really tricky
+    function handleWheel(event: WheelEvent) {
+      if (context) {
+        const zoom = 1 - event.deltaY / 240;
+        const adjustedOriginDelta = {
+          x: (mousePosRef.current.x / scale) * (1 - 1 / zoom),
+          y: (mousePosRef.current.y / scale) * (1 - 1 / zoom),
+        };
+        const newAdjustedOrigin = addPoints(
+          adjustedOrigin.current,
+          adjustedOriginDelta
+        );
+
+        context.translate(adjustedOrigin.current.x, adjustedOrigin.current.y);
+        context.scale(zoom, zoom);
+        context.translate(-newAdjustedOrigin.x, -newAdjustedOrigin.y);
+
+        adjustedOrigin.current = newAdjustedOrigin;
+        setScale(scale * zoom);
+      }
+    }
+
+    canvasElem.addEventListener("wheel", handleWheel);
+    return () => canvasElem.removeEventListener("wheel", handleWheel);
+  }, [canvasRef, scale]);
 
   return (
     <div>
-      <button onClick={() => setScale(1)}>Reset Zoom</button>
+      <button onClick={reset}>Reset Zoom</button>
       <pre>scale: {scale}</pre>
-      {/* <pre>lastScale: {lastScale}</pre> */}
-      <pre>
-        mouse: {mousePos.x}, {mousePos.y}
-      </pre>
       <canvas
         id="canvas"
         ref={canvasRef}
