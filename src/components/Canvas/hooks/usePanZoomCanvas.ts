@@ -39,16 +39,22 @@ export default function usePanZoomCanvas(
   const [mousePos, setMousePos] = useMousePos(canvasRef);
   const isResetRef = useRef<boolean>(false);
 
+  const adjustForDevice = useCallback(() => {
+    if (context) {
+      // adjust for device pixel density
+      const { devicePixelRatio: ratio = 1 } = window;
+      context.canvas.width = canvasWidth * ratio;
+      context.canvas.height = canvasHeight * ratio;
+      context.scale(ratio, ratio);
+      setScale(ratio);
+    }
+  }, [canvasHeight, canvasWidth, context]);
+
   // reset
   const reset = useCallback(
     (context: CanvasRenderingContext2D) => {
       if (context && !isResetRef.current) {
-        // adjust for device pixel density
-        const { devicePixelRatio: ratio = 1 } = window;
-        context.canvas.width = canvasWidth * ratio;
-        context.canvas.height = canvasHeight * ratio;
-        context.scale(ratio, ratio);
-        setScale(ratio);
+        adjustForDevice();
 
         // reset state and refs
         setContext(context);
@@ -62,19 +68,15 @@ export default function usePanZoomCanvas(
         isResetRef.current = true;
       }
     },
-    [lastOffsetRef, setMousePos, canvasWidth, canvasHeight]
+    [adjustForDevice, setMousePos, lastOffsetRef]
   );
 
-  // reset always on canvas dimension change
+  // reset pixels on canvas dimension change
   useLayoutEffect(() => {
     if (context) {
-      const { devicePixelRatio: ratio = 1 } = window;
-      context.canvas.width = canvasWidth * ratio;
-      context.canvas.height = canvasHeight * ratio;
-      context.scale(ratio, ratio);
-      setScale(ratio);
+      adjustForDevice();
     }
-  }, [canvasHeight, canvasWidth, context]);
+  }, [adjustForDevice, canvasHeight, canvasWidth, context]);
 
   // functions for panning
   const mouseMove = useCallback(
