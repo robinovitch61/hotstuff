@@ -3,6 +3,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
+  drawArrow,
   drawCircle,
   drawConnection,
   intersectsCircle,
@@ -11,8 +12,9 @@ import {
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 import { diffPoints, makePoint, scalePoint } from "./pointUtils";
-import { makeNode } from "hotstuff-network";
+import { makeConnection, makeNode } from "hotstuff-network";
 import useNodeMove from "./hooks/useNodeMove";
+import useMakeConnection from "./hooks/useMakeConnection";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -44,6 +46,7 @@ export type SimpleCanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
   setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>;
+  setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>;
   canvasWidth: number;
   canvasHeight: number;
   devicePixelRatio: number;
@@ -60,6 +63,7 @@ export default function SimpleCanvas(
     canvasWidth,
     devicePixelRatio,
     setAppNodes,
+    setAppConnections,
   } = props;
 
   // hooks
@@ -73,6 +77,11 @@ export default function SimpleCanvas(
     startPan,
   ] = usePanZoomCanvas(canvasRef, canvasWidth, canvasHeight);
   const [nodeDelta, startNodeMove] = useNodeMove();
+  const [
+    connectionMousePos,
+    isConnectionDone,
+    startMakeConnection,
+  ] = useMakeConnection();
 
   // node updaters
   const addNode = useCallback(
@@ -179,8 +188,9 @@ export default function SimpleCanvas(
           event.shiftKey || nodes.filter((node) => node.isActive).length > 1;
         updateActiveNodes(node.id, sticky);
         if (event.altKey) {
-          alert("MAKE CONNECTION TODO");
-          // startMakeConnection(event);
+          clearActiveNodes();
+          updateActiveNodes(node.id, false);
+          startMakeConnection(event);
         } else {
           startNodeMove(event);
         }
@@ -235,6 +245,8 @@ export default function SimpleCanvas(
     viewportTopLeft,
     nodes,
     connections,
+    connectionMousePos,
+    isConnectionDone,
   ]);
 
   // move active nodes if click and drag
@@ -250,14 +262,55 @@ export default function SimpleCanvas(
     }));
 
     updateNodes(newActiveNodes);
-  }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...
+  }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...I think it's fine
+
+  // draw connection if it's being made
+  useLayoutEffect(() => {
+    // at this point only the selected node should be active
+    const activeNodes = nodes.filter((node) => node.isActive);
+    if (activeNodes.length !== 1) {
+      return;
+    }
+    const activeNode = activeNodes[0];
+
+    if (context && !isConnectionDone) {
+      drawArrow(
+        context,
+        activeNode.center,
+        mouseToNodeCoords(connectionMousePos, offset, viewportTopLeft, scale),
+        "grey"
+      );
+    } else if (isConnectionDone) {
+      nodes.map((node) => {
+        if (
+          intersectsCircle(
+            mouseToNodeCoords(
+              makePoint(connectionMousePos.x, connectionMousePos.y),
+              offset,
+              viewportTopLeft,
+              scale
+            ),
+            node.center,
+            node.radius
+          )
+        ) {
+          const newConnection = makeConnection({
+            source: activeNode,
+            target: node,
+            resistanceDegKPerW: 10,
+            kind: "bi",
+          });
+          setAppConnections([...connections, newConnection]);
+        }
+      });
+    }
+  }, [connectionMousePos, context, isConnectionDone]);
 
   return (
     <StyledCanvasWrapper>
       <StyledControls>
         <pre>scale: {scale}</pre>
         <pre>offset: {JSON.stringify(offset)}</pre>
-        <pre>viewportTopLeft: {JSON.stringify(viewportTopLeft)}</pre>
         <button onClick={() => context && reset(context)}>
           Reset Viewport
         </button>

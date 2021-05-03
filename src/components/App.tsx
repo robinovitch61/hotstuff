@@ -126,6 +126,7 @@ export default function App() {
             nodes={appNodes}
             connections={appConnections}
             setAppNodes={setAppNodes}
+            setAppConnections={setAppConnections}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
             devicePixelRatio={ratio}
