@@ -20,3 +20,7 @@ export function addPoints(p1: Point, p2: Point) {
 export function scalePoint(p1: Point, scale: number) {
   return { x: p1.x / scale, y: p1.y / scale };
 }
+
+export function multiplyPointByScale(p1: Point, scale: number) {
+  return { x: p1.x * scale, y: p1.y * scale };
+}

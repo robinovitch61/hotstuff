@@ -44,6 +44,7 @@ export function drawArrow(
   color: string
 ) {
   context.save();
+  context.beginPath();
   context.strokeStyle = color;
   context.lineWidth = 2;
   const headLength = 9;
@@ -61,6 +62,7 @@ export function drawArrow(
   context.lineTo(length, 0);
   context.lineTo(length - headLength, headWidth);
   context.stroke();
+  context.closePath();
   context.restore();
 }
 

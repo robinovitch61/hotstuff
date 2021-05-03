@@ -2,14 +2,21 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
-import { drawCircle, drawConnection, toNodeCoords } from "./canvasUtils";
+import { drawCircle, drawConnection } from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { makePoint } from "./pointUtils";
+import {
+  addPoints,
+  diffPoints,
+  makePoint,
+  multiplyPointByScale,
+  scalePoint,
+} from "./pointUtils";
 import { makeNode } from "hotstuff-network";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
+  max-height: 100%;
   position: relative;
 `;
 
@@ -18,6 +25,11 @@ const StyledControls = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
+  margin: 0.5em;
+
+  > button {
+    padding: 0.5em;
+  }
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
@@ -81,10 +93,11 @@ export default function SimpleCanvas(
     });
     const newAppNode = {
       ...newNode,
-      center: toNodeCoords(
-        canvas,
-        makePoint(event.clientX, event.clientY),
-        offset,
+      center: scalePoint(
+        diffPoints(
+          makePoint(event.clientX, event.clientY),
+          addPoints(offset, viewportTopLeft)
+        ),
         scale
       ),
       radius: defaultNodeRadius,
@@ -125,6 +138,19 @@ export default function SimpleCanvas(
         const targetAppNode = nodes.filter((node) => node.id === target.id)[0];
         drawConnection(context, sourceAppNode.center, targetAppNode.center);
       });
+
+      context.save();
+      context.beginPath();
+      context.fillStyle = "green";
+      context.arc(viewportTopLeft.x, viewportTopLeft.y, 5, 0, Math.PI * 2);
+      context.fill();
+      context.closePath();
+      context.beginPath();
+      context.fillStyle = "blue";
+      context.arc(offset.x, offset.y, 5, 0, Math.PI * 2);
+      context.fill();
+      context.closePath();
+      context.restore();
     }
   }, [
     canvasWidth,
@@ -140,9 +166,12 @@ export default function SimpleCanvas(
   return (
     <StyledCanvasWrapper>
       <StyledControls>
-        <button onClick={() => context && reset(context)}>Reset</button>
         <pre>scale: {scale}</pre>
         <pre>offset: {JSON.stringify(offset)}</pre>
+        <pre>viewportTopLeft: {JSON.stringify(viewportTopLeft)}</pre>
+        <button onClick={() => context && reset(context)}>
+          Reset Viewport
+        </button>
       </StyledControls>
       <StyledCanvas
         ref={canvasRef}
