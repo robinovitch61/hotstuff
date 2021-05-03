@@ -93,12 +93,15 @@ export default function SimpleCanvas(
     });
     const newAppNode = {
       ...newNode,
-      center: scalePoint(
-        diffPoints(
-          makePoint(event.clientX, event.clientY),
-          addPoints(offset, viewportTopLeft)
+      center: addPoints(
+        addPoints(
+          scalePoint(
+            diffPoints(makePoint(event.clientX, event.clientY), offset),
+            scale
+          ),
+          viewportTopLeft
         ),
-        scale
+        scalePoint(offset, scale)
       ),
       radius: defaultNodeRadius,
       color: "red",
