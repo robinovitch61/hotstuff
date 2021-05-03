@@ -1,4 +1,10 @@
-import { makePoint, Point } from "./pointUtils";
+import {
+  addPoints,
+  diffPoints,
+  makePoint,
+  Point,
+  scalePoint,
+} from "./pointUtils";
 import config from "../../config";
 
 const { canvasHeightPerc, editorWidthPerc, activeNodeStrokeWidth } = config;
@@ -84,16 +90,14 @@ export function intersectsCircle(
   return Math.pow(deltaX, 2) + Math.pow(deltaY, 2) <= Math.pow(radius, 2);
 }
 
-// transforms clicked coordinates to what gets stored in node data
-export function toNodeCoords(
-  canvas: HTMLCanvasElement,
-  point: Point,
+export function mouseToNodeCoords(
+  mouse: Point,
   offset: Point,
+  viewportTopLeft: Point,
   scale: number
-) {
-  const boundingRect = canvas.getBoundingClientRect();
-  return makePoint(
-    (point.x - boundingRect.left + offset.x) / scale,
-    (point.y - boundingRect.top + offset.y) / scale
+): Point {
+  return addPoints(
+    scalePoint(makePoint(mouse.x, mouse.y), scale),
+    viewportTopLeft
   );
 }

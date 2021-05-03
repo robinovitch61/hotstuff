@@ -2,7 +2,12 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
-import { drawCircle, drawConnection } from "./canvasUtils";
+import {
+  drawCircle,
+  drawConnection,
+  intersectsCircle,
+  mouseToNodeCoords,
+} from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 import {
@@ -10,9 +15,11 @@ import {
   diffPoints,
   makePoint,
   multiplyPointByScale,
+  Point,
   scalePoint,
 } from "./pointUtils";
 import { makeNode } from "hotstuff-network";
+import useNodeMove from "./hooks/useNodeMove";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -43,6 +50,7 @@ const { newNodeNamePrefix, defaultNodeRadius } = config;
 export type SimpleCanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
+  activeNode?: AppNode;
   addNode: (node: AppNode) => void;
   updateNode: (node: AppNode) => void;
   setActiveNode: (nodeId: string) => void;
@@ -55,6 +63,21 @@ export type SimpleCanvasProps = {
 export default function SimpleCanvas(
   props: SimpleCanvasProps
 ): React.ReactElement {
+  // destructure props
+  const {
+    nodes,
+    connections,
+    canvasHeight,
+    canvasWidth,
+    devicePixelRatio,
+    activeNode,
+    setActiveNode,
+    updateNode,
+    addNode,
+    clearActiveNode,
+  } = props;
+
+  // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [
     context,
@@ -63,18 +86,12 @@ export default function SimpleCanvas(
     offset,
     scale,
     startPan,
-  ] = usePanZoomCanvas(canvasRef, props.canvasWidth, props.canvasHeight);
+  ] = usePanZoomCanvas(canvasRef, canvasWidth, canvasHeight);
+  const [nodeDelta, startNodeMove] = useNodeMove();
 
-  const {
-    nodes,
-    connections,
-    canvasHeight,
-    canvasWidth,
-    devicePixelRatio,
-  } = props;
+  // TODO: put elsewhere
 
   function handleDoubleClick(
-    canvas: HTMLCanvasElement,
     event: React.MouseEvent<HTMLCanvasElement>,
     nodes: AppNode[]
   ) {
@@ -93,21 +110,55 @@ export default function SimpleCanvas(
     });
     const newAppNode = {
       ...newNode,
-      center: addPoints(
-        addPoints(
-          scalePoint(
-            diffPoints(makePoint(event.clientX, event.clientY), offset),
-            scale
-          ),
-          viewportTopLeft
-        ),
-        scalePoint(offset, scale)
+      center: mouseToNodeCoords(
+        makePoint(event.clientX, event.clientY),
+        offset,
+        viewportTopLeft,
+        scale
       ),
       radius: defaultNodeRadius,
       color: "red",
       isActive: false,
     };
-    props.addNode(newAppNode);
+    addNode(newAppNode);
+  }
+
+  function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
+    const canvas = canvasRef.current;
+    if (canvas === null) {
+      return;
+    }
+
+    let nodeClicked = false;
+    nodes.some((node) => {
+      if (
+        intersectsCircle(
+          mouseToNodeCoords(
+            makePoint(event.clientX, event.clientY),
+            offset,
+            viewportTopLeft,
+            scale
+          ),
+          node.center,
+          node.radius
+        )
+      ) {
+        nodeClicked = true;
+        setActiveNode(node.id);
+        if (event.altKey) {
+          alert("MAKE CONNECTION TODO");
+          // startMakeConnection(event);
+        } else {
+          startNodeMove(event);
+        }
+        return true; // short circuits the rest of the some loop
+      }
+    });
+
+    if (!nodeClicked) {
+      clearActiveNode();
+      startPan(event);
+    }
   }
 
   // setup canvas and set context
@@ -142,18 +193,18 @@ export default function SimpleCanvas(
         drawConnection(context, sourceAppNode.center, targetAppNode.center);
       });
 
-      context.save();
-      context.beginPath();
-      context.fillStyle = "green";
-      context.arc(viewportTopLeft.x, viewportTopLeft.y, 5, 0, Math.PI * 2);
-      context.fill();
-      context.closePath();
-      context.beginPath();
-      context.fillStyle = "blue";
-      context.arc(offset.x, offset.y, 5, 0, Math.PI * 2);
-      context.fill();
-      context.closePath();
-      context.restore();
+      // context.save();
+      // context.beginPath();
+      // context.fillStyle = "green";
+      // context.arc(viewportTopLeft.x, viewportTopLeft.y, 5, 0, Math.PI * 2);
+      // context.fill();
+      // context.closePath();
+      // context.beginPath();
+      // context.fillStyle = "blue";
+      // context.arc(offset.x, offset.y, 5, 0, Math.PI * 2);
+      // context.fill();
+      // context.closePath();
+      // context.restore();
     }
   }, [
     canvasWidth,
@@ -165,6 +216,20 @@ export default function SimpleCanvas(
     nodes,
     connections,
   ]);
+
+  // move active node if it's moving
+  useLayoutEffect(() => {
+    if (activeNode === undefined) {
+      return;
+    }
+    const newActiveNode = {
+      ...activeNode,
+      center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
+    };
+
+    setActiveNode(newActiveNode.id);
+    updateNode(newActiveNode);
+  }, [nodeDelta]);
 
   return (
     <StyledCanvasWrapper>
@@ -182,13 +247,13 @@ export default function SimpleCanvas(
         height={canvasHeight * devicePixelRatio}
         cssWidth={canvasWidth}
         cssHeight={canvasHeight}
-        onMouseDown={startPan}
+        onMouseDown={handleOnMouseDown}
         onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) => {
           const canvas = canvasRef.current;
           if (canvas === null) {
             return;
           }
-          handleDoubleClick(canvas, event, nodes);
+          handleDoubleClick(event, nodes);
         }}
       />
     </StyledCanvasWrapper>

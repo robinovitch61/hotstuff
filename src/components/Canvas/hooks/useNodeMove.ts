@@ -4,13 +4,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { addPoints, diffPoints, ORIGIN, Point } from "../pointUtils";
+import { diffPoints, ORIGIN, Point } from "../pointUtils";
 
 export default function useNodeMove(): [
   Point,
   (e: SyntheticMouseEvent) => void
 ] {
-  const [offset, setOffset] = useState<Point>(ORIGIN);
+  const [nodeDelta, setNodeDelta] = useState<Point>(ORIGIN);
   const lastMousePos = useRef(ORIGIN);
 
   const mouseMove = useCallback((e: MouseEvent) => {
@@ -18,19 +18,15 @@ export default function useNodeMove(): [
     const currMousePos = { x: e.pageX, y: e.pageY }; // page is for the document, https://jsfiddle.net/robinovitch61/eL9q10zj/
     lastMousePos.current = currMousePos;
 
-    // want only the incremental change on each mouse motion
-    // to adjust the node center by
-    setOffset(diffPoints(lastPoint, currMousePos));
+    setNodeDelta(diffPoints(lastPoint, currMousePos));
   }, []);
 
-  // Tear down listeners.
   const mouseUp = useCallback(() => {
     document.removeEventListener("mousemove", mouseMove);
     document.removeEventListener("mouseup", mouseUp);
   }, [mouseMove]);
 
-  // Set up listeners.
-  const startMouseMove = useCallback(
+  const startNodeMove = useCallback(
     (e: SyntheticMouseEvent) => {
       document.addEventListener("mousemove", mouseMove);
       document.addEventListener("mouseup", mouseUp);
@@ -39,5 +35,5 @@ export default function useNodeMove(): [
     [mouseMove, mouseUp]
   );
 
-  return [offset, startMouseMove];
+  return [nodeDelta, startNodeMove];
 }

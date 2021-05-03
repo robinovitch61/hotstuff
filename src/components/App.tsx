@@ -151,6 +151,11 @@ export default function App() {
     );
   }
 
+  function getActiveNode() {
+    const activeNodeList = appNodes.filter((node) => node.isActive);
+    return activeNodeList.length === 1 ? activeNodeList[0] : undefined;
+  }
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -158,6 +163,7 @@ export default function App() {
           <SimpleCanvas
             nodes={appNodes}
             connections={appConnections}
+            activeNode={getActiveNode()}
             addNode={addNode}
             updateNode={updateNode}
             setActiveNode={setActiveNode}
