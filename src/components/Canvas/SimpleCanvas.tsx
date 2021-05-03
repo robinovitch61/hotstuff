@@ -114,6 +114,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     }
 
     function handleUpdateMouse(event: MouseEvent) {
+      event.preventDefault();
       if (canvasRef.current) {
         const viewportMousePos = { x: event.clientX, y: event.clientY };
         const topLeftCanvasPos = {
@@ -141,6 +142,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
 
     // this is really tricky
     function handleWheel(event: WheelEvent) {
+      event.preventDefault();
       if (context) {
         const zoom = 1 - event.deltaY / 240;
         const adjustedOriginDelta = {
