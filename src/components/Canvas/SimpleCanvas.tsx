@@ -6,15 +6,7 @@ export type SimpleCanvasProps = {
   canvasHeight: number;
 };
 
-function useLast<T>(value: T): [T | undefined, (val: T) => void] {
-  const ref = useRef<T>();
-  // useEffect runs AFTER a render if a dependency has changed
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  // return previous value
-  return [ref.current, (val: T) => (ref.current = val)];
-}
+const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
 
 export default function SimpleCanvas(props: SimpleCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,9 +14,10 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<Point>(ORIGIN);
   const [mousePos, setMousePos] = useState<Point>(ORIGIN);
-  const adjustedOrigin = useRef<Point>(ORIGIN);
-  const [lastOffset, setLastOffset] = useLast(offset);
+  const [isReset, setIsReset] = useState(false);
+  const viewportTopLeftRef = useRef<Point>(ORIGIN);
   const lastMousePosRef = useRef<Point>(ORIGIN);
+  const lastOffsetRef = useRef<Point>(ORIGIN);
 
   // reset at start and on button click
   function reset() {
@@ -32,7 +25,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
 
-      if (renderCtx) {
+      if (renderCtx && !isReset) {
         // scale for pixels
         const { devicePixelRatio: ratio = 1 } = window;
         renderCtx.canvas.width = props.canvasWidth * ratio;
@@ -40,12 +33,14 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         renderCtx.scale(ratio, ratio);
         setScale(ratio);
 
+        // reset other values
         setContext(renderCtx);
         setOffset(ORIGIN);
-        setLastOffset(ORIGIN);
         setMousePos(ORIGIN);
-        adjustedOrigin.current = ORIGIN;
+        lastOffsetRef.current = ORIGIN;
+        viewportTopLeftRef.current = ORIGIN;
         lastMousePosRef.current = ORIGIN;
+        setIsReset(true);
       }
     }
   }
@@ -73,19 +68,31 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     lastMousePosRef.current = { x: event.pageX, y: event.pageY };
   }
 
-  // pan when offset changes
-  useLayoutEffect(() => {
-    if (context && lastOffset) {
-      const offsetDiff = scalePoint(diffPoints(offset, lastOffset), scale);
-      context.translate(offsetDiff.x, offsetDiff.y);
-      adjustedOrigin.current = diffPoints(adjustedOrigin.current, offsetDiff);
-    }
-  }, [offset]);
-
   // setup canvas and set context
   useLayoutEffect(() => {
     reset();
   }, [canvasRef]);
+
+  // pan when offset changes
+  useLayoutEffect(() => {
+    if (context && lastOffsetRef.current) {
+      const offsetDiff = scalePoint(
+        diffPoints(offset, lastOffsetRef.current),
+        scale
+      );
+      context.translate(offsetDiff.x, offsetDiff.y);
+      viewportTopLeftRef.current = diffPoints(
+        viewportTopLeftRef.current,
+        offsetDiff
+      );
+      setIsReset(false);
+    }
+  }, [offset]);
+
+  // update last offset
+  useEffect(() => {
+    lastOffsetRef.current = offset;
+  }, [offset]);
 
   // draw
   useLayoutEffect(() => {
@@ -103,8 +110,17 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         squareSize,
         squareSize
       );
+      context.arc(
+        viewportTopLeftRef.current.x,
+        viewportTopLeftRef.current.y,
+        5,
+        0,
+        2 * Math.PI
+      );
+      context.fillStyle = "red";
+      context.fill();
     }
-  }, [canvasRef, scale, offset]);
+  }, [canvasRef, context, isReset, scale, offset]);
 
   // add event listener on canvas for mouse position
   useEffect(() => {
@@ -144,22 +160,26 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     function handleWheel(event: WheelEvent) {
       event.preventDefault();
       if (context) {
-        const zoom = 1 - event.deltaY / 240;
+        const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
         const adjustedOriginDelta = {
           x: (mousePos.x / scale) * (1 - 1 / zoom),
           y: (mousePos.y / scale) * (1 - 1 / zoom),
         };
-        const newAdjustedOrigin = addPoints(
-          adjustedOrigin.current,
+        const newViewportTopLeft = addPoints(
+          viewportTopLeftRef.current,
           adjustedOriginDelta
         );
 
-        context.translate(adjustedOrigin.current.x, adjustedOrigin.current.y);
+        context.translate(
+          viewportTopLeftRef.current.x,
+          viewportTopLeftRef.current.y
+        );
         context.scale(zoom, zoom);
-        context.translate(-newAdjustedOrigin.x, -newAdjustedOrigin.y);
+        context.translate(-newViewportTopLeft.x, -newViewportTopLeft.y);
 
-        adjustedOrigin.current = newAdjustedOrigin;
+        viewportTopLeftRef.current = newViewportTopLeft;
         setScale(scale * zoom);
+        setIsReset(false);
       }
     }
 
