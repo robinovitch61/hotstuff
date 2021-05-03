@@ -18,7 +18,7 @@ import {
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
 
-export default function usePanZoom(
+export default function usePanZoomCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement>,
   canvasWidth: number,
   canvasHeight: number
@@ -38,6 +38,43 @@ export default function usePanZoom(
   const lastMousePosRef = useRef<Point>(ORIGIN);
   const [mousePos, setMousePos] = useMousePos(canvasRef);
   const isResetRef = useRef<boolean>(false);
+
+  // reset
+  const reset = useCallback(
+    (context: CanvasRenderingContext2D) => {
+      if (context && !isResetRef.current) {
+        // adjust for device pixel density
+        const { devicePixelRatio: ratio = 1 } = window;
+        context.canvas.width = canvasWidth * ratio;
+        context.canvas.height = canvasHeight * ratio;
+        context.scale(ratio, ratio);
+        setScale(ratio);
+
+        // reset state and refs
+        setContext(context);
+        setOffset(ORIGIN);
+        setMousePos(ORIGIN);
+        setViewportTopLeft(ORIGIN);
+        lastOffsetRef.current = ORIGIN;
+        lastMousePosRef.current = ORIGIN;
+
+        // this thing is so multiple resets in a row don't clear canvas
+        isResetRef.current = true;
+      }
+    },
+    [lastOffsetRef, setMousePos, canvasWidth, canvasHeight]
+  );
+
+  // setup canvas and set context
+  useLayoutEffect(() => {
+    if (canvasRef.current) {
+      // get new drawing context
+      const renderCtx = canvasRef.current.getContext("2d");
+      if (renderCtx) {
+        reset(renderCtx);
+      }
+    }
+  }, [reset, canvasHeight, canvasWidth, canvasRef]);
 
   // functions for panning
   const mouseMove = useCallback(
@@ -122,32 +159,6 @@ export default function usePanZoom(
     canvasElem.addEventListener("wheel", handleWheel);
     return () => canvasElem.removeEventListener("wheel", handleWheel);
   }, [canvasRef, context, mousePos.x, mousePos.y, viewportTopLeft, scale]);
-
-  // reset
-  const reset = useCallback(
-    (context: CanvasRenderingContext2D) => {
-      if (context && !isResetRef.current) {
-        // adjust for device pixel density
-        const { devicePixelRatio: ratio = 1 } = window;
-        context.canvas.width = canvasWidth * ratio;
-        context.canvas.height = canvasHeight * ratio;
-        context.scale(ratio, ratio);
-        setScale(ratio);
-
-        // reset state and refs
-        setContext(context);
-        setOffset(ORIGIN);
-        setMousePos(ORIGIN);
-        setViewportTopLeft(ORIGIN);
-        lastOffsetRef.current = ORIGIN;
-        lastMousePosRef.current = ORIGIN;
-
-        // this thing is so multiple resets in a row don't clear canvas
-        isResetRef.current = true;
-      }
-    },
-    [lastOffsetRef, setMousePos, canvasWidth, canvasHeight]
-  );
 
   return [context, reset, viewportTopLeft, offset, scale, startPan];
 }

@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as canvasUtils from "./canvasUtils";
 import styled from "styled-components";
@@ -285,7 +286,7 @@ export default function Canvas(props: CanvasProps) {
       />
       <div style={{ position: "absolute", top: 0 }}>
         {nodes.map((node) => (
-          <pre>{JSON.stringify(node, null, 2)}</pre>
+          <pre key={node.id}>{JSON.stringify(node, null, 2)}</pre>
         ))}
       </div>
     </>

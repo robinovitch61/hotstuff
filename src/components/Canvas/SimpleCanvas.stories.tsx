@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Story, Meta } from "@storybook/react";
 import SimpleCanvas, { SimpleCanvasProps } from "./SimpleCanvas";
 

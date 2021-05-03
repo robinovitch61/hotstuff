@@ -1,31 +1,25 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
-import usePanZoom from "./hooks/usePanZoom";
+import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 
 export type SimpleCanvasProps = {
   canvasWidth: number;
   canvasHeight: number;
 };
 
-export default function SimpleCanvas(props: SimpleCanvasProps) {
+export default function SimpleCanvas(
+  props: SimpleCanvasProps
+): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [context, reset, viewportTopLeft, offset, scale, startPan] = usePanZoom(
-    canvasRef,
-    props.canvasWidth,
-    props.canvasHeight
-  );
-
-  // setup canvas and set context
-  useLayoutEffect(() => {
-    if (canvasRef.current) {
-      // get new drawing context
-      const renderCtx = canvasRef.current.getContext("2d");
-      if (renderCtx) {
-        reset(renderCtx);
-      }
-    }
-  }, [reset, props.canvasHeight, props.canvasWidth]);
+  const [
+    context,
+    reset,
+    viewportTopLeft,
+    offset,
+    scale,
+    startPan,
+  ] = usePanZoomCanvas(canvasRef, props.canvasWidth, props.canvasHeight);
 
   // draw
   useLayoutEffect(() => {
