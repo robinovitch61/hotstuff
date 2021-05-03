@@ -28,13 +28,7 @@ import {
 import useNodeMove from "./hooks/useNodeMove";
 import useMakeConnection from "./hooks/useMakeConnection";
 
-const {
-  defaultNodeRadius,
-  newNodeNamePrefix,
-  zoomIncrement,
-  minZoom,
-  maxZoom,
-} = config;
+const { defaultNodeRadius, newNodeNamePrefix, minZoom, maxZoom } = config;
 
 type CanvasProps = {
   nodes: AppNode[];
@@ -78,12 +72,7 @@ export default function Canvas(props: CanvasProps) {
   const [windowWidth, windowHeight] = useWindowSize();
   const [offset, setOffset, startPan] = usePan();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [scale, setScale] = useScale(
-    canvasRef,
-    zoomIncrement,
-    minZoom,
-    maxZoom
-  );
+  const [scale, setScale] = useScale(canvasRef, 0.01, minZoom, maxZoom);
   const activeNodeRef = useRef<AppNode>();
   // const mousePosRef = useMousePos(ref);
   const [nodeMoveOffset, startNodeMove] = useNodeMove();

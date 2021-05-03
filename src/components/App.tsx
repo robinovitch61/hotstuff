@@ -13,6 +13,7 @@ import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
 import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
+import SimpleCanvas from "./Canvas/SimpleCanvas";
 
 const {
   defaultTimeStepSeconds,
@@ -99,13 +100,9 @@ export default function App() {
   const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
-  const [windowWidth, windowHeight] = useWindowSize();
+  const [size, ratio] = useWindowSize();
 
-  // // oh shit https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
-  // const test = useRef(0);
-  // alert(test.current);
-  // test.current = 1;
-  // alert(test.current);
+  const [windowWidth, windowHeight] = size;
 
   // width/heights
   const workspaceWidth = windowWidth;
@@ -159,15 +156,15 @@ export default function App() {
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
         <StyledCanvas height={canvasHeight}>
-          <Canvas
+          <SimpleCanvas
             nodes={appNodes}
             connections={appConnections}
             addNode={addNode}
             updateNode={updateNode}
             setActiveNode={setActiveNode}
             clearActiveNode={clearActiveNode}
-            canvasHeight={canvasHeight}
-            canvasWidth={canvasWidth}
+            canvasHeight={canvasHeight / ratio}
+            canvasWidth={canvasWidth / ratio}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />

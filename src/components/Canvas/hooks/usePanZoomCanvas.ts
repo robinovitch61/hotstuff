@@ -65,17 +65,6 @@ export default function usePanZoomCanvas(
     [lastOffsetRef, setMousePos, canvasWidth, canvasHeight]
   );
 
-  // setup canvas and set context
-  useLayoutEffect(() => {
-    if (canvasRef.current) {
-      // get new drawing context
-      const renderCtx = canvasRef.current.getContext("2d");
-      if (renderCtx) {
-        reset(renderCtx);
-      }
-    }
-  }, [reset, canvasHeight, canvasWidth, canvasRef]);
-
   // functions for panning
   const mouseMove = useCallback(
     (event: MouseEvent) => {
@@ -119,7 +108,7 @@ export default function usePanZoomCanvas(
   }, [context, offset, lastOffsetRef, scale]);
 
   // add event listener on canvas for zoom
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvasElem = canvasRef.current;
     if (canvasElem === null) {
       return;
