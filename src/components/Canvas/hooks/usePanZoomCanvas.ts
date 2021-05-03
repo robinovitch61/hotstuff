@@ -65,6 +65,17 @@ export default function usePanZoomCanvas(
     [lastOffsetRef, setMousePos, canvasWidth, canvasHeight]
   );
 
+  // reset always on canvas dimension change
+  useLayoutEffect(() => {
+    if (context) {
+      const { devicePixelRatio: ratio = 1 } = window;
+      context.canvas.width = canvasWidth * ratio;
+      context.canvas.height = canvasHeight * ratio;
+      context.scale(ratio, ratio);
+      setScale(ratio);
+    }
+  }, [canvasHeight, canvasWidth, context]);
+
   // functions for panning
   const mouseMove = useCallback(
     (event: MouseEvent) => {

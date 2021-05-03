@@ -8,7 +8,6 @@ import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 const StyledCanvasWrapper = styled.div`
   display: block;
   position: relative;
-  border: 1px solid red;
 `;
 
 const StyledControls = styled.div`
@@ -16,6 +15,10 @@ const StyledControls = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+`;
+
+const StyledCanvas = styled.canvas`
+  border: 1px solid red;
 `;
 
 export type SimpleCanvasProps = {
@@ -92,7 +95,7 @@ export default function SimpleCanvas(
       <StyledControls>
         <button onClick={() => context && reset(context)}>Reset</button>
       </StyledControls>
-      <canvas
+      <StyledCanvas
         width={canvasWidth}
         height={canvasHeight}
         ref={canvasRef}
