@@ -6,7 +6,7 @@ const config = {
   defaultNodeRadius: 15,
   newNodeNamePrefix: "New Node",
   zoomSensitivity: 500, // bigger = less zoom per click
-  minZoom: 1,
+  minZoom: 0.25,
   maxZoom: 5,
   activeNodeStrokeWidth: 2.5,
 };

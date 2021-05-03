@@ -8,13 +8,7 @@ import {
   scalePoint,
 } from "../pointUtils";
 import config from "../../../config";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
 
@@ -45,8 +39,8 @@ export default function usePanZoomCanvas(
       const { devicePixelRatio: ratio = 1 } = window;
       context.canvas.width = canvasWidth * ratio;
       context.canvas.height = canvasHeight * ratio;
-      // context.scale(ratio, ratio);
-      // setScale(ratio);
+      context.scale(ratio, ratio);
+      setScale(1);
     }
   }, [canvasHeight, canvasWidth, context]);
 

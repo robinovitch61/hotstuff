@@ -8,7 +8,6 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./Canvas/pointUtils";
-import Canvas from "./Canvas/Canvas";
 import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
 import config from "../config";
@@ -163,8 +162,9 @@ export default function App() {
             updateNode={updateNode}
             setActiveNode={setActiveNode}
             clearActiveNode={clearActiveNode}
-            canvasHeight={canvasHeight / ratio}
-            canvasWidth={canvasWidth / ratio}
+            canvasHeight={canvasHeight}
+            canvasWidth={canvasWidth}
+            devicePixelRatio={ratio}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />

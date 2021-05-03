@@ -16,12 +16,14 @@ const StyledCanvasWrapper = styled.div`
 const StyledControls = styled.div`
   z-index: 10;
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
 `;
 
-const StyledCanvas = styled.canvas`
+const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
   border: 1px solid red;
+  width: ${({ cssWidth }) => `${cssWidth}px`};
+  height: ${({ cssHeight }) => `${cssHeight}px`};
 `;
 
 const { newNodeNamePrefix, defaultNodeRadius } = config;
@@ -35,6 +37,7 @@ export type SimpleCanvasProps = {
   clearActiveNode: () => void;
   canvasWidth: number;
   canvasHeight: number;
+  devicePixelRatio: number;
 };
 
 export default function SimpleCanvas(
@@ -50,7 +53,13 @@ export default function SimpleCanvas(
     startPan,
   ] = usePanZoomCanvas(canvasRef, props.canvasWidth, props.canvasHeight);
 
-  const { nodes, connections, canvasHeight, canvasWidth } = props;
+  const {
+    nodes,
+    connections,
+    canvasHeight,
+    canvasWidth,
+    devicePixelRatio,
+  } = props;
 
   function handleDoubleClick(
     canvas: HTMLCanvasElement,
@@ -132,11 +141,15 @@ export default function SimpleCanvas(
     <StyledCanvasWrapper>
       <StyledControls>
         <button onClick={() => context && reset(context)}>Reset</button>
+        <pre>scale: {scale}</pre>
+        <pre>offset: {JSON.stringify(offset)}</pre>
       </StyledControls>
       <StyledCanvas
-        width={canvasWidth}
-        height={canvasHeight}
         ref={canvasRef}
+        width={canvasWidth * devicePixelRatio}
+        height={canvasHeight * devicePixelRatio}
+        cssWidth={canvasWidth}
+        cssHeight={canvasHeight}
         onMouseDown={startPan}
         onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) => {
           const canvas = canvasRef.current;
