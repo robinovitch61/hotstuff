@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
@@ -10,14 +10,7 @@ import {
 } from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import {
-  addPoints,
-  diffPoints,
-  makePoint,
-  multiplyPointByScale,
-  Point,
-  scalePoint,
-} from "./pointUtils";
+import { diffPoints, makePoint, scalePoint } from "./pointUtils";
 import { makeNode } from "hotstuff-network";
 import useNodeMove from "./hooks/useNodeMove";
 
@@ -50,11 +43,7 @@ const { newNodeNamePrefix, defaultNodeRadius } = config;
 export type SimpleCanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
-  activeNode?: AppNode;
-  addNode: (node: AppNode) => void;
-  updateNode: (node: AppNode) => void;
-  setActiveNode: (nodeId: string) => void;
-  clearActiveNode: () => void;
+  setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>;
   canvasWidth: number;
   canvasHeight: number;
   devicePixelRatio: number;
@@ -70,11 +59,7 @@ export default function SimpleCanvas(
     canvasHeight,
     canvasWidth,
     devicePixelRatio,
-    activeNode,
-    setActiveNode,
-    updateNode,
-    addNode,
-    clearActiveNode,
+    setAppNodes,
   } = props;
 
   // hooks
@@ -89,7 +74,49 @@ export default function SimpleCanvas(
   ] = usePanZoomCanvas(canvasRef, canvasWidth, canvasHeight);
   const [nodeDelta, startNodeMove] = useNodeMove();
 
-  // TODO: put elsewhere
+  // node updaters
+  const addNode = useCallback(
+    (node: AppNode) => {
+      const newNodes: AppNode[] = nodes.map((node) => ({
+        ...node,
+        isActive: false,
+      }));
+      newNodes.push({ ...node, isActive: true });
+      setAppNodes(newNodes);
+    },
+    [nodes, setAppNodes]
+  );
+
+  const updateNode = useCallback(
+    (updatedNode: AppNode) => {
+      const newNodes = nodes.map((node) =>
+        node.id === updatedNode.id ? updatedNode : node
+      );
+      setAppNodes(newNodes);
+    },
+    [nodes, setAppNodes]
+  );
+
+  const updateActiveNode = useCallback(
+    (activeNodeId: string) => {
+      setAppNodes(
+        nodes.map((node) => ({
+          ...node,
+          isActive: node.id === activeNodeId ? true : false,
+        }))
+      );
+    },
+    [nodes, setAppNodes]
+  );
+
+  const clearActiveNode = useCallback(() => {
+    setAppNodes(
+      nodes.map((node) => ({
+        ...node,
+        isActive: false,
+      }))
+    );
+  }, [nodes, setAppNodes]);
 
   function handleDoubleClick(
     event: React.MouseEvent<HTMLCanvasElement>,
@@ -144,7 +171,7 @@ export default function SimpleCanvas(
         )
       ) {
         nodeClicked = true;
-        setActiveNode(node.id);
+        updateActiveNode(node.id);
         if (event.altKey) {
           alert("MAKE CONNECTION TODO");
           // startMakeConnection(event);
@@ -219,6 +246,7 @@ export default function SimpleCanvas(
 
   // move active node if it's moving
   useLayoutEffect(() => {
+    const activeNode = nodes.filter((node) => node.isActive)[0];
     if (activeNode === undefined) {
       return;
     }
@@ -227,7 +255,7 @@ export default function SimpleCanvas(
       center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
     };
 
-    setActiveNode(newActiveNode.id);
+    updateActiveNode(newActiveNode.id);
     updateNode(newActiveNode);
   }, [nodeDelta]);
 

@@ -99,6 +99,7 @@ export default function App() {
   const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
+  const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
   const [size, ratio] = useWindowSize();
 
   const [windowWidth, windowHeight] = size;
@@ -117,45 +118,6 @@ export default function App() {
     setAppConnections(testAppConnections);
   }, []);
 
-  function addNode(node: AppNode) {
-    const newNodes: AppNode[] = appNodes.map((node) => ({
-      ...node,
-      isActive: false,
-    }));
-    newNodes.push({ ...node, isActive: true });
-    setAppNodes(newNodes);
-  }
-
-  function updateNode(updatedNode: AppNode) {
-    const newNodes = appNodes.map((node) =>
-      node.id === updatedNode.id ? updatedNode : node
-    );
-    setAppNodes(newNodes);
-  }
-
-  function setActiveNode(activeNodeId: string) {
-    setAppNodes(
-      appNodes.map((node) => ({
-        ...node,
-        isActive: node.id === activeNodeId ? true : false,
-      }))
-    );
-  }
-
-  function clearActiveNode() {
-    setAppNodes(
-      appNodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }))
-    );
-  }
-
-  function getActiveNode() {
-    const activeNodeList = appNodes.filter((node) => node.isActive);
-    return activeNodeList.length === 1 ? activeNodeList[0] : undefined;
-  }
-
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -163,11 +125,7 @@ export default function App() {
           <SimpleCanvas
             nodes={appNodes}
             connections={appConnections}
-            activeNode={getActiveNode()}
-            addNode={addNode}
-            updateNode={updateNode}
-            setActiveNode={setActiveNode}
-            clearActiveNode={clearActiveNode}
+            setAppNodes={setAppNodes}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
             devicePixelRatio={ratio}
