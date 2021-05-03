@@ -87,29 +87,33 @@ export default function SimpleCanvas(
     [nodes, setAppNodes]
   );
 
-  const updateNode = useCallback(
-    (updatedNode: AppNode) => {
+  const updateNodes = useCallback(
+    (nodesToUpdate: AppNode[]) => {
+      const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
       const newNodes = nodes.map((node) =>
-        node.id === updatedNode.id ? updatedNode : node
+        nodeIdsToUpdate.includes(node.id)
+          ? nodesToUpdate.filter((up) => up.id === node.id)[0]
+          : node
       );
       setAppNodes(newNodes);
     },
     [nodes, setAppNodes]
   );
 
-  const updateActiveNode = useCallback(
-    (activeNodeId: string) => {
+  const updateActiveNodes = useCallback(
+    (activeNodeId: string, sticky: boolean) => {
       setAppNodes(
         nodes.map((node) => ({
           ...node,
-          isActive: node.id === activeNodeId ? true : false,
+          isActive:
+            node.id === activeNodeId ? true : sticky ? node.isActive : false,
         }))
       );
     },
     [nodes, setAppNodes]
   );
 
-  const clearActiveNode = useCallback(() => {
+  const clearActiveNodes = useCallback(() => {
     setAppNodes(
       nodes.map((node) => ({
         ...node,
@@ -171,7 +175,9 @@ export default function SimpleCanvas(
         )
       ) {
         nodeClicked = true;
-        updateActiveNode(node.id);
+        const sticky =
+          event.shiftKey || nodes.filter((node) => node.isActive).length > 1;
+        updateActiveNodes(node.id, sticky);
         if (event.altKey) {
           alert("MAKE CONNECTION TODO");
           // startMakeConnection(event);
@@ -183,7 +189,7 @@ export default function SimpleCanvas(
     });
 
     if (!nodeClicked) {
-      clearActiveNode();
+      clearActiveNodes();
       startPan(event);
     }
   }
@@ -219,19 +225,6 @@ export default function SimpleCanvas(
         const targetAppNode = nodes.filter((node) => node.id === target.id)[0];
         drawConnection(context, sourceAppNode.center, targetAppNode.center);
       });
-
-      // context.save();
-      // context.beginPath();
-      // context.fillStyle = "green";
-      // context.arc(viewportTopLeft.x, viewportTopLeft.y, 5, 0, Math.PI * 2);
-      // context.fill();
-      // context.closePath();
-      // context.beginPath();
-      // context.fillStyle = "blue";
-      // context.arc(offset.x, offset.y, 5, 0, Math.PI * 2);
-      // context.fill();
-      // context.closePath();
-      // context.restore();
     }
   }, [
     canvasWidth,
@@ -244,20 +237,20 @@ export default function SimpleCanvas(
     connections,
   ]);
 
-  // move active node if it's moving
+  // move active nodes if click and drag
   useLayoutEffect(() => {
-    const activeNode = nodes.filter((node) => node.isActive)[0];
-    if (activeNode === undefined) {
+    const activeNodes = nodes.filter((node) => node.isActive);
+    if (activeNodes.length === 0) {
       return;
     }
-    const newActiveNode = {
+    const newActiveNodes = activeNodes.map((activeNode) => ({
       ...activeNode,
+      isActive: true,
       center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
-    };
+    }));
 
-    updateActiveNode(newActiveNode.id);
-    updateNode(newActiveNode);
-  }, [nodeDelta]);
+    updateNodes(newActiveNodes);
+  }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...
 
   return (
     <StyledCanvasWrapper>

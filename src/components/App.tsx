@@ -65,14 +65,14 @@ const test2 = makeNode({
 const testAppNodes: AppNode[] = [
   {
     ...test1,
-    center: { x: 0, y: 0 },
+    center: { x: 200, y: 200 },
     radius: defaultNodeRadius,
     color: "red",
     isActive: false,
   },
   {
     ...test2,
-    center: { x: 150, y: 150 },
+    center: { x: 650, y: 450 },
     radius: defaultNodeRadius,
     color: "red",
     isActive: false,
