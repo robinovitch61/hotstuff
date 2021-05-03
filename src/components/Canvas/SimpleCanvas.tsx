@@ -1,22 +1,32 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import useEventListener from "./hooks/useEventListener";
-import useLast from "./hooks/useLast";
-import useMousePos from "./hooks/useMousePos";
-import useScale from "./hooks/useScale";
-import { addPoints, diffPoints, ORIGIN, Point } from "./pointUtils";
+import { addPoints, diffPoints, ORIGIN, Point, scalePoint } from "./pointUtils";
 
 export type SimpleCanvasProps = {
   canvasWidth: number;
   canvasHeight: number;
 };
 
+function useLast<T>(value: T) {
+  const ref = useRef<T>();
+  // useEffect runs AFTER a render if a dependency has changed
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  // return previous value
+  return ref.current;
+}
+
 export default function SimpleCanvas(props: SimpleCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
+  const [offset, setOffset] = useState<Point>(ORIGIN);
+  const lastOffset = useLast(offset);
   const adjustedOrigin = useRef<Point>(ORIGIN);
   const mousePosRef = useRef<Point>(ORIGIN);
+  const lastMousePosRef = useRef<Point>(ORIGIN);
 
+  // reset at start and on button click
   function reset() {
     if (canvasRef.current) {
       // get new drawing context
@@ -31,9 +41,45 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         setScale(ratio);
 
         setContext(renderCtx);
+        setOffset(ORIGIN);
         adjustedOrigin.current = ORIGIN;
       }
     }
+  }
+
+  // functions for panning
+  function mouseMove(event: MouseEvent) {
+    if (context) {
+      const lastMousePos = lastMousePosRef.current;
+      const currentMousePos = { x: event.pageX, y: event.pageY }; // use document so can pan off element
+      lastMousePosRef.current = currentMousePos;
+
+      const mouseDiff = diffPoints(currentMousePos, lastMousePos);
+      setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
+    }
+  }
+
+  // pan when offset changes
+  useLayoutEffect(() => {
+    if (lastOffset === offset) {
+      return;
+    }
+    if (context && lastOffset) {
+      const offsetDiff = scalePoint(diffPoints(offset, lastOffset), scale);
+      context.translate(offsetDiff.x, offsetDiff.y);
+      adjustedOrigin.current = diffPoints(adjustedOrigin.current, offsetDiff);
+    }
+  }, [offset]);
+
+  function mouseUp() {
+    document.removeEventListener("mousemove", mouseMove);
+    document.removeEventListener("mouseup", mouseUp);
+  }
+
+  function startPan(event: React.MouseEvent) {
+    document.addEventListener("mousemove", mouseMove);
+    document.addEventListener("mouseup", mouseUp);
+    lastMousePosRef.current = { x: event.pageX, y: event.pageY };
   }
 
   // setup canvas and set context
@@ -58,7 +104,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         squareSize
       );
     }
-  }, [canvasRef, scale]);
+  }, [canvasRef, scale, offset]);
 
   // add event listener on canvas for mouse position
   useEffect(() => {
@@ -123,7 +169,9 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     <div>
       <button onClick={reset}>Reset Zoom</button>
       <pre>scale: {scale}</pre>
+      <pre>offset: {JSON.stringify(offset)}</pre>
       <canvas
+        onMouseDown={startPan}
         id="canvas"
         ref={canvasRef}
         width={props.canvasWidth}
