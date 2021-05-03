@@ -21,9 +21,9 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<Point>(ORIGIN);
-  const [lastOffset, setLastOffset] = useLast(offset);
+  const [mousePos, setMousePos] = useState<Point>(ORIGIN);
   const adjustedOrigin = useRef<Point>(ORIGIN);
-  const mousePosRef = useRef<Point>(ORIGIN);
+  const [lastOffset, setLastOffset] = useLast(offset);
   const lastMousePosRef = useRef<Point>(ORIGIN);
 
   // reset at start and on button click
@@ -43,8 +43,8 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         setContext(renderCtx);
         setOffset(ORIGIN);
         setLastOffset(ORIGIN);
+        setMousePos(ORIGIN);
         adjustedOrigin.current = ORIGIN;
-        mousePosRef.current = ORIGIN;
         lastMousePosRef.current = ORIGIN;
       }
     }
@@ -121,7 +121,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
           x: canvasRef.current.offsetLeft,
           y: canvasRef.current.offsetTop,
         };
-        mousePosRef.current = diffPoints(viewportMousePos, topLeftCanvasPos);
+        setMousePos(diffPoints(viewportMousePos, topLeftCanvasPos));
       }
     }
 
@@ -146,8 +146,8 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       if (context) {
         const zoom = 1 - event.deltaY / 240;
         const adjustedOriginDelta = {
-          x: (mousePosRef.current.x / scale) * (1 - 1 / zoom),
-          y: (mousePosRef.current.y / scale) * (1 - 1 / zoom),
+          x: (mousePos.x / scale) * (1 - 1 / zoom),
+          y: (mousePos.y / scale) * (1 - 1 / zoom),
         };
         const newAdjustedOrigin = addPoints(
           adjustedOrigin.current,
