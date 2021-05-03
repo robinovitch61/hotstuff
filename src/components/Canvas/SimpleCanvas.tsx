@@ -2,8 +2,11 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
-import { drawCircle, drawConnection, rescaleCanvas } from "./canvasUtils";
+import { drawCircle, drawConnection, toNodeCoords } from "./canvasUtils";
+import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
+import { makePoint } from "./pointUtils";
+import { makeNode } from "hotstuff-network";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -20,6 +23,8 @@ const StyledControls = styled.div`
 const StyledCanvas = styled.canvas`
   border: 1px solid red;
 `;
+
+const { newNodeNamePrefix, defaultNodeRadius } = config;
 
 export type SimpleCanvasProps = {
   nodes: AppNode[];
@@ -46,6 +51,39 @@ export default function SimpleCanvas(
   ] = usePanZoomCanvas(canvasRef, props.canvasWidth, props.canvasHeight);
 
   const { nodes, connections, canvasHeight, canvasWidth } = props;
+
+  function handleDoubleClick(
+    canvas: HTMLCanvasElement,
+    event: React.MouseEvent<HTMLCanvasElement>,
+    nodes: AppNode[]
+  ) {
+    const numNewNodes = nodes.filter((node) =>
+      node.name.startsWith(newNodeNamePrefix)
+    ).length;
+    const newNode = makeNode({
+      name:
+        numNewNodes === 0
+          ? `${newNodeNamePrefix}`
+          : `${newNodeNamePrefix} (${numNewNodes + 1})`,
+      temperatureDegC: 0,
+      capacitanceJPerDegK: 0,
+      powerGenW: 0,
+      isBoundary: false,
+    });
+    const newAppNode = {
+      ...newNode,
+      center: toNodeCoords(
+        canvas,
+        makePoint(event.clientX, event.clientY),
+        offset,
+        scale
+      ),
+      radius: defaultNodeRadius,
+      color: "red",
+      isActive: false,
+    };
+    props.addNode(newAppNode);
+  }
 
   // setup canvas and set context
   useLayoutEffect(() => {
@@ -100,6 +138,13 @@ export default function SimpleCanvas(
         height={canvasHeight}
         ref={canvasRef}
         onMouseDown={startPan}
+        onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) => {
+          const canvas = canvasRef.current;
+          if (canvas === null) {
+            return;
+          }
+          handleDoubleClick(canvas, event, nodes);
+        }}
       />
     </StyledCanvasWrapper>
   );
