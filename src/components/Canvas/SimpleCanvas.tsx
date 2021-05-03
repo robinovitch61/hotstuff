@@ -6,14 +6,14 @@ export type SimpleCanvasProps = {
   canvasHeight: number;
 };
 
-function useLast<T>(value: T) {
+function useLast<T>(value: T): [T | undefined, (val: T) => void] {
   const ref = useRef<T>();
   // useEffect runs AFTER a render if a dependency has changed
   useEffect(() => {
     ref.current = value;
   }, [value]);
   // return previous value
-  return ref.current;
+  return [ref.current, (val: T) => (ref.current = val)];
 }
 
 export default function SimpleCanvas(props: SimpleCanvasProps) {
@@ -21,7 +21,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<Point>(ORIGIN);
-  const lastOffset = useLast(offset);
+  const [lastOffset, setLastOffset] = useLast(offset);
   const adjustedOrigin = useRef<Point>(ORIGIN);
   const mousePosRef = useRef<Point>(ORIGIN);
   const lastMousePosRef = useRef<Point>(ORIGIN);
@@ -41,8 +41,11 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         setScale(ratio);
 
         setContext(renderCtx);
-        setOffset(diffPoints(lastOffset || ORIGIN, ORIGIN));
+        setOffset(ORIGIN);
+        setLastOffset(ORIGIN);
         adjustedOrigin.current = ORIGIN;
+        mousePosRef.current = ORIGIN;
+        lastMousePosRef.current = ORIGIN;
       }
     }
   }
@@ -59,18 +62,6 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     }
   }
 
-  // pan when offset changes
-  useLayoutEffect(() => {
-    if (lastOffset === offset) {
-      return;
-    }
-    if (context && lastOffset) {
-      const offsetDiff = scalePoint(diffPoints(offset, lastOffset), scale);
-      context.translate(offsetDiff.x, offsetDiff.y);
-      adjustedOrigin.current = diffPoints(adjustedOrigin.current, offsetDiff);
-    }
-  }, [offset]);
-
   function mouseUp() {
     document.removeEventListener("mousemove", mouseMove);
     document.removeEventListener("mouseup", mouseUp);
@@ -81,6 +72,15 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     document.addEventListener("mouseup", mouseUp);
     lastMousePosRef.current = { x: event.pageX, y: event.pageY };
   }
+
+  // pan when offset changes
+  useLayoutEffect(() => {
+    if (context && lastOffset) {
+      const offsetDiff = scalePoint(diffPoints(offset, lastOffset), scale);
+      context.translate(offsetDiff.x, offsetDiff.y);
+      adjustedOrigin.current = diffPoints(adjustedOrigin.current, offsetDiff);
+    }
+  }, [offset]);
 
   // setup canvas and set context
   useLayoutEffect(() => {
@@ -167,7 +167,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
 
   return (
     <div>
-      <button onClick={reset}>Reset Zoom</button>
+      <button onClick={reset}>Reset</button>
       <pre>scale: {scale}</pre>
       <pre>offset: {JSON.stringify(offset)}</pre>
       <canvas

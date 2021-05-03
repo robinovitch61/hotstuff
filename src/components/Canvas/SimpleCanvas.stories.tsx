@@ -10,6 +10,6 @@ export default {
 
 export const ASimpleCanvas = Template.bind({});
 ASimpleCanvas.args = {
-  canvasWidth: 200,
+  canvasWidth: 400,
   canvasHeight: 200,
 };
