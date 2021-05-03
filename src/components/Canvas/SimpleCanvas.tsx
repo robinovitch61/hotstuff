@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { addPoints, diffPoints, ORIGIN, Point, scalePoint } from "./pointUtils";
 
 export type SimpleCanvasProps = {
@@ -20,7 +26,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
   const lastOffsetRef = useRef<Point>(ORIGIN);
 
   // reset at start and on button click
-  function reset() {
+  const reset = useCallback(() => {
     if (canvasRef.current) {
       // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
@@ -43,35 +49,41 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         setIsReset(true);
       }
     }
-  }
+  }, [props.canvasHeight, props.canvasWidth, isReset]);
 
   // functions for panning
-  function mouseMove(event: MouseEvent) {
-    if (context) {
-      const lastMousePos = lastMousePosRef.current;
-      const currentMousePos = { x: event.pageX, y: event.pageY }; // use document so can pan off element
-      lastMousePosRef.current = currentMousePos;
+  const mouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (context) {
+        const lastMousePos = lastMousePosRef.current;
+        const currentMousePos = { x: event.pageX, y: event.pageY }; // use document so can pan off element
+        lastMousePosRef.current = currentMousePos;
 
-      const mouseDiff = diffPoints(currentMousePos, lastMousePos);
-      setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
-    }
-  }
+        const mouseDiff = diffPoints(currentMousePos, lastMousePos);
+        setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
+      }
+    },
+    [context]
+  );
 
-  function mouseUp() {
+  const mouseUp = useCallback(() => {
     document.removeEventListener("mousemove", mouseMove);
     document.removeEventListener("mouseup", mouseUp);
-  }
+  }, [mouseMove]);
 
-  function startPan(event: React.MouseEvent) {
-    document.addEventListener("mousemove", mouseMove);
-    document.addEventListener("mouseup", mouseUp);
-    lastMousePosRef.current = { x: event.pageX, y: event.pageY };
-  }
+  const startPan = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
+      lastMousePosRef.current = { x: event.pageX, y: event.pageY };
+    },
+    [mouseMove, mouseUp]
+  );
 
   // setup canvas and set context
   useLayoutEffect(() => {
     reset();
-  }, [canvasRef]);
+  }, []);
 
   // pan when offset changes
   useLayoutEffect(() => {
@@ -87,7 +99,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       );
       setIsReset(false);
     }
-  }, [offset]);
+  }, [context, offset, scale]);
 
   // update last offset
   useEffect(() => {
@@ -120,7 +132,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       context.fillStyle = "red";
       context.fill();
     }
-  }, [canvasRef, context, isReset, scale, offset]);
+  }, [props.canvasWidth, props.canvasHeight, context, isReset, scale, offset]);
 
   // add event listener on canvas for mouse position
   useEffect(() => {
@@ -147,7 +159,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       canvasElem.removeEventListener("mousemove", handleUpdateMouse);
       canvasElem.removeEventListener("wheel", handleUpdateMouse);
     };
-  }, [canvasRef]);
+  }, []);
 
   // add event listener on canvas for zoom
   useEffect(() => {
@@ -185,7 +197,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
 
     canvasElem.addEventListener("wheel", handleWheel);
     return () => canvasElem.removeEventListener("wheel", handleWheel);
-  }, [canvasRef, scale]);
+  }, [context, mousePos.x, mousePos.y, scale]);
 
   return (
     <div>
@@ -193,8 +205,8 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
       <pre>scale: {scale}</pre>
       <pre>offset: {JSON.stringify(offset)}</pre>
       <canvas
-        onMouseDown={startPan}
         id="canvas"
+        onMouseDown={startPan}
         ref={canvasRef}
         width={props.canvasWidth}
         height={props.canvasHeight}
