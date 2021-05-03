@@ -12,7 +12,7 @@ import Editor from "./Editor/Editor";
 import Plot from "./Plot/Plot";
 import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
-import SimpleCanvas from "./Canvas/SimpleCanvas";
+import Canvas from "./Canvas/Canvas";
 
 const {
   defaultTimeStepSeconds,
@@ -122,7 +122,7 @@ export default function App() {
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
         <StyledCanvas height={canvasHeight}>
-          <SimpleCanvas
+          <Canvas
             nodes={appNodes}
             connections={appConnections}
             setAppNodes={setAppNodes}
