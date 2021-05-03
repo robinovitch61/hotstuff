@@ -1,43 +1,39 @@
-import { useLayoutEffect, RefObject, useRef, useState } from "react";
-import { Point } from "../pointUtils";
+import * as React from "react";
+import { useLayoutEffect, RefObject, useState } from "react";
+import { diffPoints, Point } from "../pointUtils";
 
-export default function useMousePos(ref: RefObject<HTMLElement | null>) {
+export default function useMousePos(
+  ref: RefObject<HTMLElement | null>
+): [Point, React.Dispatch<React.SetStateAction<Point>>] {
   // const mousePosRef = useRef<Point>({ x: 0, y: 0 });
   const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
 
+  // add event listener on canvas for mouse position
   useLayoutEffect(() => {
-    if (!ref.current) {
+    const canvasElem = ref.current;
+    if (canvasElem === null) {
       return;
     }
 
-    function handleMouseMove(event: MouseEvent) {
+    function handleUpdateMouse(event: MouseEvent) {
+      event.preventDefault();
       if (ref.current) {
-        // mousePosRef.current = {
-        setMousePos({
-          x: event.clientX - ref.current.offsetLeft,
-          y: event.clientY - ref.current.offsetTop,
-        });
+        const viewportMousePos = { x: event.clientX, y: event.clientY };
+        const topLeftCanvasPos = {
+          x: ref.current.offsetLeft,
+          y: ref.current.offsetTop,
+        };
+        setMousePos(diffPoints(viewportMousePos, topLeftCanvasPos));
       }
     }
 
-    // function handleWheel(event: WheelEvent) {
-    //   if (ref.current) {
-    //     const boundingRect = ref.current.getBoundingClientRect();
-    //     mousePosRef.current = {
-    //       x: event.clientX + boundingRect.left,
-    //       y: event.clientY + boundingRect.bottom,
-    //     };
-    //   }
-    // }
-
-    const node = ref.current;
-    node.addEventListener("mousemove", handleMouseMove);
-    // node.addEventListener("wheel", handleWheel);
+    canvasElem.addEventListener("mousemove", handleUpdateMouse);
+    canvasElem.addEventListener("wheel", handleUpdateMouse);
     return () => {
-      node.removeEventListener("mousemove", handleMouseMove);
-      // node.removeEventListener("wheel", handleWheel);
+      canvasElem.removeEventListener("mousemove", handleUpdateMouse);
+      canvasElem.removeEventListener("wheel", handleUpdateMouse);
     };
   }, [ref]);
 
-  return mousePos;
+  return [mousePos, setMousePos];
 }

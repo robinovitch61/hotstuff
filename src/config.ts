@@ -5,7 +5,7 @@ const config = {
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 15,
   newNodeNamePrefix: "New Node",
-  zoomIncrement: 0.03,
+  zoomSensitivity: 500, // bigger = less zoom per click
   minZoom: 0.25,
   maxZoom: 3,
   activeNodeStrokeWidth: 2.5,

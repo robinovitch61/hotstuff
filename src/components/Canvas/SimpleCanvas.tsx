@@ -6,9 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
+import config from "../../config";
+import useLast from "./hooks/useLast";
+import useMousePos from "./hooks/useMousePos";
 import { addPoints, diffPoints, ORIGIN, Point, scalePoint } from "./pointUtils";
 
-const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
+const { maxZoom, minZoom, zoomSensitivity } = config;
 
 export type SimpleCanvasProps = {
   canvasWidth: number;
@@ -20,16 +23,11 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<Point>(ORIGIN);
-  const [mousePos, setMousePos] = useState<Point>(ORIGIN);
   const [viewportTopLeft, setViewportTopLeft] = useState<Point>(ORIGIN);
+  const [mousePos, setMousePos] = useMousePos(canvasRef);
+  const lastOffsetRef = useLast<Point>(offset);
   const isResetRef = useRef<boolean>(false);
   const lastMousePosRef = useRef<Point>(ORIGIN);
-  const lastOffsetRef = useRef<Point>(ORIGIN);
-
-  // update last offset
-  useEffect(() => {
-    lastOffsetRef.current = offset;
-  }, [offset]);
 
   // reset
   const reset = useCallback(
@@ -54,7 +52,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         isResetRef.current = true;
       }
     },
-    [props.canvasWidth, props.canvasHeight]
+    [lastOffsetRef, setMousePos, props.canvasWidth, props.canvasHeight]
   );
 
   // functions for panning
@@ -140,33 +138,6 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     viewportTopLeft,
   ]);
 
-  // add event listener on canvas for mouse position
-  useEffect(() => {
-    const canvasElem = canvasRef.current;
-    if (canvasElem === null) {
-      return;
-    }
-
-    function handleUpdateMouse(event: MouseEvent) {
-      event.preventDefault();
-      if (canvasRef.current) {
-        const viewportMousePos = { x: event.clientX, y: event.clientY };
-        const topLeftCanvasPos = {
-          x: canvasRef.current.offsetLeft,
-          y: canvasRef.current.offsetTop,
-        };
-        setMousePos(diffPoints(viewportMousePos, topLeftCanvasPos));
-      }
-    }
-
-    canvasElem.addEventListener("mousemove", handleUpdateMouse);
-    canvasElem.addEventListener("wheel", handleUpdateMouse);
-    return () => {
-      canvasElem.removeEventListener("mousemove", handleUpdateMouse);
-      canvasElem.removeEventListener("wheel", handleUpdateMouse);
-    };
-  }, []);
-
   // add event listener on canvas for zoom
   useEffect(() => {
     const canvasElem = canvasRef.current;
@@ -180,7 +151,12 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
     function handleWheel(event: WheelEvent) {
       event.preventDefault();
       if (context) {
-        const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
+        const zoom = 1 - event.deltaY / zoomSensitivity;
+        const newScale = scale * zoom;
+        if (newScale > maxZoom || newScale < minZoom) {
+          return;
+        }
+
         const viewportTopLeftDelta = {
           x: (mousePos.x / scale) * (1 - 1 / zoom),
           y: (mousePos.y / scale) * (1 - 1 / zoom),
@@ -195,7 +171,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         context.translate(-newViewportTopLeft.x, -newViewportTopLeft.y);
 
         setViewportTopLeft(newViewportTopLeft);
-        setScale(scale * zoom);
+        setScale(newScale);
         isResetRef.current = false;
       }
     }
