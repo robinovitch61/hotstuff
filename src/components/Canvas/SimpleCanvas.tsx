@@ -41,7 +41,7 @@ export default function SimpleCanvas(props: SimpleCanvasProps) {
         setScale(ratio);
 
         setContext(renderCtx);
-        setOffset(ORIGIN);
+        setOffset(diffPoints(lastOffset || ORIGIN, ORIGIN));
         adjustedOrigin.current = ORIGIN;
       }
     }
