@@ -144,6 +144,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     event: React.MouseEvent<HTMLCanvasElement>,
     nodes: AppNode[]
   ) {
+    if (event.shiftKey || event.altKey) {
+      return;
+    }
     const numNewNodes = nodes.filter((node) =>
       node.name.startsWith(newNodeNamePrefix)
     ).length;
@@ -179,6 +182,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     }
 
     let nodeClicked = false;
+    const activeNodeIds = nodes
+      .filter((node) => node.isActive)
+      .map((node) => node.id);
     nodes.some((node) => {
       if (
         intersectsCircle(
@@ -193,14 +199,19 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         )
       ) {
         nodeClicked = true;
-        const sticky =
-          event.shiftKey || nodes.filter((node) => node.isActive).length > 1;
-        updateActiveNodes([node.id], sticky);
+
         if (event.altKey) {
           clearActiveNodes();
           updateActiveNodes([node.id], false);
           startMakeConnection(event);
+        } else if (event.shiftKey && activeNodeIds.includes(node.id)) {
+          updateActiveNodes(
+            activeNodeIds.filter((id) => id !== node.id),
+            false
+          );
         } else {
+          const sticky = event.shiftKey || activeNodeIds.length > 1;
+          updateActiveNodes([node.id], sticky);
           startNodeMove(event);
         }
         return true; // short circuits the rest of the some loop
