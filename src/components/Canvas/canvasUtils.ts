@@ -1,46 +1,90 @@
-import {
-  addPoints,
-  diffPoints,
-  makePoint,
-  Point,
-  scalePoint,
-} from "./pointUtils";
+import { addPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
 
-const { canvasHeightPerc, editorWidthPerc, activeNodeStrokeWidth } = config;
+const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
 
-export function rescaleCanvas(
-  canvas: HTMLCanvasElement,
+function drawCircle(
   context: CanvasRenderingContext2D,
-  canvasWidth: number,
-  canvasHeight: number
-) {
-  const { devicePixelRatio: ratio = 1 } = window;
-  canvas.width = canvasWidth * ratio;
-  canvas.height = canvasHeight * ratio;
-  context.scale(ratio, ratio);
-}
-
-export function drawCircle(
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
+  center: Point,
   radius: number,
-  color: string,
-  isActive: boolean
-) {
+  color: string
+): void {
   context.save();
   context.beginPath();
-  context.arc(x, y, radius, 0, 2 * Math.PI);
+  context.arc(center.x, center.y, radius, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
-  if (isActive) {
-    // inset
-    context.arc(x, y, radius - activeNodeStrokeWidth / 2, 0, 2 * Math.PI);
-    context.lineWidth = activeNodeStrokeWidth;
-    context.stroke();
-  }
+  context.closePath();
   context.restore();
+}
+
+function drawCircleOutline(
+  context: CanvasRenderingContext2D,
+  center: Point,
+  radius: number,
+  color: string
+): void {
+  context.save();
+  context.beginPath();
+  // inset
+  context.arc(
+    center.x,
+    center.y,
+    radius - activeNodeStrokeWidth / 2,
+    0,
+    2 * Math.PI
+  );
+  context.lineWidth = activeNodeStrokeWidth;
+  context.strokeStyle = color;
+  context.stroke();
+  context.closePath();
+  context.restore();
+}
+
+function getHashPattern(): HTMLCanvasElement {
+  // ty https://stackoverflow.com/a/47288427/8438955
+  const patternCanvas = document.createElement("canvas");
+  const patternContext = patternCanvas.getContext("2d");
+  if (patternContext) {
+    const colour = "black";
+
+    const CANVAS_SIDE_LENGTH = 10;
+    const WIDTH = CANVAS_SIDE_LENGTH;
+    const HEIGHT = CANVAS_SIDE_LENGTH;
+    const DIVISIONS = 8;
+
+    patternCanvas.width = WIDTH;
+    patternCanvas.height = HEIGHT;
+    patternContext.fillStyle = colour;
+
+    // Top line
+    patternContext.beginPath();
+    patternContext.moveTo(0, HEIGHT * (1 / DIVISIONS));
+    patternContext.lineTo(WIDTH * (1 / DIVISIONS), 0);
+    patternContext.lineTo(0, 0);
+    patternContext.lineTo(0, HEIGHT * (1 / DIVISIONS));
+    patternContext.fill();
+
+    // Middle line
+    patternContext.beginPath();
+    patternContext.moveTo(WIDTH, HEIGHT * (1 / DIVISIONS));
+    patternContext.lineTo(WIDTH * (1 / DIVISIONS), HEIGHT);
+    patternContext.lineTo(0, HEIGHT);
+    patternContext.lineTo(0, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
+    patternContext.lineTo(WIDTH * ((DIVISIONS - 1) / DIVISIONS), 0);
+    patternContext.lineTo(WIDTH, 0);
+    patternContext.lineTo(WIDTH, HEIGHT * (1 / DIVISIONS));
+    patternContext.fill();
+
+    // Bottom line
+    patternContext.beginPath();
+    patternContext.moveTo(WIDTH, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
+    patternContext.lineTo(WIDTH * ((DIVISIONS - 1) / DIVISIONS), HEIGHT);
+    patternContext.lineTo(WIDTH, HEIGHT);
+    patternContext.lineTo(WIDTH, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
+    patternContext.fill();
+  }
+  return patternCanvas;
 }
 
 export function drawArrow(
@@ -48,7 +92,7 @@ export function drawArrow(
   start: Point,
   end: Point,
   color: string
-) {
+): void {
   context.save();
   context.beginPath();
   context.strokeStyle = color;
@@ -93,6 +137,33 @@ export function drawClearBox(
   context.closePath();
 
   context.restore();
+}
+
+export function drawNode(
+  context: CanvasRenderingContext2D,
+  center: Point,
+  radius: number,
+  isActive: boolean,
+  isBoundary: boolean,
+  temperatureDegC: number, // determines color?
+  capacitanceJPerDegK: number // determines size?
+): void {
+  drawCircle(context, center, radius, "red");
+  if (isActive) {
+    drawCircleOutline(context, center, radius, "black");
+  }
+  if (isBoundary) {
+    context.save();
+    context.beginPath();
+    const pattern = context.createPattern(getHashPattern(), "repeat");
+    if (pattern) {
+      context.fillStyle = pattern;
+      context.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+      context.fill();
+      context.closePath();
+      context.restore();
+    }
+  }
 }
 
 export function drawConnection(

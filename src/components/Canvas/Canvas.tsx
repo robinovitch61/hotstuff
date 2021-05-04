@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
   drawArrow,
-  drawCircle,
   drawClearBox,
   drawConnection,
+  drawNode,
   intersectsCircle,
   isInsideBox,
   mouseToNodeCoords,
@@ -42,7 +42,12 @@ const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
   height: ${({ cssHeight }) => `${cssHeight}px`};
 `;
 
-const { newNodeNamePrefix, defaultNodeRadius } = config;
+const {
+  newNodeNamePrefix,
+  defaultNodeRadius,
+  defaultConnectionKind,
+  defaultResistanceDegKPerW,
+} = config;
 
 export type CanvasProps = {
   nodes: AppNode[];
@@ -210,7 +215,8 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
             false
           );
         } else {
-          const sticky = event.shiftKey || activeNodeIds.length > 1;
+          const sticky =
+            event.shiftKey || (activeNodeIds.length > 1 && node.isActive);
           updateActiveNodes([node.id], sticky);
           startNodeMove(event);
         }
@@ -254,8 +260,15 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       context.setTransform(storedTransform);
 
       nodes.map((node) => {
-        const { x, y } = node.center;
-        drawCircle(context, x, y, node.radius, node.color, node.isActive);
+        drawNode(
+          context,
+          node.center,
+          node.radius,
+          node.isActive,
+          node.isBoundary,
+          node.temperatureDegC,
+          node.capacitanceJPerDegK
+        );
       });
 
       connections.map((conn) => {
@@ -324,13 +337,20 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
             ),
             node.center,
             node.radius
+          ) &&
+          node.id !== activeNode.id &&
+          !connections.some(
+            (conn) =>
+              (conn.source.id === node.id &&
+                conn.target.id === activeNode.id) ||
+              (conn.target.id === node.id && conn.source.id === activeNode.id)
           )
         ) {
           const newConnection = makeConnection({
             source: activeNode,
             target: node,
-            resistanceDegKPerW: 10, // TODO: Sane default
-            kind: "bi", // TODO: this is probably fine, but move default to config
+            resistanceDegKPerW: defaultResistanceDegKPerW,
+            kind: defaultConnectionKind,
           });
           setAppConnections([...connections, newConnection]);
         }

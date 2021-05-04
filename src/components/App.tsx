@@ -51,7 +51,7 @@ const test1 = makeNode({
   temperatureDegC: 20,
   capacitanceJPerDegK: 10,
   powerGenW: 0,
-  isBoundary: false,
+  isBoundary: true,
 });
 
 const test2 = makeNode({
