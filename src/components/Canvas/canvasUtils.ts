@@ -72,11 +72,34 @@ export function drawArrow(
   context.restore();
 }
 
+export function drawClearBox(
+  context: CanvasRenderingContext2D,
+  start: Point,
+  end: Point,
+  color: string
+): void {
+  context.save();
+  context.beginPath();
+  context.fillStyle = color;
+  context.globalAlpha = 0.2;
+  context.fillRect(start.x, start.y, end.x - start.x, end.y - start.y);
+  context.closePath();
+
+  // outline
+  context.beginPath();
+  context.strokeStyle = color;
+  context.rect(start.x, start.y, end.x - start.x, end.y - start.y);
+  context.stroke();
+  context.closePath();
+
+  context.restore();
+}
+
 export function drawConnection(
   context: CanvasRenderingContext2D,
   source: Point,
   target: Point
-) {
+): void {
   drawArrow(context, source, target, "black");
 }
 
@@ -88,6 +111,33 @@ export function intersectsCircle(
   const deltaX = click.x - circleCenter.x;
   const deltaY = click.y - circleCenter.y;
   return Math.pow(deltaX, 2) + Math.pow(deltaY, 2) <= Math.pow(radius, 2);
+}
+
+export function isInsideBox(
+  startBox: Point,
+  endBox: Point,
+  point: Point
+): boolean {
+  const [topLeft, bottomRight] =
+    startBox.x < endBox.x && startBox.y < endBox.y
+      ? [startBox, endBox]
+      : [endBox, startBox];
+
+  const [bottomLeft, topRight] =
+    startBox.x < endBox.x && startBox.y > endBox.y
+      ? [startBox, endBox]
+      : [endBox, startBox];
+
+  return (
+    (topLeft.x <= point.x &&
+      point.x <= bottomRight.x &&
+      topLeft.y <= point.y &&
+      point.y <= bottomRight.y) ||
+    (bottomLeft.x <= point.x &&
+      point.x <= topRight.x &&
+      topRight.y <= point.y &&
+      point.y <= bottomLeft.y)
+  );
 }
 
 export function mouseToNodeCoords(

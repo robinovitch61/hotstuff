@@ -5,16 +5,18 @@ import { AppConnection, AppNode } from "../App";
 import {
   drawArrow,
   drawCircle,
+  drawClearBox,
   drawConnection,
   intersectsCircle,
+  isInsideBox,
   mouseToNodeCoords,
 } from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { diffPoints, makePoint, scalePoint } from "./pointUtils";
+import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import { makeConnection, makeNode } from "hotstuff-network";
 import useNodeMove from "./hooks/useNodeMove";
-import useMakeConnection from "./hooks/useMakeConnection";
+import useClickAndDrag from "./hooks/useClickAndDrag";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -79,7 +81,13 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     connectionMousePos,
     isConnectionDone,
     startMakeConnection,
-  ] = useMakeConnection();
+  ] = useClickAndDrag();
+  const [
+    multiSelectMousePos,
+    isMultiSelectDone,
+    startMultiSelect,
+  ] = useClickAndDrag();
+  const startMultiSelectRef = useRef<Point | undefined>(undefined);
 
   // node updaters
   const addNode = useCallback(
@@ -108,12 +116,15 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   );
 
   const updateActiveNodes = useCallback(
-    (activeNodeId: string, sticky: boolean) => {
+    (activeNodeIds: string[], sticky: boolean) => {
       setAppNodes(
         nodes.map((node) => ({
           ...node,
-          isActive:
-            node.id === activeNodeId ? true : sticky ? node.isActive : false,
+          isActive: activeNodeIds.includes(node.id)
+            ? true
+            : sticky
+            ? node.isActive
+            : false,
         }))
       );
     },
@@ -184,10 +195,10 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         nodeClicked = true;
         const sticky =
           event.shiftKey || nodes.filter((node) => node.isActive).length > 1;
-        updateActiveNodes(node.id, sticky);
+        updateActiveNodes([node.id], sticky);
         if (event.altKey) {
           clearActiveNodes();
-          updateActiveNodes(node.id, false);
+          updateActiveNodes([node.id], false);
           startMakeConnection(event);
         } else {
           startNodeMove(event);
@@ -197,8 +208,18 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     });
 
     if (!nodeClicked) {
-      clearActiveNodes();
-      startPan(event);
+      if (event.shiftKey) {
+        startMultiSelectRef.current = mouseToNodeCoords(
+          makePoint(event.clientX, event.clientY),
+          offset,
+          viewportTopLeft,
+          scale
+        );
+        startMultiSelect(event);
+      } else {
+        clearActiveNodes();
+        startPan(event);
+      }
     }
   }
 
@@ -245,6 +266,8 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     connections,
     connectionMousePos,
     isConnectionDone,
+    multiSelectMousePos,
+    isMultiSelectDone,
   ]);
 
   // move active nodes if click and drag
@@ -303,6 +326,33 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       });
     }
   }, [connectionMousePos, context, isConnectionDone]); // incomplete deps array here but infinite loop otherwise...I think it's fine
+
+  // draw box during multi select
+  useLayoutEffect(() => {
+    if (context && startMultiSelectRef.current && !isMultiSelectDone) {
+      drawClearBox(
+        context,
+        startMultiSelectRef.current,
+        mouseToNodeCoords(multiSelectMousePos, offset, viewportTopLeft, scale),
+        "grey"
+      );
+    } else if (isMultiSelectDone && startMultiSelectRef.current) {
+      const startBoxPoint = startMultiSelectRef.current;
+      const endBoxPoint = mouseToNodeCoords(
+        multiSelectMousePos,
+        offset,
+        viewportTopLeft,
+        scale
+      );
+      console.log(startBoxPoint);
+      console.log(endBoxPoint);
+
+      const extraActiveNodeIds = nodes
+        .filter((node) => isInsideBox(startBoxPoint, endBoxPoint, node.center))
+        .map((node) => node.id);
+      updateActiveNodes(extraActiveNodeIds, true);
+    }
+  }, [context, multiSelectMousePos, isMultiSelectDone]); // incomplete deps array here but infinite loop otherwise...I think it's fine
 
   return (
     <StyledCanvasWrapper>

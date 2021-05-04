@@ -1,18 +1,16 @@
 import {
   MouseEvent as SyntheticMouseEvent,
   useCallback,
-  useRef,
   useState,
 } from "react";
 import { ORIGIN, Point } from "../pointUtils";
 
-export default function useMakeConnection(): [
+export default function useClickAndDrag(): [
   Point,
   boolean,
   (e: SyntheticMouseEvent) => void
 ] {
   const [mousePos, setMousePos] = useState<Point>(ORIGIN);
-  // const mouseUpRef = useRef<boolean>(false);
   const [isMouseUp, setIsMouseUp] = useState(false);
 
   const mouseMove = useCallback((e: MouseEvent) => {
