@@ -276,7 +276,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         // TODO: Smarter way to do this?
         const sourceAppNode = nodes.filter((node) => node.id === source.id)[0];
         const targetAppNode = nodes.filter((node) => node.id === target.id)[0];
-        drawConnection(context, sourceAppNode.center, targetAppNode.center);
+        drawConnection(context, sourceAppNode, targetAppNode);
       });
     }
   }, [

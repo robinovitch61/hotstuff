@@ -1,5 +1,6 @@
 import { addPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
+import { AppNode } from "../App";
 
 const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
 
@@ -91,7 +92,9 @@ export function drawArrow(
   context: CanvasRenderingContext2D,
   start: Point,
   end: Point,
-  color: string
+  color: string,
+  startOffset = 0,
+  endOffset = 0
 ): void {
   context.save();
   context.beginPath();
@@ -106,11 +109,12 @@ export function drawArrow(
   context.translate(start.x, start.y);
   context.rotate(angle);
   context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(length, 0);
-  context.moveTo(length - headLength, -headWidth);
-  context.lineTo(length, 0);
-  context.lineTo(length - headLength, headWidth);
+  context.moveTo(startOffset, 0);
+  const adjLength = length - endOffset;
+  context.lineTo(adjLength, 0);
+  context.moveTo(adjLength - headLength, -headWidth);
+  context.lineTo(adjLength, 0);
+  context.lineTo(adjLength - headLength, headWidth);
   context.stroke();
   context.closePath();
   context.restore();
@@ -168,10 +172,17 @@ export function drawNode(
 
 export function drawConnection(
   context: CanvasRenderingContext2D,
-  source: Point,
-  target: Point
+  source: AppNode,
+  target: AppNode
 ): void {
-  drawArrow(context, source, target, "black");
+  drawArrow(
+    context,
+    source.center,
+    target.center,
+    "black",
+    source.radius,
+    target.radius
+  );
 }
 
 export function intersectsCircle(
