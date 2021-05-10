@@ -1,40 +1,62 @@
-import React from "react";
-import EditableTable, { SortState } from "./EditableTable";
+import React, { useState } from "react";
+import { AppNode } from "../../App";
+import EditableTable, { Column } from "./EditableTable";
+import { SortState } from "./SortableTableHeader";
 
-export type NodeRow = {
-  id: string;
-  name: string;
-  temperatureDegC: number;
-  capacitanceJPerDegK: number;
-  powerGenW: number;
-  isBoundary: boolean;
-};
-
-const defaultNodeSortState: SortState<NodeRow> = {
+const defaultNodeSortState: SortState<AppNode> = {
   key: "name",
   direction: "ASC",
 };
 
+const nodeColumns: Column<AppNode>[] = [
+  {
+    text: "Name",
+    key: "name",
+    width: 0.2,
+  },
+  {
+    text: "Temp [degC]",
+    key: "temperatureDegC",
+    width: 0.1,
+  },
+  {
+    text: "Capacitance [J/degK]",
+    key: "capacitanceJPerDegK",
+    width: 0.1,
+  },
+  {
+    text: "Power Gen [W]",
+    key: "powerGenW",
+    width: 0.1,
+  },
+  {
+    text: "Is Boundary?",
+    key: "isBoundary",
+    width: 0.1,
+  },
+];
+
 export type NodeTableProps = {
-  rows: NodeRow[];
-  onUpdateRow: () => void;
-  onDeleteRow: (id: string) => void;
+  rows: AppNode[];
+  onUpdateRow: (row: AppNode) => void;
+  onDeleteRow: (row: AppNode) => void;
 };
 
-export default function NodeTable(props: NodeTableProps) {
+export default function NodeTable(props: NodeTableProps): React.ReactElement {
+  const [sortState, setSortState] = useState<SortState<AppNode>>(
+    defaultNodeSortState
+  );
+
   return (
-    <EditableTable<NodeRow>
-      columns={[
-        "Name",
-        "Initial Temp [degC]",
-        "Capacitance [J/degK]",
-        "Power Gen [W]",
-        "Boundary?",
-      ]}
-      data={props.rows}
+    <EditableTable<AppNode>
+      columns={nodeColumns}
+      rowData={props.rows}
       onUpdateRow={props.onUpdateRow}
       onDeleteRow={props.onDeleteRow}
-      sortState={defaultNodeSortState}
+      onUpdateSortState={(newSortState: SortState<AppNode>) =>
+        setSortState(newSortState)
+      }
+      sortState={sortState}
     />
   );
 }

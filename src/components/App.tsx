@@ -5,7 +5,7 @@ import {
   makeNode,
   ModelOutput,
 } from "hotstuff-network";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./Canvas/pointUtils";
 import Editor from "./Editor/Editor";
@@ -118,6 +118,79 @@ export default function App() {
     setAppConnections(testAppConnections);
   }, []);
 
+  // node modifiers
+  const addNode = useCallback(
+    (node: AppNode) => {
+      const newNodes: AppNode[] = appNodes.map((node) => ({
+        ...node,
+        isActive: false,
+      }));
+      newNodes.push({ ...node, isActive: true });
+      setAppNodes(newNodes);
+    },
+    [appNodes]
+  );
+
+  const deleteConnectionsForNode = useCallback(
+    (nodeId: string) => {
+      setAppConnections(
+        appConnections.filter(
+          (conn) => conn.source.id !== nodeId && conn.target.id !== nodeId
+        )
+      );
+    },
+    [appConnections]
+  );
+
+  const deleteNodes = useCallback(
+    (nodeIds: string[]) => {
+      nodeIds.forEach((id) => deleteConnectionsForNode(id));
+      setAppNodes(appNodes.filter((node) => !nodeIds.includes(node.id)));
+    },
+    [appNodes, deleteConnectionsForNode]
+  );
+
+  const updateNodes = useCallback(
+    (nodesToUpdate: AppNode[]) => {
+      console.log(`updateing ${nodesToUpdate}`);
+      const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
+      const newNodes = appNodes.map((node) => {
+        if (nodeIdsToUpdate.includes(node.id)) {
+          return nodesToUpdate.filter((newNode) => newNode.id === node.id)[0];
+        } else {
+          return node;
+        }
+      });
+      setAppNodes(newNodes);
+    },
+    [appNodes]
+  );
+
+  const updateActiveNodes = useCallback(
+    (activeNodeIds: string[], sticky: boolean) => {
+      setAppNodes(
+        appNodes.map((node) => ({
+          ...node,
+          isActive: activeNodeIds.includes(node.id)
+            ? true
+            : sticky
+            ? node.isActive
+            : false,
+        }))
+      );
+    },
+    [appNodes]
+  );
+
+  const clearActiveNodes = useCallback(() => {
+    setAppNodes(
+      appNodes.map((node) => ({
+        ...node,
+        isActive: false,
+      }))
+    );
+  }, [appNodes]);
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -125,7 +198,10 @@ export default function App() {
           <Canvas
             nodes={appNodes}
             connections={appConnections}
-            setAppNodes={setAppNodes}
+            addNode={addNode}
+            updateNodes={updateNodes}
+            updateActiveNodes={updateActiveNodes}
+            clearActiveNodes={clearActiveNodes}
             setAppConnections={setAppConnections}
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
@@ -134,7 +210,16 @@ export default function App() {
         </StyledCanvas>
         <Plot height={plotHeight} />
       </StyledWorkspace>
-      <Editor height={windowHeight} width={editorWidth} />
+      <Editor
+        height={windowHeight}
+        width={editorWidth}
+        nodes={appNodes}
+        addNode={addNode}
+        deleteNodes={deleteNodes}
+        updateNodes={updateNodes}
+        updateActiveNodes={updateActiveNodes}
+        clearActiveNodes={clearActiveNodes}
+      />
     </StyledApp>
   );
 }

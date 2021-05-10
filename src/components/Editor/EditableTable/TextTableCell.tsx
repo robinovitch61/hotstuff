@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import { StyledInput } from "./sharedStyled";
 
 export type TextTableCellProps = {
-  initialVal?: string;
+  initialVal: string;
   onBlur: (newValue: string) => void;
 };
 
 export default function TextTableCell(
   props: TextTableCellProps
 ): React.ReactElement {
-  const [value, setValue] = useState<string>(
-    props.initialVal !== undefined ? props.initialVal : ""
-  );
+  const [value, setValue] = useState<string>(props.initialVal);
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     const newVal = event.target.value;

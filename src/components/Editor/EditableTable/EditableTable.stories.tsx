@@ -1,6 +1,7 @@
 import React from "react";
-import EditableTable, { EditableTableProps } from "./EditableTable";
+import EditableTable, { Column, EditableTableProps } from "./EditableTable";
 import { Story, Meta } from "@storybook/react";
+import { SortState } from "./SortableTableHeader";
 
 type StoryType = {
   name: string;
@@ -17,31 +18,39 @@ export default {
   component: EditableTable,
 } as Meta;
 
+const columns: Column<StoryType>[] = [
+  {
+    text: "Person Name",
+    key: "name",
+    width: 0.33,
+  },
+  {
+    text: "Person Number",
+    key: "number",
+    width: 0.33,
+  },
+  {
+    text: "Is Active?",
+    key: "isActive",
+    width: 0.33,
+  },
+];
+
+const data: StoryType[] = [
+  { name: "Leo", number: 1, isActive: true },
+  { name: "Bob", number: 2, isActive: false },
+];
+
+const sortState: SortState<StoryType> = { key: "name", direction: "ASC" };
+
 const editableTableArgs = {
-  onDeleteRow: (data) => console.log(`delete ${JSON.stringify(data)}`),
-  data: { name: "Leo", number: 1, isActive: "yes" },
-  columns: [
-    {
-      text: "Person Name",
-      key: "name",
-      cellType: "text",
-      width: 0.33,
-    },
-    {
-      text: "Person Number",
-      key: "number",
-      cellType: "numeric",
-      width: 0.33,
-    },
-    {
-      text: "Is Active?",
-      key: "isActive",
-      cellType: "boolean",
-      width: 0.33,
-    },
-  ],
-  updateRow: (data) => console.log(`updating ${JSON.stringify(data)}`),
-  deleteable: true,
+  columns,
+  data,
+  onUpdateRow: (data: StoryType) =>
+    console.log(`updating ${JSON.stringify(data)}`),
+  onDeleteRow: (data: StoryType) =>
+    console.log(`delete ${JSON.stringify(data)}`),
+  sortState,
 };
 
 export const AnEditableTable = Template.bind({});

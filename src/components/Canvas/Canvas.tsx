@@ -52,7 +52,10 @@ const {
 export type CanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
-  setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>;
+  addNode: (node: AppNode) => void;
+  updateNodes: (nodes: AppNode[]) => void;
+  updateActiveNodes: (nodeIds: string[], sticky: boolean) => void;
+  clearActiveNodes: () => void;
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>;
   canvasWidth: number;
   canvasHeight: number;
@@ -67,7 +70,10 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     canvasHeight,
     canvasWidth,
     devicePixelRatio,
-    setAppNodes,
+    addNode,
+    updateNodes,
+    updateActiveNodes,
+    clearActiveNodes,
     setAppConnections,
   } = props;
 
@@ -93,57 +99,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     startMultiSelect,
   ] = useClickAndDrag();
   const startMultiSelectRef = useRef<Point | undefined>(undefined);
-
-  // node updaters
-  const addNode = useCallback(
-    (node: AppNode) => {
-      const newNodes: AppNode[] = nodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }));
-      newNodes.push({ ...node, isActive: true });
-      setAppNodes(newNodes);
-    },
-    [nodes, setAppNodes]
-  );
-
-  const updateNodes = useCallback(
-    (nodesToUpdate: AppNode[]) => {
-      const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
-      const newNodes = nodes.map((node) =>
-        nodeIdsToUpdate.includes(node.id)
-          ? nodesToUpdate.filter((up) => up.id === node.id)[0]
-          : node
-      );
-      setAppNodes(newNodes);
-    },
-    [nodes, setAppNodes]
-  );
-
-  const updateActiveNodes = useCallback(
-    (activeNodeIds: string[], sticky: boolean) => {
-      setAppNodes(
-        nodes.map((node) => ({
-          ...node,
-          isActive: activeNodeIds.includes(node.id)
-            ? true
-            : sticky
-            ? node.isActive
-            : false,
-        }))
-      );
-    },
-    [nodes, setAppNodes]
-  );
-
-  const clearActiveNodes = useCallback(() => {
-    setAppNodes(
-      nodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }))
-    );
-  }, [nodes, setAppNodes]);
 
   function handleDoubleClick(
     event: React.MouseEvent<HTMLCanvasElement>,
@@ -388,6 +343,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   return (
     <StyledCanvasWrapper>
       <StyledControls>
+        <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre>
         <pre>scale: {scale}</pre>
         <pre>offset: {JSON.stringify(offset)}</pre>
         <button onClick={() => context && reset(context)}>

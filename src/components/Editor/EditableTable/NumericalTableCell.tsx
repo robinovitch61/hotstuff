@@ -2,16 +2,14 @@ import React, { useCallback, useState } from "react";
 import { StyledInput } from "./sharedStyled";
 
 export type NumericalTableCellProps = {
-  initialVal?: number;
+  initialVal: number;
   onBlur: (newValue: number) => void;
 };
 
 export default function NumericalTableCell(
   props: NumericalTableCellProps
 ): React.ReactElement {
-  const [value, setValue] = useState<string>(
-    props.initialVal !== undefined ? props.initialVal.toString() : ""
-  );
+  const [value, setValue] = useState<string>(props.initialVal.toString());
   const getFloatVal = useCallback((event: React.ChangeEvent<HTMLInputElement>):
     | number
     | undefined => {

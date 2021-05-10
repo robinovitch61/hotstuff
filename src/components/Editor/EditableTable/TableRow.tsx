@@ -30,41 +30,40 @@ const StyledDeleteCell = styled(StyledCell)`
 `;
 
 export type TableRowProps<T> = {
-  onDeleteRow: (data: T) => void;
-  data: T;
   columns: Column<T>[];
-  updateRow: (data: T) => void;
-  deleteable: boolean;
+  data: T;
+  onUpdateRow: (data: T) => void;
+  onDeleteRow: (data: T) => void;
+  isDeletable: boolean;
 };
 
 export default function TableRow<T>(
   props: TableRowProps<T>
 ): React.ReactElement {
-  const [rowData, setRowData] = useState<T>(props.data);
-
-  useEffect(() => {
-    props.updateRow(rowData);
-  }, [props, rowData]);
-
+  console.log(props);
   return (
     <StyledRow>
       {props.columns.map((col) => {
         const cell =
-          col.cellType === "numeric" ? (
+          typeof props.data[col.key] === "number" ? (
             <NumericalTableCell
-              initialVal={props.data[`${col.key}`]}
-              onBlur={(newVal) => setRowData({ ...rowData, [col.key]: newVal })}
+              initialVal={props.data[col.key] as any} // TODO
+              onBlur={(newVal) =>
+                props.onUpdateRow({ ...props.data, [col.key]: newVal })
+              }
             />
-          ) : col.cellType === "text" ? (
+          ) : typeof props.data[col.key] === "string" ? (
             <TextTableCell
-              initialVal={props.data[`${col.key}`]}
-              onBlur={(newVal) => setRowData({ ...rowData, [col.key]: newVal })}
+              initialVal={props.data[col.key] as any} // TODO
+              onBlur={(newVal) =>
+                props.onUpdateRow({ ...props.data, [col.key]: newVal })
+              }
             />
           ) : (
             <BooleanTableCell
-              initialIsActive={props.data[`${col.key}`]}
+              initialIsActive={props.data[col.key] as any} // TODO
               onClick={(isActive) =>
-                setRowData({ ...rowData, [col.key]: !isActive })
+                props.onUpdateRow({ ...props.data, [col.key]: !isActive })
               }
               showWhenActive={"✅"}
             />
@@ -76,10 +75,10 @@ export default function TableRow<T>(
         );
       })}
 
-      {!!props.deleteable && (
+      {!!props.isDeletable && (
         <StyledDeleteCell
           width={0.1}
-          onClick={() => props.onDeleteRow(rowData)}
+          onClick={() => props.onDeleteRow(props.data)}
         >
           ❌
         </StyledDeleteCell>

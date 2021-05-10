@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useCallback, useState } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import TableRow from "./TableRow";
 import SortableTableHeader, { SortState } from "./SortableTableHeader";
 
@@ -11,60 +10,57 @@ import SortableTableHeader, { SortState } from "./SortableTableHeader";
 
 const StyledTableWrapper = styled.div``;
 
-const StyledTable = styled.table`
+const StyledTable = styled.div`
   width: 100%;
   border-collapse: collapse;
   box-sizing: content-box;
 `;
 
-const StyledTableBody = styled.tbody``;
+const StyledTableBody = styled.div`
+  width: 100%;
+`;
 
 export type Column<T> = {
   text: string;
   key: keyof T;
-  cellType: "numeric" | "text" | "boolean";
+  // cellType: "numeric" | "text" | "boolean";
   width: number; // 0 to 1
 };
 
 export type EditableTableProps<T> = {
   columns: Column<T>[];
-  data: T[];
-  onUpdateRow: () => void;
+  rowData: T[];
+  onUpdateRow: (data: T) => void;
   onDeleteRow: (data: T) => void;
+  onUpdateSortState: (sortState: SortState<T>) => void;
   sortState?: SortState<T>;
 };
 
 export default function EditableTable<T>(
   props: EditableTableProps<T>
 ): React.ReactElement {
-  const [sortState, setSortState] = useState<SortState<T> | undefined>(
-    props.sortState
-  );
-
-  function renderTableRows() {
-    return props.data.map((rowData, index) => {
-      return (
-        <TableRow<T>
-          key={index}
-          columns={props.columns}
-          data={rowData}
-          updateRow={props.onUpdateRow}
-          onDeleteRow={() => props.onDeleteRow(rowData)}
-          deleteable
-        />
-      );
-    });
-  }
+  const tableRows = props.rowData.map((row, index) => {
+    return (
+      <TableRow<T>
+        key={index}
+        columns={props.columns}
+        data={row}
+        onUpdateRow={props.onUpdateRow}
+        onDeleteRow={props.onDeleteRow}
+        isDeletable
+      />
+    );
+  });
 
   return (
     <StyledTableWrapper>
       <StyledTable>
         <SortableTableHeader
           columns={props.columns}
-          sortState={sortState}
-          updateSortState={setSortState}
+          sortState={props.sortState}
+          updateSortState={props.onUpdateSortState}
         />
-        <StyledTableBody>{renderTableRows()}</StyledTableBody>
+        <StyledTableBody>{tableRows}</StyledTableBody>
       </StyledTable>
     </StyledTableWrapper>
   );

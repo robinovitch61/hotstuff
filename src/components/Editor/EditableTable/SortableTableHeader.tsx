@@ -2,13 +2,20 @@ import React from "react";
 import styled from "styled-components/macro";
 import { Column } from "./EditableTable";
 
-const StyledHeaderWrapper = styled.thead``;
+const StyledHeaderWrapper = styled.div`
+  width: 100%;
+  display: flex;
+`;
 
-const StyledRow = styled.tr``;
-
-const StyledColHeader = styled.th`
+const StyledColHeader = styled.div<{ width: number }>`
   border: 1px solid lightgrey;
   cursor: pointer;
+  width: ${({ width }) => `${width * 100}%`};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  user-select: none;
 `;
 
 function oppositeSortDirection(sortDirection: SortDirection): SortDirection {
@@ -35,27 +42,29 @@ export default function SortableHeader<T>(
 
   return (
     <StyledHeaderWrapper>
-      <StyledRow>
-        {props.columns.map((col) => {
-          const isSortedCol =
-            props.sortState && props.sortState.key === col.key;
-          const onClick = () => {
-            props.updateSortState({
-              key: col.key,
-              direction:
-                !isSortedCol || !props.sortState
-                  ? "ASC"
-                  : oppositeSortDirection(props.sortState.direction),
-            });
-          };
+      {props.columns.map((col) => {
+        const isSortedCol = props.sortState && props.sortState.key === col.key;
+        const onClick = () => {
+          props.updateSortState({
+            key: col.key,
+            direction:
+              !isSortedCol || !props.sortState
+                ? "ASC"
+                : oppositeSortDirection(props.sortState.direction),
+          });
+        };
 
-          return (
-            <StyledColHeader key={col.key.toString()} onClick={onClick}>
-              {`${col.text} ${isSortedCol ? sortIcon : ""}`}
-            </StyledColHeader>
-          );
-        })}
-      </StyledRow>
+        return (
+          <StyledColHeader
+            key={col.key.toString()}
+            onClick={onClick}
+            width={col.width}
+          >
+            {`${col.text} ${isSortedCol ? sortIcon : ""}`}
+          </StyledColHeader>
+        );
+      })}
+      <StyledColHeader width={0.1}></StyledColHeader>
     </StyledHeaderWrapper>
   );
 }

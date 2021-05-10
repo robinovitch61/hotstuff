@@ -1,6 +1,7 @@
 import React from "react";
 import TableRow, { TableRowProps } from "./TableRow";
 import { Story, Meta } from "@storybook/react";
+import { Column } from "./EditableTable";
 
 type StoryType = {
   name: string;
@@ -17,30 +18,34 @@ export default {
   component: TableRow,
 } as Meta;
 
+const columns: Column<StoryType>[] = [
+  {
+    text: "Person Name",
+    key: "name",
+    // cellType: "text",
+    width: 0.33,
+  },
+  {
+    text: "Person Number",
+    key: "number",
+    // cellType: "numeric",
+    width: 0.33,
+  },
+  {
+    text: "Is Active?",
+    key: "isActive",
+    // cellType: "boolean",
+    width: 0.33,
+  },
+];
+
 const tableRowArgs = {
-  onDeleteRow: (data) => console.log(`delete ${JSON.stringify(data)}`),
-  data: { name: "Leo", number: 1, isActive: "yes" },
-  columns: [
-    {
-      text: "Person Name",
-      key: "name",
-      cellType: "text",
-      width: 0.33,
-    },
-    {
-      text: "Person Number",
-      key: "number",
-      cellType: "numeric",
-      width: 0.33,
-    },
-    {
-      text: "Is Active?",
-      key: "isActive",
-      cellType: "boolean",
-      width: 0.33,
-    },
-  ],
-  updateRow: (data) => console.log(`updating ${JSON.stringify(data)}`),
+  onDeleteRow: (data: StoryType) =>
+    console.log(`delete ${JSON.stringify(data)}`),
+  data: { name: "Leo", number: 1, isActive: true },
+  columns,
+  updateRow: (data: StoryType) =>
+    console.log(`updating ${JSON.stringify(data)}`),
   deleteable: true,
 };
 
