@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import styled from "styled-components/macro";
 
+const StyledTabsWrapper = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+`;
+
 const StyledTabs = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-evenly;
   border-bottom: 1px solid black;
+  position: sticky;
+  top: 0;
 `;
 
 const StyledTab = styled.div`
@@ -58,7 +69,7 @@ export default function Tabs(props: TabsProps): React.ReactElement {
   const [activeIdx, setActiveIdx] = useState(0);
 
   return (
-    <div>
+    <StyledTabsWrapper>
       {props.tabs.length > 1 && (
         <StyledTabs>
           {props.tabs.map((tab, idx) => {
@@ -80,6 +91,6 @@ export default function Tabs(props: TabsProps): React.ReactElement {
       <StyledInnerContent topLeftRounded={props.tabs.length <= 1}>
         {props.tabs.filter((_, idx) => idx === activeIdx)[0].component}
       </StyledInnerContent>
-    </div>
+    </StyledTabsWrapper>
   );
 }

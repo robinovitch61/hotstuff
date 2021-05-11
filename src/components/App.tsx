@@ -8,7 +8,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./Canvas/pointUtils";
-import Editor from "./Editor/Editor";
+import Sidebar from "./Sidebar/Sidebar";
 import Plot from "./Plot/Plot";
 import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
@@ -90,7 +90,7 @@ const testAppConnections: AppConnection[] = [
   },
 ];
 
-export default function App() {
+export default function App(): React.ReactElement {
   const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
     undefined
   );
@@ -210,7 +210,7 @@ export default function App() {
         </StyledCanvas>
         <Plot height={plotHeight} />
       </StyledWorkspace>
-      <Editor
+      <Sidebar
         height={windowHeight}
         width={editorWidth}
         nodes={appNodes}

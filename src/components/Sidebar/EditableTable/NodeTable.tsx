@@ -13,26 +13,31 @@ const nodeColumns: Column<AppNode>[] = [
     text: "Name",
     key: "name",
     width: 0.2,
+    minWidthPx: 100,
   },
   {
-    text: "Temp [degC]",
+    text: "Temp degC",
     key: "temperatureDegC",
     width: 0.1,
+    minWidthPx: 100,
   },
   {
-    text: "Capacitance [J/degK]",
+    text: "Capacitance J/degK",
     key: "capacitanceJPerDegK",
     width: 0.1,
+    minWidthPx: 100,
   },
   {
-    text: "Power Gen [W]",
+    text: "Power Gen W",
     key: "powerGenW",
     width: 0.1,
+    minWidthPx: 80,
   },
   {
-    text: "Is Boundary?",
+    text: "Boundary?",
     key: "isBoundary",
     width: 0.1,
+    minWidthPx: 80,
   },
 ];
 

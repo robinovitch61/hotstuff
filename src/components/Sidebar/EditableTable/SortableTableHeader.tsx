@@ -3,19 +3,35 @@ import styled from "styled-components/macro";
 import { Column } from "./EditableTable";
 
 const StyledHeaderWrapper = styled.div`
+  display: inline-flex;
   width: 100%;
-  display: flex;
+  height: 100%;
+  position: sticky;
+  top: 0;
 `;
 
-const StyledColHeader = styled.div<{ width: number }>`
-  border: 1px solid lightgrey;
-  cursor: pointer;
+const StyledColHeader = styled.div<{ width: number; minWidth?: number }>`
+  display: inline-flex;
   width: ${({ width }) => `${width * 100}%`};
-  display: flex;
+  min-width: ${({ minWidth }) => (!!minWidth ? `${minWidth}px` : "none")};
   justify-content: center;
   align-items: center;
   font-weight: bold;
+  border: 1px solid lightgrey;
+  cursor: pointer;
   user-select: none;
+  position: relative;
+`;
+
+const StyledColText = styled.div`
+  font-size: 0.8em;
+  padding: 1em;
+`;
+
+const StyledSortIcon = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
 `;
 
 function oppositeSortDirection(sortDirection: SortDirection): SortDirection {
@@ -37,8 +53,8 @@ export default function SortableHeader<T>(
   const sortIcon = !props.sortState
     ? ""
     : props.sortState.direction === "ASC"
-    ? "🔼"
-    : "🔽";
+    ? "\u25B2"
+    : "\u25BC";
 
   return (
     <StyledHeaderWrapper>
@@ -59,12 +75,13 @@ export default function SortableHeader<T>(
             key={col.key.toString()}
             onClick={onClick}
             width={col.width}
+            minWidth={col.minWidthPx}
           >
-            {`${col.text} ${isSortedCol ? sortIcon : ""}`}
+            <StyledColText>{col.text}</StyledColText>
+            <StyledSortIcon>{isSortedCol ? sortIcon : ""}</StyledSortIcon>
           </StyledColHeader>
         );
       })}
-      <StyledColHeader width={0.1}></StyledColHeader>
     </StyledHeaderWrapper>
   );
 }

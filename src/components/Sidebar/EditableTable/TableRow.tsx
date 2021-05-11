@@ -11,18 +11,20 @@ const StyledRow = styled.tr`
   width: 100%;
 `;
 
-const StyledCell = styled.td<{ width: number }>`
+const StyledCell = styled.td<{ width: number; minWidth?: number }>`
   display: inline-flex;
   justify-content: center;
   align-items: center;
   border: 1px solid #ddd;
   height: 2em;
   width: ${({ width }) => `${width * 100}%`};
+  min-width: ${({ minWidth }) => (!!minWidth ? `${minWidth}px` : "none")};
 `;
 
 const StyledDeleteCell = styled(StyledCell)`
   cursor: pointer;
   user-select: none;
+  min-width: 40px;
 
   &:hover {
     background: black;
@@ -40,7 +42,6 @@ export type TableRowProps<T> = {
 export default function TableRow<T>(
   props: TableRowProps<T>
 ): React.ReactElement {
-  console.log(props);
   return (
     <StyledRow>
       {props.columns.map((col) => {
@@ -69,7 +70,11 @@ export default function TableRow<T>(
             />
           );
         return (
-          <StyledCell key={col.key.toString()} width={col.width}>
+          <StyledCell
+            key={col.key.toString()}
+            width={col.width}
+            minWidth={col.minWidthPx}
+          >
             {cell}
           </StyledCell>
         );

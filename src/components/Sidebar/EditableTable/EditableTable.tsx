@@ -8,7 +8,9 @@ import SortableTableHeader, { SortState } from "./SortableTableHeader";
 // [] StringBox, BooleanBox
 // [] Generic type inputs
 
-const StyledTableWrapper = styled.div``;
+const StyledTableWrapper = styled.div`
+  width: 100%;
+`;
 
 const StyledTable = styled.div`
   width: 100%;
@@ -25,6 +27,7 @@ export type Column<T> = {
   key: keyof T;
   // cellType: "numeric" | "text" | "boolean";
   width: number; // 0 to 1
+  minWidthPx?: number;
 };
 
 export type EditableTableProps<T> = {
