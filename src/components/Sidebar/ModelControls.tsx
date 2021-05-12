@@ -7,7 +7,6 @@ const StyledModelControlsWrapper = styled.div`
   width: 100%;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
 `;
 
 const StyledRunButton = styled.button``;
@@ -16,7 +15,9 @@ export type ModelControlsProps = {
   onRunModel: () => void;
 };
 
-export default function ModelControls(props: ModelControlsProps) {
+export default function ModelControls(
+  props: ModelControlsProps
+): React.ReactElement {
   return (
     <StyledModelControlsWrapper>
       <StyledRunButton onClick={props.onRunModel}>Run Model</StyledRunButton>

@@ -8,7 +8,7 @@ import ModelControls from "./ModelControls";
 const StyledEditor = styled.div<{ width: number; height: number }>`
   height: ${(props) => props.height}px;
   width: ${(props) => props.width}px;
-  border: 1px solid orange;
+  border-left: 3px solid black;
 `;
 
 const StyledTabsWrapper = styled.div`
@@ -20,7 +20,6 @@ const StyledTabsWrapper = styled.div`
 const StyledModelControlsWrapper = styled.div`
   display: inline-flex;
   width: 100%;
-  height: 25%;
 `;
 
 type EditorProps = {

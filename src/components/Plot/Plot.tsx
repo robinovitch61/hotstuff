@@ -157,7 +157,7 @@ const colors = [
 const StyledPlot = styled.div<{ height: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
-  border: 1px solid green;
+  border-top: 3px solid black;
   margin: 0;
   padding: 0;
 `;

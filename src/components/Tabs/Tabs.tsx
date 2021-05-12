@@ -12,8 +12,8 @@ const StyledTabsWrapper = styled.div`
 `;
 
 const StyledTabs = styled.div`
-  display: flex;
-  /* width: 100%; */
+  display: inline-flex;
+  width: 100%;
   justify-content: space-evenly;
   border-bottom: 1px solid black;
   position: sticky;
@@ -25,7 +25,7 @@ const StyledTabs = styled.div`
 const StyledTab = styled.div`
   cursor: pointer;
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: lightgray;
   height: ${config.tabHeightPx}px;

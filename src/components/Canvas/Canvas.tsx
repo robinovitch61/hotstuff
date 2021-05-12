@@ -33,7 +33,6 @@ const StyledControls = styled.div`
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
-  border: 1px solid red;
   width: ${({ cssWidth }) => `${cssWidth}px`};
   height: ${({ cssHeight }) => `${cssHeight}px`};
 `;
