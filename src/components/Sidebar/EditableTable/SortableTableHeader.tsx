@@ -1,13 +1,14 @@
 import React from "react";
 import styled from "styled-components/macro";
 import { Column } from "./EditableTable";
+import config from "../../../config";
 
 const StyledHeaderWrapper = styled.div`
   display: inline-flex;
   width: 100%;
   height: 100%;
   position: sticky;
-  top: 0;
+  top: ${config.tabHeightPx}px;
 `;
 
 const StyledColHeader = styled.div<{ width: number; minWidth?: number }>`
@@ -21,6 +22,8 @@ const StyledColHeader = styled.div<{ width: number; minWidth?: number }>`
   cursor: pointer;
   user-select: none;
   position: relative;
+  background: white;
+  border-bottom: 1px solid black;
 `;
 
 const StyledColText = styled.div`
@@ -82,6 +85,7 @@ export default function SortableHeader<T>(
           </StyledColHeader>
         );
       })}
+      <StyledColHeader width={0.1} minWidth={40} />
     </StyledHeaderWrapper>
   );
 }

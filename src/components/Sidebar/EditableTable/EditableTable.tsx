@@ -39,13 +39,17 @@ export type EditableTableProps<T> = {
   sortState?: SortState<T>;
 };
 
-export default function EditableTable<T>(
+interface IDHavingThing {
+  id: string | number;
+}
+
+export default function EditableTable<T extends IDHavingThing>(
   props: EditableTableProps<T>
 ): React.ReactElement {
-  const tableRows = props.rowData.map((row, index) => {
+  const tableRows = props.rowData.map((row) => {
     return (
       <TableRow<T>
-        key={index}
+        key={row.id}
         columns={props.columns}
         data={row}
         onUpdateRow={props.onUpdateRow}

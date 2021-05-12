@@ -17,7 +17,7 @@ import Canvas from "./Canvas/Canvas";
 const {
   defaultTimeStepSeconds,
   defaultTotalTimeSeconds,
-  editorWidthPerc,
+  sidebarWidthPerc: editorWidthPerc,
   canvasHeightPerc,
   defaultNodeRadius,
 } = config;
@@ -152,7 +152,6 @@ export default function App(): React.ReactElement {
 
   const updateNodes = useCallback(
     (nodesToUpdate: AppNode[]) => {
-      console.log(`updateing ${nodesToUpdate}`);
       const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
       const newNodes = appNodes.map((node) => {
         if (nodeIdsToUpdate.includes(node.id)) {

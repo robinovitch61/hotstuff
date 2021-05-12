@@ -17,6 +17,10 @@ code {
     monospace;
 }
 
+button {
+  padding: 0.5em;
+}
+
 /* force show scrollbars for webkit-based browsers on mac: https://gist.github.com/IceCreamYou/cd517596e5847a88e2bb0a091da43fb4 */
 .force-show-scrollbars ::-webkit-scrollbar-track:vertical {
   border-left: 1px solid #E7E7E7;

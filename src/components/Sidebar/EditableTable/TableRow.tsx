@@ -5,13 +5,13 @@ import { Column } from "./EditableTable";
 import NumericalTableCell from "./NumericalTableCell";
 import TextTableCell from "./TextTableCell";
 
-const StyledRow = styled.tr`
+const StyledRow = styled.div`
   display: inline-flex;
   align-items: center;
   width: 100%;
 `;
 
-const StyledCell = styled.td<{ width: number; minWidth?: number }>`
+const StyledCell = styled.div<{ width: number; minWidth?: number }>`
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -83,6 +83,7 @@ export default function TableRow<T>(
       {!!props.isDeletable && (
         <StyledDeleteCell
           width={0.1}
+          minWidth={40}
           onClick={() => props.onDeleteRow(props.data)}
         >
           ❌

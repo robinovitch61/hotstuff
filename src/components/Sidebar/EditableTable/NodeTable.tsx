@@ -52,10 +52,18 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     defaultNodeSortState
   );
 
+  function sortByState(first: AppNode, second: AppNode): number {
+    if (first[sortState.key] > second[sortState.key]) {
+      return sortState.direction === "ASC" ? 1 : -1;
+    } else {
+      return sortState.direction === "ASC" ? -1 : 1;
+    }
+  }
+
   return (
     <EditableTable<AppNode>
       columns={nodeColumns}
-      rowData={props.rows}
+      rowData={[...props.rows].sort(sortByState)}
       onUpdateRow={props.onUpdateRow}
       onDeleteRow={props.onDeleteRow}
       onUpdateSortState={(newSortState: SortState<AppNode>) =>

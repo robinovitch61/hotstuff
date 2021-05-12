@@ -4,6 +4,7 @@ import { Story, Meta } from "@storybook/react";
 import { SortState } from "./SortableTableHeader";
 
 type StoryType = {
+  id: string;
   name: string;
   number: number;
   isActive: boolean;
@@ -37,8 +38,8 @@ const columns: Column<StoryType>[] = [
 ];
 
 const data: StoryType[] = [
-  { name: "Leo", number: 1, isActive: true },
-  { name: "Bob", number: 2, isActive: false },
+  { id: "1", name: "Leo", number: 1, isActive: true },
+  { id: "2", name: "Bob", number: 2, isActive: false },
 ];
 
 const sortState: SortState<StoryType> = { key: "name", direction: "ASC" };

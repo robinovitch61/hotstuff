@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 import styled from "styled-components/macro";
+import config from "../../config";
 
 const StyledTabsWrapper = styled.div`
   display: inline-flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;
+  /* width: 100%; */
   overflow: auto;
   position: relative;
 `;
 
 const StyledTabs = styled.div`
   display: flex;
-  width: 100%;
+  /* width: 100%; */
   justify-content: space-evenly;
   border-bottom: 1px solid black;
   position: sticky;
   top: 0;
+  background: white;
+  box-sizing: border-box;
 `;
 
 const StyledTab = styled.div`
@@ -25,6 +28,7 @@ const StyledTab = styled.div`
   display: flex;
   align-items: center;
   background: lightgray;
+  height: ${config.tabHeightPx}px;
   /* background: rgb(85, 9, 121);
   background: linear-gradient(
     90deg,

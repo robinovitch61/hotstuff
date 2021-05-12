@@ -30,10 +30,6 @@ const StyledControls = styled.div`
   bottom: 0;
   left: 0;
   margin: 0.5em;
-
-  > button {
-    padding: 0.5em;
-  }
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
@@ -330,8 +326,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         viewportTopLeft,
         scale
       );
-      console.log(startBoxPoint);
-      console.log(endBoxPoint);
 
       const extraActiveNodeIds = nodes
         .filter((node) => isInsideBox(startBoxPoint, endBoxPoint, node.center))
