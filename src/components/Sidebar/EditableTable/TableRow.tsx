@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import BooleanTableCell from "./BooleanTableCell";
-import { Column } from "./EditableTable";
+import { Column, IDHavingThing } from "./EditableTable";
 import NumericalTableCell from "./NumericalTableCell";
+import DropDownTableCell from "./DropDownTableCell";
 import TextTableCell from "./TextTableCell";
 
 const StyledRow = styled.div<{ heightOffsetPx?: number }>`
@@ -34,7 +35,7 @@ const StyledDeleteCell = styled(StyledCell)`
   }
 `;
 
-export type TableRowProps<T> = {
+export type TableRowProps<T extends IDHavingThing> = {
   columns: Column<T>[];
   data: T;
   onUpdateRow: (data: T) => void;
@@ -43,14 +44,27 @@ export type TableRowProps<T> = {
   heightOffsetPx?: number;
 };
 
-export default function TableRow<T>(
+export default function TableRow<T extends IDHavingThing>(
   props: TableRowProps<T>
 ): React.ReactElement {
   return (
     <StyledRow heightOffsetPx={props.heightOffsetPx}>
       {props.columns.map((col) => {
         const cell =
-          typeof props.data[col.key] === "number" ? (
+          !!col.options && col.options.length > 0 && col.onSelectOption ? (
+            <DropDownTableCell
+              rowId={props.data.id}
+              options={col.options}
+              initialVal={
+                col.options.filter(
+                  (option) =>
+                    option.value === (props.data[col.key] as any) ||
+                    option.text === (props.data[col.key] as any)
+                )[0].value
+              }
+              onSelectOption={col.onSelectOption}
+            />
+          ) : typeof props.data[col.key] === "number" ? (
             <NumericalTableCell
               initialVal={props.data[col.key] as any} // TODO
               onBlur={(newVal) =>

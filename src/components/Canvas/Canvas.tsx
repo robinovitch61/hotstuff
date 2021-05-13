@@ -296,12 +296,16 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
               (conn.target.id === node.id && conn.source.id === activeNode.id)
           )
         ) {
-          const newConnection = makeConnection({
-            source: activeNode,
-            target: node,
-            resistanceDegKPerW: defaultResistanceDegKPerW,
-            kind: defaultConnectionKind,
-          });
+          const newConnection = {
+            ...makeConnection({
+              source: activeNode,
+              target: node,
+              resistanceDegKPerW: defaultResistanceDegKPerW,
+              kind: defaultConnectionKind,
+            }),
+            sourceName: activeNode.name,
+            targetName: node.name,
+          };
           setAppConnections([...connections, newConnection]);
         }
       });
@@ -336,7 +340,8 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   return (
     <StyledCanvasWrapper>
       <StyledControls>
-        <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre>
+        {/* <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre> */}
+        <pre>conns: {JSON.stringify(connections, null, 2)}</pre>
         <pre>scale: {scale}</pre>
         <pre>offset: {JSON.stringify(offset)}</pre>
         <button onClick={() => context && reset(context)}>

@@ -21,12 +21,18 @@ const StyledTableBody = styled.div`
   width: 100%;
 `;
 
+export type ColOption = {
+  text: string;
+  value: string;
+};
+
 export type Column<T> = {
   text: string;
   key: keyof T;
-  // cellType: "numeric" | "text" | "boolean";
   width: number; // 0 to 1
   minWidthPx?: number;
+  options?: ColOption[];
+  onSelectOption?: (id: string, option: ColOption) => void;
 };
 
 export type EditableTableProps<T> = {
@@ -39,8 +45,8 @@ export type EditableTableProps<T> = {
   heightOffsetPx?: number;
 };
 
-interface IDHavingThing {
-  id: string | number;
+export interface IDHavingThing {
+  id: string;
 }
 
 export default function EditableTable<T extends IDHavingThing>(

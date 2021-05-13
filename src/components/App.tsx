@@ -29,7 +29,10 @@ export type AppNode = HSNode & {
   isActive: boolean;
 };
 
-export type AppConnection = HSConnection;
+export type AppConnection = HSConnection & {
+  sourceName: string;
+  targetName: string;
+};
 
 const StyledApp = styled.div<{ height: number }>`
   display: flex;
@@ -191,6 +194,8 @@ const testAppConnections: AppConnection[] = [
       resistanceDegKPerW: 10,
       kind: "bi",
     }),
+    sourceName: test1.name,
+    targetName: test2.name,
   },
 ];
 
@@ -246,14 +251,6 @@ export default function App(): React.ReactElement {
     [appConnections]
   );
 
-  const deleteNodes = useCallback(
-    (nodeIds: string[]) => {
-      nodeIds.forEach((id) => deleteConnectionsForNode(id));
-      setAppNodes(appNodes.filter((node) => !nodeIds.includes(node.id)));
-    },
-    [appNodes, deleteConnectionsForNode]
-  );
-
   const updateNodes = useCallback(
     (nodesToUpdate: AppNode[]) => {
       const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
@@ -267,6 +264,38 @@ export default function App(): React.ReactElement {
       setAppNodes(newNodes);
     },
     [appNodes]
+  );
+
+  const deleteNodes = useCallback(
+    (nodeIds: string[]) => {
+      nodeIds.forEach((id) => deleteConnectionsForNode(id));
+      setAppNodes(appNodes.filter((node) => !nodeIds.includes(node.id)));
+    },
+    [appNodes, deleteConnectionsForNode]
+  );
+
+  const updateConnections = useCallback(
+    (connsToUpdate: AppConnection[]) => {
+      const connIdsToUpdate = connsToUpdate.map((conn) => conn.id);
+      const newConns = appConnections.map((conn) => {
+        if (connIdsToUpdate.includes(conn.id)) {
+          return connsToUpdate.filter((newConn) => newConn.id === conn.id)[0];
+        } else {
+          return conn;
+        }
+      });
+      setAppConnections(newConns);
+    },
+    [appConnections]
+  );
+
+  const deleteConnections = useCallback(
+    (connIds: string[]) => {
+      setAppConnections(
+        appConnections.filter((conn) => !connIds.includes(conn.id))
+      );
+    },
+    [appConnections]
   );
 
   const updateActiveNodes = useCallback(
@@ -317,9 +346,12 @@ export default function App(): React.ReactElement {
         height={windowHeight}
         width={editorWidth}
         nodes={appNodes}
+        connections={appConnections}
         addNode={addNode}
-        deleteNodes={deleteNodes}
         updateNodes={updateNodes}
+        deleteNodes={deleteNodes}
+        updateConnections={updateConnections}
+        deleteConnections={deleteConnections}
         updateActiveNodes={updateActiveNodes}
         clearActiveNodes={clearActiveNodes}
       />
