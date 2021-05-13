@@ -60,6 +60,7 @@ export default function EditableTable<T extends IDHavingThing>(
         data={row}
         onUpdateRow={props.onUpdateRow}
         onDeleteRow={props.onDeleteRow}
+        isActive={true}
         isDeletable
         heightOffsetPx={props.heightOffsetPx}
       />

@@ -15,6 +15,16 @@ const StyledRow = styled.div<{ heightOffsetPx?: number }>`
     heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
 `;
 
+const StyledHighlight = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(112, 165, 255, 0.2);
+  pointer-events: none;
+`;
+
 const StyledCell = styled.div<{ width: number; minWidth?: number }>`
   display: inline-flex;
   justify-content: center;
@@ -40,6 +50,7 @@ export type TableRowProps<T extends IDHavingThing> = {
   data: T;
   onUpdateRow: (data: T) => void;
   onDeleteRow: (data: T) => void;
+  isActive: boolean;
   isDeletable: boolean;
   heightOffsetPx?: number;
 };
@@ -49,6 +60,7 @@ export default function TableRow<T extends IDHavingThing>(
 ): React.ReactElement {
   return (
     <StyledRow heightOffsetPx={props.heightOffsetPx}>
+      <StyledHighlight className={props.isActive ? "active" : ""} />
       {props.columns.map((col) => {
         const cell =
           !!col.options && col.options.length > 0 && col.onSelectOption ? (
