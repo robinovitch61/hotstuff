@@ -3,12 +3,14 @@ import styled from "styled-components/macro";
 import { Column } from "./EditableTable";
 import config from "../../../config";
 
-const StyledHeaderWrapper = styled.div`
-  display: inline-flex;
+const StyledHeaderWrapper = styled.div<{ heightOffsetPx?: number }>`
+  display: flex;
   width: 100%;
   height: 100%;
   position: sticky;
-  top: ${config.tabHeightPx}px;
+  top: ${({ heightOffsetPx }) =>
+    heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
+  z-index: 1;
 `;
 
 const StyledColHeader = styled.div<{ width: number; minWidth?: number }>`
@@ -48,6 +50,7 @@ export type SortableHeaderProps<T> = {
   columns: Column<T>[];
   sortState?: SortState<T>;
   updateSortState: (sortState: SortState<T>) => void;
+  heightOffsetPx?: number;
 };
 
 export default function SortableHeader<T>(
@@ -60,7 +63,7 @@ export default function SortableHeader<T>(
     : "\u25BC";
 
   return (
-    <StyledHeaderWrapper>
+    <StyledHeaderWrapper heightOffsetPx={props.heightOffsetPx}>
       {props.columns.map((col) => {
         const isSortedCol = props.sortState && props.sortState.key === col.key;
         const onClick = () => {
@@ -85,7 +88,7 @@ export default function SortableHeader<T>(
           </StyledColHeader>
         );
       })}
-      <StyledColHeader width={0.1} minWidth={40} />
+      <StyledColHeader width={0.1} minWidth={40} style={{ cursor: "unset" }} />
     </StyledHeaderWrapper>
   );
 }

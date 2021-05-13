@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import config from "../../../config";
 import { AppNode } from "../../App";
 import EditableTable, { Column } from "./EditableTable";
 import { SortState } from "./SortableTableHeader";
@@ -70,6 +71,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         setSortState(newSortState)
       }
       sortState={sortState}
+      heightOffsetPx={config.tabHeightPx}
     />
   );
 }

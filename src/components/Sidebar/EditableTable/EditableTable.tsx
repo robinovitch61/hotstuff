@@ -36,6 +36,7 @@ export type EditableTableProps<T> = {
   onDeleteRow: (data: T) => void;
   onUpdateSortState: (sortState: SortState<T>) => void;
   sortState?: SortState<T>;
+  heightOffsetPx?: number;
 };
 
 interface IDHavingThing {
@@ -54,6 +55,7 @@ export default function EditableTable<T extends IDHavingThing>(
         onUpdateRow={props.onUpdateRow}
         onDeleteRow={props.onDeleteRow}
         isDeletable
+        heightOffsetPx={props.heightOffsetPx}
       />
     );
   });
@@ -65,6 +67,7 @@ export default function EditableTable<T extends IDHavingThing>(
           columns={props.columns}
           sortState={props.sortState}
           updateSortState={props.onUpdateSortState}
+          heightOffsetPx={props.heightOffsetPx}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
       </StyledTable>

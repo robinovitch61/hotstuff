@@ -4,6 +4,7 @@ import config from "../../config";
 
 const StyledTabsWrapper = styled.div`
   display: inline-flex;
+  width: 100%;
   flex-direction: column;
   overflow: auto;
   position: relative;
@@ -11,13 +12,14 @@ const StyledTabsWrapper = styled.div`
 
 const StyledTabs = styled.div`
   display: inline-flex;
+  width: 100%;
   height: ${config.tabHeightPx}px;
   justify-content: space-evenly;
-  border-bottom: 1px solid black;
   position: sticky;
-  top: 0;
+  top: 0px;
   background: white;
   box-sizing: border-box;
+  z-index: 1;
 `;
 
 const StyledTab = styled.div<{ width: number }>`
@@ -36,6 +38,7 @@ const StyledTab = styled.div<{ width: number }>`
   ); */
   border-radius: 5px 5px 0 0;
   border: 1px solid black;
+  border-bottom: 2px solid black;
 
   &:hover {
     opacity: 0.75;
@@ -52,9 +55,8 @@ const StyledTabText = styled.div`
 `;
 
 const StyledInnerContent = styled.div<{ topLeftRounded: boolean }>`
-  border-radius: ${({ topLeftRounded }) =>
-    `${topLeftRounded ? "20px" : "0"} 20px 20px 20px`};
   background: white;
+  position: relative;
 `;
 
 type Tab = {

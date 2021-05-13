@@ -5,10 +5,13 @@ import { Column } from "./EditableTable";
 import NumericalTableCell from "./NumericalTableCell";
 import TextTableCell from "./TextTableCell";
 
-const StyledRow = styled.div`
+const StyledRow = styled.div<{ heightOffsetPx?: number }>`
   display: inline-flex;
   align-items: center;
   width: 100%;
+  position: sticky;
+  top: ${({ heightOffsetPx }) =>
+    heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
 `;
 
 const StyledCell = styled.div<{ width: number; minWidth?: number }>`
@@ -37,13 +40,14 @@ export type TableRowProps<T> = {
   onUpdateRow: (data: T) => void;
   onDeleteRow: (data: T) => void;
   isDeletable: boolean;
+  heightOffsetPx?: number;
 };
 
 export default function TableRow<T>(
   props: TableRowProps<T>
 ): React.ReactElement {
   return (
-    <StyledRow>
+    <StyledRow heightOffsetPx={props.heightOffsetPx}>
       {props.columns.map((col) => {
         const cell =
           typeof props.data[col.key] === "number" ? (
