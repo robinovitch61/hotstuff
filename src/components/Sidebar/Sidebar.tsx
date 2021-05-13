@@ -11,7 +11,7 @@ const StyledEditor = styled.div<{ width: number; height: number }>`
   border-left: 3px solid black;
 `;
 
-const StyledTabsWrapper = styled.div`
+const StyledTables = styled.div`
   display: inline-flex;
   width: 100%;
   height: 50%;
@@ -43,14 +43,14 @@ export default function Sidebar(props: EditorProps): React.ReactElement {
   );
   return (
     <StyledEditor width={props.width} height={props.height}>
-      <StyledTabsWrapper>
+      <StyledTables>
         <Tabs
           tabs={[
             { text: "Nodes", component: nodeTable, width: 0.5 },
             { text: "Connections", component: <h1>hi</h1>, width: 0.5 },
           ]}
         />
-      </StyledTabsWrapper>
+      </StyledTables>
       <StyledModelControlsWrapper>
         <ModelControls onRunModel={() => alert("run!")} />
       </StyledModelControlsWrapper>

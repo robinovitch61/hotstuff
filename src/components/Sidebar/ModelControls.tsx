@@ -7,6 +7,8 @@ const StyledModelControlsWrapper = styled.div`
   width: 100%;
   justify-content: center;
   align-items: center;
+  border-top: 3px solid black;
+  padding-top: 1em;
 `;
 
 const StyledRunButton = styled.button``;

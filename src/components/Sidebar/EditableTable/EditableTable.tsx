@@ -15,7 +15,6 @@ const StyledTableWrapper = styled.div`
 const StyledTable = styled.div`
   width: 100%;
   border-collapse: collapse;
-  box-sizing: content-box;
 `;
 
 const StyledTableBody = styled.div`

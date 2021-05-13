@@ -18,25 +18,25 @@ const nodeColumns: Column<AppNode>[] = [
   {
     text: "Temp degC",
     key: "temperatureDegC",
-    width: 0.1,
+    width: 0.2,
     minWidthPx: 100,
   },
   {
     text: "Capacitance J/degK",
     key: "capacitanceJPerDegK",
-    width: 0.1,
+    width: 0.2,
     minWidthPx: 100,
   },
   {
     text: "Power Gen W",
     key: "powerGenW",
-    width: 0.1,
+    width: 0.15,
     minWidthPx: 80,
   },
   {
     text: "Boundary?",
     key: "isBoundary",
-    width: 0.1,
+    width: 0.15,
     minWidthPx: 80,
   },
 ];
