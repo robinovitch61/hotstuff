@@ -8,20 +8,20 @@ type Point = {
 const diffPoints = (p1: Point, p2: Point) => {
   return {
     x: p1.x - p2.x,
-    y: p1.y - p2.y
+    y: p1.y - p2.y,
   };
 };
 const addPoints = (p1: Point, p2: Point) => {
   return {
     x: p1.x + p2.x,
-    y: p1.y + p2.y
+    y: p1.y + p2.y,
   };
 };
 
 // constants
 const ORIGIN = Object.freeze({
   x: 0,
-  y: 0
+  y: 0,
 });
 const SQUARE_SIZE = 20;
 
@@ -36,13 +36,13 @@ const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 const initialScale = 1;
 const initialOffset = {
   x: 0,
-  y: 0
+  y: 0,
 };
 
 // "state"
 let mousePos = ORIGIN;
 let offset = initialOffset;
-let scale = initialScale;
+const scale = initialScale;
 let lastMousePos = ORIGIN;
 
 function draw() {
@@ -73,7 +73,7 @@ function draw() {
 const mouseMove = (event: MouseEvent) => {
   mousePos = {
     x: event.pageX,
-    y: event.pageY
+    y: event.pageY,
   };
   const mouseDiff = diffPoints(mousePos, lastMousePos);
   lastMousePos = mousePos;
@@ -90,7 +90,7 @@ const startPan = (event: MouseEvent) => {
   document.addEventListener("mouseup", mouseUp);
   lastMousePos = {
     x: event.pageX,
-    y: event.pageY
+    y: event.pageY,
   };
 };
 canvas.addEventListener("mousedown", startPan);

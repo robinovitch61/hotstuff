@@ -3,19 +3,19 @@
 var diffPoints = function (p1, p2) {
     return {
         x: p1.x - p2.x,
-        y: p1.y - p2.y
+        y: p1.y - p2.y,
     };
 };
 var addPoints = function (p1, p2) {
     return {
         x: p1.x + p2.x,
-        y: p1.y + p2.y
+        y: p1.y + p2.y,
     };
 };
 // constants
 var ORIGIN = Object.freeze({
     x: 0,
-    y: 0
+    y: 0,
 });
 var SQUARE_SIZE = 20;
 // dom
@@ -28,7 +28,7 @@ var context = canvas.getContext("2d");
 var initialScale = 1;
 var initialOffset = {
     x: 0,
-    y: 0
+    y: 0,
 };
 // "state"
 var mousePos = ORIGIN;
@@ -50,7 +50,7 @@ function draw() {
 var mouseMove = function (event) {
     mousePos = {
         x: event.pageX,
-        y: event.pageY
+        y: event.pageY,
     };
     var mouseDiff = diffPoints(mousePos, lastMousePos);
     lastMousePos = mousePos;
@@ -65,7 +65,7 @@ var startPan = function (event) {
     document.addEventListener("mouseup", mouseUp);
     lastMousePos = {
         x: event.pageX,
-        y: event.pageY
+        y: event.pageY,
     };
 };
 canvas.addEventListener("mousedown", startPan);
