@@ -17,6 +17,7 @@ var ORIGIN = Object.freeze({
     y: 0,
 });
 var SQUARE_SIZE = 20;
+var ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
 // dom
 var canvas = document.getElementById("canvas");
 if (canvas === null) {
@@ -30,10 +31,8 @@ var initialOffset = {
     y: 0,
 };
 // "state"
-var mousePos = ORIGIN;
 var offset = initialOffset;
 var scale = initialScale;
-var lastMousePos = ORIGIN;
 function draw() {
     window.requestAnimationFrame(draw);
     // clear canvas
@@ -45,28 +44,11 @@ function draw() {
     context.fillRect(-SQUARE_SIZE / 2, -SQUARE_SIZE / 2, SQUARE_SIZE, SQUARE_SIZE);
     context.restore();
 }
-// panning
-var mouseMove = function (event) {
-    mousePos = {
-        x: event.pageX,
-        y: event.pageY,
-    };
-    var mouseDiff = diffPoints(mousePos, lastMousePos);
-    lastMousePos = mousePos;
-    offset = addPoints(offset, mouseDiff);
-};
-var mouseUp = function () {
-    document.removeEventListener("mousemove", mouseMove);
-    document.removeEventListener("mouseup", mouseUp);
-};
-var startPan = function (event) {
-    document.addEventListener("mousemove", mouseMove);
-    document.addEventListener("mouseup", mouseUp);
-    lastMousePos = {
-        x: event.pageX,
-        y: event.pageY,
-    };
-};
-canvas.addEventListener("mousedown", startPan);
+function handleWheel(event) {
+    event.preventDefault();
+    var zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
+    scale = scale * zoom;
+}
+canvas.addEventListener("wheel", handleWheel);
 window.requestAnimationFrame(draw);
 export {};
