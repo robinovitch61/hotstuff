@@ -19,9 +19,6 @@ var ORIGIN = Object.freeze({
 var SQUARE_SIZE = 20;
 // dom
 var canvas = document.getElementById("canvas");
-if (canvas === null) {
-    throw Error("no canvas");
-}
 var context = canvas.getContext("2d");
 // "props"
 var initialScale = 1;

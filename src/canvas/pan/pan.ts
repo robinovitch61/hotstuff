@@ -29,9 +29,6 @@ const SQUARE_SIZE = 20;
 
 // dom
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-if (canvas === null) {
-  throw Error("no canvas");
-}
 const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 // "props"

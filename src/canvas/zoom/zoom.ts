@@ -30,10 +30,8 @@ const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
 
 // dom
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-if (canvas === null) {
-  throw Error("no canvas");
-}
 const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+const mousePosDiv = document.getElementById("mousePos") as HTMLDivElement;
 
 // "props"
 const initialScale = 1;
@@ -43,6 +41,8 @@ const initialOffset = {
 };
 
 // "state"
+let mousePos = ORIGIN;
+const lastMousePos = ORIGIN;
 const offset = initialOffset;
 let scale = initialScale;
 
@@ -68,6 +68,7 @@ function draw() {
   );
 
   context.restore();
+  mousePosDiv.innerText = JSON.stringify(mousePos);
 }
 
 function handleWheel(event: WheelEvent) {
@@ -76,6 +77,18 @@ function handleWheel(event: WheelEvent) {
   scale = scale * zoom;
 }
 
+function handleUpdateMouse(event: MouseEvent) {
+  event.preventDefault();
+  const viewportMousePos = { x: event.clientX, y: event.clientY };
+  const boundingRect = canvas.getBoundingClientRect();
+  const topLeftCanvasPos = {
+    x: boundingRect.left,
+    y: boundingRect.top,
+  };
+  mousePos = diffPoints(viewportMousePos, topLeftCanvasPos);
+}
+
 canvas.addEventListener("wheel", handleWheel);
+canvas.addEventListener("mousemove", handleUpdateMouse);
 
 window.requestAnimationFrame(draw);
