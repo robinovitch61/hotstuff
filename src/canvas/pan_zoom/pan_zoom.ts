@@ -7,128 +7,45 @@ type Point = {
 };
 
 // helpers
-function diffPoints(p1: Point, p2: Point): Point {
+const diffPoints = (p1: Point, p2: Point) => {
   return {
     x: p1.x - p2.x,
     y: p1.y - p2.y,
   };
-}
-function addPoints(p1: Point, p2: Point): Point {
+};
+
+const addPoints = (p1: Point, p2: Point) => {
   return {
     x: p1.x + p2.x,
     y: p1.y + p2.y,
   };
-}
+};
+
 function scalePoint(p1: Point, scale: number): Point {
   return { x: p1.x / scale, y: p1.y / scale };
 }
 
 // constants
-const ORIGIN = Object.freeze({
-  x: 0,
-  y: 0,
-});
+const ORIGIN = Object.freeze({ x: 0, y: 0 });
 const SQUARE_SIZE = 20;
 const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
+const MAX_SCALE = 50;
+const MIN_SCALE = 0.1;
 
 // dom
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-if (canvas === null) {
-  throw Error("no canvas");
-}
 const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+const debugDiv = document.getElementById("debug") as HTMLDivElement;
 
 // "props"
-const initialScale = 1;
-const initialOffset = {
-  x: 0,
-  y: 0,
-};
+const initialScale = 0.75;
+const initialOffset = { x: 10, y: 20 };
 
 // "state"
 let mousePos = ORIGIN;
-let offset = initialOffset;
-const scale = initialScale;
 let lastMousePos = ORIGIN;
-const lastOffset = ORIGIN;
-const viewportTopLeft = ORIGIN;
-
-// // pan when offset or scale changes
-// useLayoutEffect(() => {
-//   if (context && lastOffsetRef.current) {
-//     const offsetDiff = scalePoint(
-//       diffPoints(offset, lastOffsetRef.current),
-//       scale
-//     );
-//     context.translate(offsetDiff.x, offsetDiff.y);
-//     setViewportTopLeft((prevVal) => diffPoints(prevVal, offsetDiff));
-//     isResetRef.current = false;
-//   }
-// }, [context, offset, scale]);
-
-// add event listener on canvas for mouse position
-// useEffect(() => {
-//   const canvasElem = canvasRef.current;
-//   if (canvasElem === null) {
-//     return;
-//   }
-//
-//   function handleUpdateMouse(event: MouseEvent) {
-//     event.preventDefault();
-//     if (canvasRef.current) {
-//       const viewportMousePos = { x: event.clientX, y: event.clientY };
-//       const topLeftCanvasPos = {
-//         x: canvasRef.current.offsetLeft,
-//         y: canvasRef.current.offsetTop,
-//       };
-//       setMousePos(diffPoints(viewportMousePos, topLeftCanvasPos));
-//     }
-//   }
-//
-//   canvasElem.addEventListener("mousemove", handleUpdateMouse);
-//   canvasElem.addEventListener("wheel", handleUpdateMouse);
-//   return () => {
-//     canvasElem.removeEventListener("mousemove", handleUpdateMouse);
-//     canvasElem.removeEventListener("wheel", handleUpdateMouse);
-//   };
-// }, []);
-//
-// // add event listener on canvas for zoom
-// useEffect(() => {
-//   const canvasElem = canvasRef.current;
-//   if (canvasElem === null) {
-//     return;
-//   }
-//
-//   // this is tricky. Update the viewport's "origin" such that
-//   // the mouse doesn't move during scale - the 'zoom point' of the mouse
-//   // before and after zoom is relatively the same position on the viewport
-//   function handleWheel(event: WheelEvent) {
-//     event.preventDefault();
-//     if (context) {
-//       const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
-//       const viewportTopLeftDelta = {
-//         x: (mousePos.x / scale) * (1 - 1 / zoom),
-//         y: (mousePos.y / scale) * (1 - 1 / zoom),
-//       };
-//       const newViewportTopLeft = addPoints(
-//         viewportTopLeft,
-//         viewportTopLeftDelta
-//       );
-//
-//       context.translate(viewportTopLeft.x, viewportTopLeft.y);
-//       context.scale(zoom, zoom);
-//       context.translate(-newViewportTopLeft.x, -newViewportTopLeft.y);
-//
-//       setViewportTopLeft(newViewportTopLeft);
-//       setScale(scale * zoom);
-//       isResetRef.current = false;
-//     }
-//   }
-//
-//   canvasElem.addEventListener("wheel", handleWheel);
-//   return () => canvasElem.removeEventListener("wheel", handleWheel);
-// }, [context, mousePos.x, mousePos.y, viewportTopLeft, scale]);
+let offset = initialOffset;
+let scale = initialScale;
 
 function draw() {
   window.requestAnimationFrame(draw);
@@ -136,55 +53,81 @@ function draw() {
   // clear canvas
   context.canvas.width = context.canvas.width;
 
-  // transform coordinates and draw stuff, then restore transforms
+  // save untransformed coordinate state
   context.save();
 
-  // const offsetDiff = scalePoint(
-  //   diffPoints(offset, lastOffsetRef.current),
-  //   scale
-  // );
-  // context.translate(offsetDiff.x, offsetDiff.y);
-  // setViewportTopLeft((prevVal) => diffPoints(prevVal, offsetDiff));
-
+  // transform coordinates
   context.scale(scale, scale);
-  context.translate(
-    (context.canvas.width / 2 + offset.x) / scale,
-    (context.canvas.height / 2 + offset.y) / scale
-  );
+  context.translate(offset.x, offset.y);
+
+  // draw
   context.fillRect(
-    -SQUARE_SIZE / 2,
-    -SQUARE_SIZE / 2,
+    250 + -SQUARE_SIZE / 2,
+    250 + -SQUARE_SIZE / 2,
     SQUARE_SIZE,
     SQUARE_SIZE
   );
 
+  // debugging
+  context.beginPath();
+  context.moveTo(0, 0);
+  context.lineTo(0, 50);
+  context.moveTo(0, 0);
+  context.lineTo(50, 0);
+  context.stroke();
+  debugDiv.innerText = `scale: ${scale}
+    mouse: ${JSON.stringify(mousePos)}
+    offset: ${JSON.stringify(offset)}
+  `;
+
+  // restore untransformed states
   context.restore();
 }
 
-// panning
-const mouseMove = (event: MouseEvent) => {
-  mousePos = {
-    x: event.pageX,
-    y: event.pageY,
-  };
-  const mouseDiff = diffPoints(mousePos, lastMousePos);
+// track mouse
+function handleUpdateMouse(event: MouseEvent) {
+  event.preventDefault();
+  const viewportMousePos = { x: event.pageX, y: event.pageY };
+  const boundingRect = canvas.getBoundingClientRect();
+  const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
   lastMousePos = mousePos;
+  mousePos = diffPoints(viewportMousePos, topLeftCanvasPos);
+}
+document.addEventListener("mousemove", handleUpdateMouse);
+
+// zoom
+function handleWheel(event: WheelEvent) {
+  event.preventDefault();
+  const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
+  const newScale = scale * zoom;
+  if (MIN_SCALE > newScale || newScale > MAX_SCALE) {
+    return;
+  }
+
+  // offset the canvas such that the point under the mouse doesn't move
+  const lastMouse = scalePoint(mousePos, scale);
+  const newMouse = scalePoint(mousePos, newScale);
+  const mouseOffset = diffPoints(lastMouse, newMouse);
+  offset = diffPoints(offset, mouseOffset);
+
+  scale = newScale;
+}
+canvas.addEventListener("wheel", handleWheel);
+
+// panning
+const mouseMove = () => {
+  const mouseDiff = scalePoint(diffPoints(mousePos, lastMousePos), scale);
   offset = addPoints(offset, mouseDiff);
 };
-
 const mouseUp = () => {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp);
 };
-
-const startPan = (event: MouseEvent) => {
+const startPan = () => {
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
-  lastMousePos = {
-    x: event.pageX,
-    y: event.pageY,
-  };
 };
 canvas.addEventListener("mousedown", startPan);
 
+// repeatedly redraw
 window.requestAnimationFrame(draw);
