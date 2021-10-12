@@ -37,12 +37,12 @@ const debugDiv = document.getElementById("debug") as HTMLDivElement;
 // "props"
 const initialScale = 0.75;
 const initialOffset = { x: 10, y: 20 };
+const scale = initialScale;
 
 // "state"
 let mousePos = ORIGIN;
 let lastMousePos = ORIGIN;
 let offset = initialOffset;
-const scale = initialScale;
 
 function draw() {
   window.requestAnimationFrame(draw);
@@ -72,8 +72,7 @@ function draw() {
   context.moveTo(0, 0);
   context.lineTo(50, 0);
   context.stroke();
-  debugDiv.innerText = `scale: ${scale}
-    mouse: ${JSON.stringify(mousePos)}
+  debugDiv.innerText = `mouse: ${JSON.stringify(mousePos)}
     offset: ${JSON.stringify(offset)}
   `;
 

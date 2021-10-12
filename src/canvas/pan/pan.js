@@ -24,11 +24,11 @@ var debugDiv = document.getElementById("debug");
 // "props"
 var initialScale = 0.75;
 var initialOffset = { x: 10, y: 20 };
+var scale = initialScale;
 // "state"
 var mousePos = ORIGIN;
 var lastMousePos = ORIGIN;
 var offset = initialOffset;
-var scale = initialScale;
 function draw() {
     window.requestAnimationFrame(draw);
     // clear canvas
@@ -47,7 +47,7 @@ function draw() {
     context.moveTo(0, 0);
     context.lineTo(50, 0);
     context.stroke();
-    debugDiv.innerText = "scale: " + scale + "\n    mouse: " + JSON.stringify(mousePos) + "\n    offset: " + JSON.stringify(offset) + "\n  ";
+    debugDiv.innerText = "mouse: " + JSON.stringify(mousePos) + "\n    offset: " + JSON.stringify(offset) + "\n  ";
     // restore untransformed states
     context.restore();
 }
