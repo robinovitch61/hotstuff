@@ -1,0 +1,7 @@
+#canvas {
+  position: fixed;
+  border: 2px solid black;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
