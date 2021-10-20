@@ -1,39 +1,27 @@
 import * as React from "react";
 import { useLayoutEffect, RefObject, useState } from "react";
-import { diffPoints, Point } from "../pointUtils";
+import { diffPoints, ORIGIN, Point } from "../pointUtils";
 
-export default function useMousePos(
-  ref: RefObject<HTMLElement | null>
-): [Point, React.Dispatch<React.SetStateAction<Point>>] {
-  // const mousePosRef = useRef<Point>({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState<Point>({ x: 0, y: 0 });
+export default function useMousePos(ref: RefObject<HTMLElement | null>): Point {
+  const [mousePos, setMousePos] = useState<Point>(ORIGIN);
 
   // add event listener on canvas for mouse position
   useLayoutEffect(() => {
-    const canvasElem = ref.current;
-    if (canvasElem === null) {
-      return;
-    }
-
     function handleUpdateMouse(event: MouseEvent) {
       event.preventDefault();
       if (ref.current) {
-        const viewportMousePos = { x: event.clientX, y: event.clientY };
-        const topLeftCanvasPos = {
-          x: ref.current.offsetLeft,
-          y: ref.current.offsetTop,
-        };
+        const viewportMousePos = { x: event.pageX, y: event.pageY };
+        const boundingRect = ref.current.getBoundingClientRect();
+        const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
         setMousePos(diffPoints(viewportMousePos, topLeftCanvasPos));
       }
     }
 
-    canvasElem.addEventListener("mousemove", handleUpdateMouse);
-    canvasElem.addEventListener("wheel", handleUpdateMouse);
+    document.addEventListener("mousemove", handleUpdateMouse);
     return () => {
-      canvasElem.removeEventListener("mousemove", handleUpdateMouse);
-      canvasElem.removeEventListener("wheel", handleUpdateMouse);
+      document.removeEventListener("mousemove", handleUpdateMouse);
     };
   }, [ref]);
 
-  return [mousePos, setMousePos];
+  return mousePos;
 }

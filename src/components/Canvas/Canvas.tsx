@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
@@ -76,12 +76,13 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [
     context,
-    reset,
-    viewportTopLeft,
+    setContext,
+    mousePos,
+    lastMousePos,
     offset,
     scale,
     startPan,
-  ] = usePanZoomCanvas(canvasRef, canvasWidth, canvasHeight);
+  ] = usePanZoomCanvas(canvasRef);
   const [nodeDelta, startNodeMove] = useNodeMove();
   const [
     connectionMousePos,
@@ -120,7 +121,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       center: mouseToNodeCoords(
         makePoint(event.clientX, event.clientY),
         offset,
-        viewportTopLeft,
         scale
       ),
       radius: defaultNodeRadius,
@@ -146,7 +146,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
           mouseToNodeCoords(
             makePoint(event.clientX, event.clientY),
             offset,
-            viewportTopLeft,
             scale
           ),
           node.center,
@@ -179,7 +178,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         startMultiSelectRef.current = mouseToNodeCoords(
           makePoint(event.clientX, event.clientY),
           offset,
-          viewportTopLeft,
           scale
         );
         startMultiSelect(event);
@@ -195,19 +193,18 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     if (canvasRef.current) {
       // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
-      if (renderCtx) {
-        reset(renderCtx);
-      }
+      setContext(renderCtx);
     }
-  }, [reset, canvasHeight, canvasWidth, canvasRef, context]);
+  }, [canvasHeight, canvasWidth, canvasRef, context, setContext]);
 
   // draw
   useLayoutEffect(() => {
     if (context) {
-      // clear canvas but maintain transform
-      const storedTransform = context.getTransform();
+      // clear canvas
       context.canvas.width = context.canvas.width;
-      context.setTransform(storedTransform);
+
+      context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
+      context.translate(offset.x, offset.y);
 
       nodes.map((node) => {
         drawNode(
@@ -235,13 +232,13 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     context,
     scale,
     offset,
-    viewportTopLeft,
     nodes,
     connections,
     connectionMousePos,
     isConnectionDone,
     multiSelectMousePos,
     isMultiSelectDone,
+    devicePixelRatio,
   ]);
 
   // move active nodes if click and drag
@@ -272,7 +269,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       drawArrow(
         context,
         activeNode.center,
-        mouseToNodeCoords(connectionMousePos, offset, viewportTopLeft, scale),
+        mouseToNodeCoords(connectionMousePos, offset, scale),
         "grey"
       );
     } else if (isConnectionDone) {
@@ -282,7 +279,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
             mouseToNodeCoords(
               makePoint(connectionMousePos.x, connectionMousePos.y),
               offset,
-              viewportTopLeft,
               scale
             ),
             node.center,
@@ -318,17 +314,12 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       drawClearBox(
         context,
         startMultiSelectRef.current,
-        mouseToNodeCoords(multiSelectMousePos, offset, viewportTopLeft, scale),
+        mouseToNodeCoords(multiSelectMousePos, offset, scale),
         "grey"
       );
     } else if (isMultiSelectDone && startMultiSelectRef.current) {
       const startBoxPoint = startMultiSelectRef.current;
-      const endBoxPoint = mouseToNodeCoords(
-        multiSelectMousePos,
-        offset,
-        viewportTopLeft,
-        scale
-      );
+      const endBoxPoint = mouseToNodeCoords(multiSelectMousePos, offset, scale);
 
       const extraActiveNodeIds = nodes
         .filter((node) => isInsideBox(startBoxPoint, endBoxPoint, node.center))
@@ -341,12 +332,11 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     <StyledCanvasWrapper>
       <StyledControls>
         {/* <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre> */}
+        <pre>mousePos: {JSON.stringify(mousePos, null, 2)}</pre>
+        <pre>lastMousePos: {JSON.stringify(lastMousePos, null, 2)}</pre>
         <pre>conns: {JSON.stringify(connections, null, 2)}</pre>
         <pre>scale: {scale}</pre>
         <pre>offset: {JSON.stringify(offset)}</pre>
-        <button onClick={() => context && reset(context)}>
-          Reset Viewport
-        </button>
       </StyledControls>
       <StyledCanvas
         ref={canvasRef}

@@ -1,4 +1,10 @@
-import { addPoints, makePoint, Point, scalePoint } from "./pointUtils";
+import {
+  addPoints,
+  diffPoints,
+  makePoint,
+  Point,
+  scalePoint,
+} from "./pointUtils";
 import config from "../../config";
 import { AppNode } from "../App";
 
@@ -186,12 +192,12 @@ export function drawConnection(
 }
 
 export function intersectsCircle(
-  click: Point,
+  point: Point,
   circleCenter: Point,
   radius: number
 ): boolean {
-  const deltaX = click.x - circleCenter.x;
-  const deltaY = click.y - circleCenter.y;
+  const deltaX = point.x - circleCenter.x;
+  const deltaY = point.y - circleCenter.y;
   return Math.pow(deltaX, 2) + Math.pow(deltaY, 2) <= Math.pow(radius, 2);
 }
 
@@ -225,11 +231,7 @@ export function isInsideBox(
 export function mouseToNodeCoords(
   mouse: Point,
   offset: Point,
-  viewportTopLeft: Point,
   scale: number
 ): Point {
-  return addPoints(
-    scalePoint(makePoint(mouse.x, mouse.y), scale),
-    viewportTopLeft
-  );
+  return diffPoints(scalePoint(makePoint(mouse.x, mouse.y), scale), offset);
 }
