@@ -47,6 +47,11 @@ let lastMousePos = ORIGIN;
 let offset = initialOffset;
 let scale = initialScale;
 
+// when setting up canvas, set width/height to devicePixelRation times normal
+const { devicePixelRatio = 1 } = window;
+context.canvas.width = context.canvas.width * devicePixelRatio;
+context.canvas.height = context.canvas.height * devicePixelRatio;
+
 function draw() {
   window.requestAnimationFrame(draw);
 
@@ -56,8 +61,8 @@ function draw() {
   // save untransformed coordinate state
   context.save();
 
-  // transform coordinates
-  context.scale(scale, scale);
+  // transform coordinates - scale multiplied by devicePixelRatio
+  context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
   context.translate(offset.x, offset.y);
 
   // draw

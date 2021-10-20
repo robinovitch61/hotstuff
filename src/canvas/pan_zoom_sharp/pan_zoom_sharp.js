@@ -32,14 +32,18 @@ var mousePos = ORIGIN;
 var lastMousePos = ORIGIN;
 var offset = initialOffset;
 var scale = initialScale;
+// when setting up canvas, set width/height to devicePixelRation times normal
+var _a = window.devicePixelRatio, devicePixelRatio = _a === void 0 ? 1 : _a;
+context.canvas.width = context.canvas.width * devicePixelRatio;
+context.canvas.height = context.canvas.height * devicePixelRatio;
 function draw() {
     window.requestAnimationFrame(draw);
     // clear canvas
     context.canvas.width = context.canvas.width;
     // save untransformed coordinate state
     context.save();
-    // transform coordinates
-    context.scale(scale, scale);
+    // transform coordinates - scale multiplied by devicePixelRatio
+    context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
     context.translate(offset.x, offset.y);
     // draw
     context.fillRect(250 + -SQUARE_SIZE / 2, 250 + -SQUARE_SIZE / 2, SQUARE_SIZE, SQUARE_SIZE);
