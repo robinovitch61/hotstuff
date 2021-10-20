@@ -40,8 +40,6 @@ function draw() {
     window.requestAnimationFrame(draw);
     // clear canvas
     context.canvas.width = context.canvas.width;
-    // save untransformed coordinate state
-    context.save();
     // transform coordinates - scale multiplied by devicePixelRatio
     context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
     context.translate(offset.x, offset.y);
@@ -55,8 +53,6 @@ function draw() {
     context.lineTo(50, 0);
     context.stroke();
     debugDiv.innerText = "scale: " + scale + "\n    mouse: " + JSON.stringify(mousePos) + "\n    offset: " + JSON.stringify(offset) + "\n  ";
-    // restore untransformed states
-    context.restore();
 }
 // track mouse
 function handleUpdateMouse(event) {

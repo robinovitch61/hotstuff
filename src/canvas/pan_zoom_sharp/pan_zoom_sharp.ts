@@ -58,9 +58,6 @@ function draw() {
   // clear canvas
   context.canvas.width = context.canvas.width;
 
-  // save untransformed coordinate state
-  context.save();
-
   // transform coordinates - scale multiplied by devicePixelRatio
   context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
   context.translate(offset.x, offset.y);
@@ -84,9 +81,6 @@ function draw() {
     mouse: ${JSON.stringify(mousePos)}
     offset: ${JSON.stringify(offset)}
   `;
-
-  // restore untransformed states
-  context.restore();
 }
 
 // track mouse
