@@ -3,9 +3,8 @@ import {
   HSNode,
   makeConnection,
   makeNode,
-  ModelOutput,
 } from "hotstuff-network";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./Canvas/pointUtils";
 import Sidebar from "./Sidebar/Sidebar";
@@ -15,8 +14,6 @@ import useWindowSize from "./Canvas/hooks/useWindowSize";
 import Canvas from "./Canvas/Canvas";
 
 const {
-  defaultTimeStepSeconds,
-  defaultTotalTimeSeconds,
   sidebarWidthPerc: editorWidthPerc,
   canvasHeightPerc,
   defaultNodeRadius,
@@ -200,15 +197,15 @@ const testAppConnections: AppConnection[] = [
 ];
 
 export default function App(): React.ReactElement {
-  const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
-    undefined
-  );
+  // const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
+  //   undefined
+  // );
   // hooks
-  const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
-  const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
+  // const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
+  // const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
-  const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
+  // const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
   const [size, ratio] = useWindowSize();
 
   const [windowWidth, windowHeight] = size;

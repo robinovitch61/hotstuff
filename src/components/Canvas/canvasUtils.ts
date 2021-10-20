@@ -1,10 +1,4 @@
-import {
-  addPoints,
-  diffPoints,
-  makePoint,
-  Point,
-  scalePoint,
-} from "./pointUtils";
+import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
 import { AppNode } from "../App";
 
@@ -154,9 +148,9 @@ export function drawNode(
   center: Point,
   radius: number,
   isActive: boolean,
-  isBoundary: boolean,
-  temperatureDegC: number, // determines color?
-  capacitanceJPerDegK: number // determines size?
+  isBoundary: boolean
+  // temperatureDegC: number, // determines color?
+  // capacitanceJPerDegK: number // determines size?
 ): void {
   drawCircle(context, center, radius, "red");
   if (isActive) {

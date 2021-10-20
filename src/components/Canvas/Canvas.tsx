@@ -214,9 +214,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
           node.center,
           node.radius,
           node.isActive,
-          node.isBoundary,
-          node.temperatureDegC,
-          node.capacitanceJPerDegK
+          node.isBoundary
+          // node.temperatureDegC,
+          // node.capacitanceJPerDegK
         );
       });
 

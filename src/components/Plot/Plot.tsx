@@ -1,29 +1,29 @@
 import * as React from "react";
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+// import {
+//   CartesianGrid,
+//   Legend,
+//   Line,
+//   LineChart,
+//   ResponsiveContainer,
+//   Tooltip,
+//   XAxis,
+//   YAxis,
+// } from "recharts";
 import styled from "styled-components";
-import config from "../../config";
-import useWindowSize from "../Canvas/hooks/useWindowSize";
+// import config from "../../config";
+// import useWindowSize from "../Canvas/hooks/useWindowSize";
 
-const { canvasHeightPerc } = config;
-const MAX_PLOT_POINTS_PER_NODE = 400;
-const colors = [
-  "#2ecc71",
-  "#3498db",
-  "#9b59b6",
-  "#e74c3c",
-  "#e67e22",
-  "#34495e",
-  "#16a085",
-];
+// const { canvasHeightPerc } = config;
+// const MAX_PLOT_POINTS_PER_NODE = 400;
+// const colors = [
+//   "#2ecc71",
+//   "#3498db",
+//   "#9b59b6",
+//   "#e74c3c",
+//   "#e67e22",
+//   "#34495e",
+//   "#16a085",
+// ];
 
 // const StyledCharts = styled.div`
 //   display: flex;
@@ -166,7 +166,7 @@ type PlotProps = {
   height: number;
 };
 
-export default function Plot(props: PlotProps) {
+export default function Plot(props: PlotProps): React.ReactElement {
   // // show the temps of the first node as dots vertically along the svg
   // const plotParams = {
   //   height: 350,

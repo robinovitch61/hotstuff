@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components/macro";
 import BooleanTableCell from "./BooleanTableCell";
 import { Column, IDHavingThing } from "./EditableTable";
@@ -70,29 +70,29 @@ export default function TableRow<T extends IDHavingThing>(
               initialVal={
                 col.options.filter(
                   (option) =>
-                    option.value === (props.data[col.key] as any) ||
-                    option.text === (props.data[col.key] as any)
+                    option.value === (props.data[col.key] as never) ||
+                    option.text === (props.data[col.key] as never)
                 )[0].value
               }
               onSelectOption={col.onSelectOption}
             />
           ) : typeof props.data[col.key] === "number" ? (
             <NumericalTableCell
-              initialVal={props.data[col.key] as any} // TODO
+              initialVal={props.data[col.key] as never} // TODO
               onBlur={(newVal) =>
                 props.onUpdateRow({ ...props.data, [col.key]: newVal })
               }
             />
           ) : typeof props.data[col.key] === "string" ? (
             <TextTableCell
-              initialVal={props.data[col.key] as any} // TODO
+              initialVal={props.data[col.key] as never} // TODO
               onBlur={(newVal) =>
                 props.onUpdateRow({ ...props.data, [col.key]: newVal })
               }
             />
           ) : (
             <BooleanTableCell
-              initialIsActive={props.data[col.key] as any} // TODO
+              initialIsActive={props.data[col.key] as never} // TODO
               onClick={(isActive) =>
                 props.onUpdateRow({ ...props.data, [col.key]: !isActive })
               }

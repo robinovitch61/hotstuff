@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components/macro";
 import { Column } from "./EditableTable";
-import config from "../../../config";
 
 const StyledHeaderWrapper = styled.div<{ heightOffsetPx?: number }>`
   display: flex;

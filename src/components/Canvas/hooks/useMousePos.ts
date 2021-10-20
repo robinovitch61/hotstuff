@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useLayoutEffect, RefObject, useState } from "react";
 import { diffPoints, ORIGIN, Point } from "../pointUtils";
 
