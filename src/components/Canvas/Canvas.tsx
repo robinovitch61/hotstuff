@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
+import { diffPoints, makePoint, ORIGIN, Point, scalePoint } from "./pointUtils";
 import { makeConnection, makeNode } from "hotstuff-network";
 import useNodeMove from "./hooks/useNodeMove";
 import useClickAndDrag from "./hooks/useClickAndDrag";
@@ -30,6 +30,10 @@ const StyledControls = styled.div`
   bottom: 0;
   left: 0;
   margin: 0.5em;
+
+  > button {
+    margin-right: 5px;
+  }
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
@@ -72,17 +76,15 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     setAppConnections,
   } = props;
 
+  // state - some of this should possibly live in localstorage or something to persist across site visits
+  const [savedOffset, setSavedOffset] = useState<Point>(ORIGIN);
+  const [savedScale, setSavedScale] = useState<number>(1);
+
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [
-    context,
-    setContext,
-    mousePos,
-    lastMousePos,
-    offset,
-    scale,
-    startPan,
-  ] = usePanZoomCanvas(canvasRef);
+  const [context, setView, offset, scale, startPan] = usePanZoomCanvas(
+    canvasRef
+  );
   const [nodeDelta, startNodeMove] = useNodeMove();
   const [
     connectionMousePos,
@@ -193,9 +195,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     if (canvasRef.current) {
       // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
-      setContext(renderCtx);
+      setView(renderCtx, makePoint(0, 0), 1);
     }
-  }, [canvasHeight, canvasWidth, canvasRef, context, setContext]);
+  }, [canvasHeight, canvasWidth, canvasRef, context, setView]);
 
   // draw
   useLayoutEffect(() => {
@@ -332,11 +334,24 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     <StyledCanvasWrapper>
       <StyledControls>
         {/* <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre> */}
-        <pre>mousePos: {JSON.stringify(mousePos, null, 2)}</pre>
-        <pre>lastMousePos: {JSON.stringify(lastMousePos, null, 2)}</pre>
-        <pre>conns: {JSON.stringify(connections, null, 2)}</pre>
-        <pre>scale: {scale}</pre>
-        <pre>offset: {JSON.stringify(offset)}</pre>
+        {/*<pre>mousePos: {JSON.stringify(mousePos, null, 2)}</pre>*/}
+        {/*<pre>lastMousePos: {JSON.stringify(lastMousePos, null, 2)}</pre>*/}
+        {/*<pre>conns: {JSON.stringify(connections, null, 2)}</pre>*/}
+        {/*<pre>scale: {scale}</pre>*/}
+        {/*<pre>offset: {JSON.stringify(offset)}</pre>*/}
+        <button
+          onClick={() => context && setView(context, savedOffset, savedScale)}
+        >
+          Reset View
+        </button>
+        <button
+          onClick={() => {
+            setSavedOffset(offset);
+            setSavedScale(scale);
+          }}
+        >
+          Save View
+        </button>
       </StyledControls>
       <StyledCanvas
         ref={canvasRef}

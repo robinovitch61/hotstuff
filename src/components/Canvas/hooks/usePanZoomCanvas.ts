@@ -1,3 +1,4 @@
+import React from "react";
 import useLast from "./useLast";
 import useMousePos from "./useMousePos";
 import { diffPoints, ORIGIN, Point, scalePoint } from "../pointUtils";
@@ -10,9 +11,11 @@ export default function usePanZoomCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement>
 ): [
   CanvasRenderingContext2D | null,
-  React.Dispatch<React.SetStateAction<CanvasRenderingContext2D | null>>,
-  Point,
-  Point,
+  (
+    context: CanvasRenderingContext2D | null,
+    offset: Point,
+    scale: number
+  ) => void,
   Point,
   number,
   (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void
@@ -22,6 +25,23 @@ export default function usePanZoomCanvas(
   const [offset, setOffset] = useState<Point>(ORIGIN);
   const mousePos = useMousePos(canvasRef);
   const lastMousePos = useLast(mousePos);
+
+  // set view
+  const setView = useCallback(
+    (
+      context: CanvasRenderingContext2D | null,
+      offset: Point,
+      scale: number
+    ) => {
+      if (context) {
+        // reset state and refs
+        setContext(context);
+        setOffset(offset);
+        setScale(scale);
+      }
+    },
+    []
+  );
 
   // functions for panning
   const mouseMove = useCallback(() => {
@@ -74,13 +94,5 @@ export default function usePanZoomCanvas(
     return () => canvasElem.removeEventListener("wheel", handleWheel);
   }, [canvasRef, context, mousePos, offset, scale]);
 
-  return [
-    context,
-    setContext,
-    mousePos,
-    lastMousePos.current || { x: 0, y: 0 },
-    offset,
-    scale,
-    startPan,
-  ];
+  return [context, setView, offset, scale, startPan];
 }
