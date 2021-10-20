@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import BooleanTableCell, { BooleanTableCellProps } from "./BooleanTableCell";
 import { Story, Meta } from "@storybook/react";
 

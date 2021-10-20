@@ -6,7 +6,7 @@ import {
 } from "hotstuff-network";
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { Point } from "./Canvas/pointUtils";
+import { ORIGIN, Point } from "./Canvas/pointUtils";
 import Sidebar from "./Sidebar/Sidebar";
 import Plot from "./Plot/Plot";
 import config from "../config";
@@ -200,12 +200,13 @@ export default function App(): React.ReactElement {
   // const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
   //   undefined
   // );
-  // hooks
   // const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
   // const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
   // const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
+  const [savedOffset, setSavedOffset] = useState<Point>(ORIGIN);
+  const [savedScale, setSavedScale] = useState<number>(1);
   const [size, ratio] = useWindowSize();
 
   const [windowWidth, windowHeight] = size;
@@ -335,6 +336,10 @@ export default function App(): React.ReactElement {
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
             devicePixelRatio={ratio}
+            savedOffset={savedOffset}
+            setSavedOffset={setSavedOffset}
+            savedScale={savedScale}
+            setSavedScale={setSavedScale}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />

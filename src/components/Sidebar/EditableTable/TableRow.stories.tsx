@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import TableRow, { TableRowProps } from "./TableRow";
 import { Story, Meta } from "@storybook/react";
 import { Column } from "./EditableTable";

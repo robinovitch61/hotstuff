@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import useLast from "./useLast";
 import useMousePos from "./useMousePos";
 import { diffPoints, ORIGIN, Point, scalePoint } from "../pointUtils";

@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import TextTableCell, { TextTableCellProps } from "./TextTableCell";
 import { Story, Meta } from "@storybook/react";
 

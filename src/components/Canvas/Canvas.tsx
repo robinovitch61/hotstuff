@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import { AppConnection, AppNode } from "../App";
 import {
@@ -13,27 +13,16 @@ import {
 } from "./canvasUtils";
 import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { diffPoints, makePoint, ORIGIN, Point, scalePoint } from "./pointUtils";
+import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import { makeConnection, makeNode } from "hotstuff-network";
 import useNodeMove from "./hooks/useNodeMove";
 import useClickAndDrag from "./hooks/useClickAndDrag";
+import Controls from "./Controls";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
   max-height: 100%;
   position: relative;
-`;
-
-const StyledControls = styled.div`
-  z-index: 10;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  margin: 0.5em;
-
-  > button {
-    margin-right: 5px;
-  }
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
@@ -59,6 +48,10 @@ export type CanvasProps = {
   canvasWidth: number;
   canvasHeight: number;
   devicePixelRatio: number;
+  savedOffset: Point;
+  setSavedOffset: React.Dispatch<React.SetStateAction<Point>>;
+  savedScale: number;
+  setSavedScale: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function Canvas(props: CanvasProps): React.ReactElement {
@@ -75,10 +68,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     clearActiveNodes,
     setAppConnections,
   } = props;
-
-  // state - some of this should possibly live in localstorage or something to persist across site visits
-  const [savedOffset, setSavedOffset] = useState<Point>(ORIGIN);
-  const [savedScale, setSavedScale] = useState<number>(1);
 
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -332,27 +321,16 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
 
   return (
     <StyledCanvasWrapper>
-      <StyledControls>
-        {/* <pre>nodes: {JSON.stringify(nodes, null, 2)}</pre> */}
-        {/*<pre>mousePos: {JSON.stringify(mousePos, null, 2)}</pre>*/}
-        {/*<pre>lastMousePos: {JSON.stringify(lastMousePos, null, 2)}</pre>*/}
-        {/*<pre>conns: {JSON.stringify(connections, null, 2)}</pre>*/}
-        {/*<pre>scale: {scale}</pre>*/}
-        {/*<pre>offset: {JSON.stringify(offset)}</pre>*/}
-        <button
-          onClick={() => context && setView(context, savedOffset, savedScale)}
-        >
-          Reset View
-        </button>
-        <button
-          onClick={() => {
-            setSavedOffset(offset);
-            setSavedScale(scale);
-          }}
-        >
-          Save View
-        </button>
-      </StyledControls>
+      <Controls
+        context={context}
+        offset={offset}
+        scale={scale}
+        setView={setView}
+        savedOffset={props.savedOffset}
+        setSavedOffset={props.setSavedOffset}
+        savedScale={props.savedScale}
+        setSavedScale={props.setSavedScale}
+      />
       <StyledCanvas
         ref={canvasRef}
         width={canvasWidth * devicePixelRatio}

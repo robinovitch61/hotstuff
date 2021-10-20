@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import EditableTable, { Column, EditableTableProps } from "./EditableTable";
 import { Story, Meta } from "@storybook/react";
 import { SortState } from "./SortableTableHeader";
