@@ -8,7 +8,7 @@ import {
 } from "../pointUtils";
 import config from "../../../config";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { calculateMouse } from "../canvasUtils";
+import { calculateCanvasMouse } from "../canvasUtils";
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
 
@@ -53,7 +53,7 @@ export default function usePanZoomCanvas(
     (event: React.MouseEvent | MouseEvent) => {
       if (context) {
         // update mouse position
-        const newMousePos = calculateMouse(event, context.canvas);
+        const newMousePos = calculateCanvasMouse(event, context.canvas);
         lastMousePosRef.current = mousePosRef.current;
         mousePosRef.current = newMousePos;
 
@@ -77,7 +77,7 @@ export default function usePanZoomCanvas(
       if (context) {
         document.addEventListener("mousemove", mouseMove);
         document.addEventListener("mouseup", mouseUp);
-        mousePosRef.current = calculateMouse(event, context.canvas);
+        mousePosRef.current = calculateCanvasMouse(event, context.canvas);
       }
     },
     [context, mouseMove, mouseUp]
@@ -89,7 +89,7 @@ export default function usePanZoomCanvas(
       event.preventDefault();
       if (context) {
         // update mouse position
-        const newMousePos = calculateMouse(event, context.canvas);
+        const newMousePos = calculateCanvasMouse(event, context.canvas);
         lastMousePosRef.current = mousePosRef.current;
         mousePosRef.current = newMousePos;
 

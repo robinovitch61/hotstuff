@@ -1,7 +1,8 @@
-import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
+import { diffPoints, makePoint, ORIGIN, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
 import { AppNode } from "../App";
 import * as React from "react";
+import { CanvasState } from "./Canvas";
 
 const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
 
@@ -223,15 +224,7 @@ export function isInsideBox(
   );
 }
 
-export function mouseToNodeCoords(
-  mouse: Point,
-  offset: Point,
-  scale: number
-): Point {
-  return diffPoints(scalePoint(makePoint(mouse.x, mouse.y), scale), offset);
-}
-
-export function calculateMouse(
+export function calculateCanvasMouse(
   event: React.MouseEvent | MouseEvent,
   canvas: HTMLCanvasElement
 ): Point {
@@ -239,4 +232,28 @@ export function calculateMouse(
   const boundingRect = canvas.getBoundingClientRect();
   const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
   return diffPoints(viewportMousePos, topLeftCanvasPos);
+}
+
+function canvasMouseToNodeCoords(
+  mouse: Point,
+  offset: Point,
+  scale: number
+): Point {
+  return diffPoints(scalePoint(mouse, scale), offset);
+}
+
+export function mouseToNodeCoords(
+  event: React.MouseEvent | MouseEvent,
+  canvasState: CanvasState
+): Point {
+  if (canvasState.context) {
+    const canvasMouse = calculateCanvasMouse(event, canvasState.context.canvas);
+    return canvasMouseToNodeCoords(
+      canvasMouse,
+      canvasState.offset,
+      canvasState.scale
+    );
+  } else {
+    return ORIGIN;
+  }
 }

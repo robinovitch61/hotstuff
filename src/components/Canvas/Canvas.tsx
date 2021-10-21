@@ -57,8 +57,7 @@ export type CanvasProps = {
   ) => void;
   handleDoubleClick: (
     event: React.MouseEvent,
-    offset: Point,
-    scale: number
+    canvasState: CanvasState
   ) => void;
   savedCanvasState: SavedCanvasState;
   setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
@@ -283,7 +282,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
           onMouseDown(event, { context, offset, scale }, () => startPan(event))
         }
         onDoubleClick={(event: React.MouseEvent) =>
-          handleDoubleClick(event, offset, scale)
+          handleDoubleClick(event, { context, offset, scale })
         }
       />
     </StyledCanvasWrapper>
