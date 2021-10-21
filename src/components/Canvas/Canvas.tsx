@@ -54,9 +54,13 @@ export type CanvasProps = {
   setSavedScale: React.Dispatch<React.SetStateAction<number>>;
   draw: (context: CanvasRenderingContext2D) => void;
   handleDoubleClick: (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: React.MouseEvent,
     offset: Point,
     scale: number
+  ) => void;
+  onMouseDown: (
+    event: React.MouseEvent | MouseEvent,
+    defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
   ) => void;
 };
 
@@ -75,6 +79,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     setAppConnections,
     draw,
     handleDoubleClick,
+    onMouseDown,
   } = props;
 
   // hooks
@@ -82,76 +87,76 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   const [context, setView, offset, scale, startPan] = usePanZoomCanvas(
     canvasRef
   );
-  const [nodeDelta, startNodeMove] = useNodeMove();
-  const [
-    connectionMousePos,
-    isConnectionDone,
-    startMakeConnection,
-  ] = useClickAndDrag();
-  const [
-    multiSelectMousePos,
-    isMultiSelectDone,
-    startMultiSelect,
-  ] = useClickAndDrag();
-  const startMultiSelectRef = useRef<Point | undefined>(undefined);
+  // const [nodeDelta, startNodeMove] = useNodeMove();
+  // const [
+  //   connectionMousePos,
+  //   isConnectionDone,
+  //   startMakeConnection,
+  // ] = useClickAndDrag();
+  // const [
+  //   multiSelectMousePos,
+  //   isMultiSelectDone,
+  //   startMultiSelect,
+  // ] = useClickAndDrag();
+  // const startMultiSelectRef = useRef<Point | undefined>(undefined);
 
-  function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
-    const canvas = canvasRef.current;
-    if (canvas === null) {
-      return;
-    }
-
-    let nodeClicked = false;
-    const activeNodeIds = nodes
-      .filter((node) => node.isActive)
-      .map((node) => node.id);
-    nodes.some((node) => {
-      if (
-        intersectsCircle(
-          mouseToNodeCoords(
-            makePoint(event.clientX, event.clientY),
-            offset,
-            scale
-          ),
-          node.center,
-          node.radius
-        )
-      ) {
-        nodeClicked = true;
-
-        if (event.altKey) {
-          clearActiveNodes();
-          updateActiveNodes([node.id], false);
-          startMakeConnection(event);
-        } else if (event.shiftKey && activeNodeIds.includes(node.id)) {
-          updateActiveNodes(
-            activeNodeIds.filter((id) => id !== node.id),
-            false
-          );
-        } else {
-          const sticky =
-            event.shiftKey || (activeNodeIds.length > 1 && node.isActive);
-          updateActiveNodes([node.id], sticky);
-          startNodeMove(event);
-        }
-        return true; // short circuits the rest of the some loop
-      }
-    });
-
-    if (!nodeClicked) {
-      if (event.shiftKey) {
-        startMultiSelectRef.current = mouseToNodeCoords(
-          makePoint(event.clientX, event.clientY),
-          offset,
-          scale
-        );
-        startMultiSelect(event);
-      } else {
-        clearActiveNodes();
-        startPan(event);
-      }
-    }
-  }
+  // function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
+  //   const canvas = canvasRef.current;
+  //   if (canvas === null) {
+  //     return;
+  //   }
+  //
+  //   let nodeClicked = false;
+  //   const activeNodeIds = nodes
+  //     .filter((node) => node.isActive)
+  //     .map((node) => node.id);
+  //   nodes.some((node) => {
+  //     if (
+  //       intersectsCircle(
+  //         mouseToNodeCoords(
+  //           makePoint(event.clientX, event.clientY),
+  //           offset,
+  //           scale
+  //         ),
+  //         node.center,
+  //         node.radius
+  //       )
+  //     ) {
+  //       nodeClicked = true;
+  //
+  //       if (event.altKey) {
+  //         clearActiveNodes();
+  //         updateActiveNodes([node.id], false);
+  //         startMakeConnection(event);
+  //       } else if (event.shiftKey && activeNodeIds.includes(node.id)) {
+  //         updateActiveNodes(
+  //           activeNodeIds.filter((id) => id !== node.id),
+  //           false
+  //         );
+  //       } else {
+  //         const sticky =
+  //           event.shiftKey || (activeNodeIds.length > 1 && node.isActive);
+  //         updateActiveNodes([node.id], sticky);
+  //         startNodeMove(event);
+  //       }
+  //       return true; // short circuits the rest of the some loop
+  //     }
+  //   });
+  //
+  //   if (!nodeClicked) {
+  //     if (event.shiftKey) {
+  //       startMultiSelectRef.current = mouseToNodeCoords(
+  //         makePoint(event.clientX, event.clientY),
+  //         offset,
+  //         scale
+  //       );
+  //       startMultiSelect(event);
+  //     } else {
+  //       clearActiveNodes();
+  //       startPan(event);
+  //     }
+  //   }
+  // }
 
   // setup canvas and set context
   useLayoutEffect(() => {
@@ -175,20 +180,20 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     }
   }, [context, devicePixelRatio, draw, offset.x, offset.y, scale]);
 
-  // move active nodes if click and drag
-  useLayoutEffect(() => {
-    const activeNodes = nodes.filter((node) => node.isActive);
-    if (activeNodes.length === 0) {
-      return;
-    }
-    const newActiveNodes = activeNodes.map((activeNode) => ({
-      ...activeNode,
-      isActive: true,
-      center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
-    }));
-
-    updateNodes(newActiveNodes);
-  }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...I think it's fine
+  // // move active nodes if click and drag
+  // useLayoutEffect(() => {
+  //   const activeNodes = nodes.filter((node) => node.isActive);
+  //   if (activeNodes.length === 0) {
+  //     return;
+  //   }
+  //   const newActiveNodes = activeNodes.map((activeNode) => ({
+  //     ...activeNode,
+  //     isActive: true,
+  //     center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
+  //   }));
+  //
+  //   updateNodes(newActiveNodes);
+  // }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...I think it's fine
 
   // // draw connection if it's being made
   // useLayoutEffect(() => {
@@ -280,8 +285,10 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         height={canvasHeight * devicePixelRatio}
         cssWidth={canvasWidth}
         cssHeight={canvasHeight}
-        onMouseDown={handleOnMouseDown}
-        onDoubleClick={(event: React.MouseEvent<HTMLCanvasElement>) =>
+        onMouseDown={(event: React.MouseEvent | MouseEvent) =>
+          onMouseDown(event, () => startPan(event))
+        }
+        onDoubleClick={(event: React.MouseEvent) =>
           handleDoubleClick(event, offset, scale)
         }
       />

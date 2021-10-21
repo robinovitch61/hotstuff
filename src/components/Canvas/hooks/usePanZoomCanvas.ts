@@ -33,7 +33,7 @@ export default function usePanZoomCanvas(
   ) => void,
   Point,
   number,
-  (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void
+  (event: React.MouseEvent | MouseEvent) => void
 ] {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);

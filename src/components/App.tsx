@@ -356,11 +356,7 @@ export default function App(): React.ReactElement {
   );
 
   const handleDoubleClick = useCallback(
-    (
-      event: React.MouseEvent<HTMLCanvasElement>,
-      offset: Point,
-      scale: number
-    ) => {
+    (event: React.MouseEvent | MouseEvent, offset: Point, scale: number) => {
       if (event.shiftKey || event.altKey) {
         return;
       }
@@ -393,6 +389,10 @@ export default function App(): React.ReactElement {
     [addNode]
   );
 
+  const onMouseDown = useCallback((event, defaultBehavior) => {
+    defaultBehavior(event);
+  }, []);
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -414,6 +414,7 @@ export default function App(): React.ReactElement {
             setSavedScale={setSavedScale}
             draw={draw}
             handleDoubleClick={handleDoubleClick}
+            onMouseDown={onMouseDown}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />
