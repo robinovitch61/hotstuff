@@ -1,11 +1,26 @@
 import * as React from "react";
-import useLast from "./useLast";
-import useMousePos from "./useMousePos";
-import { diffPoints, ORIGIN, Point, scalePoint } from "../pointUtils";
+import {
+  addPoints,
+  diffPoints,
+  ORIGIN,
+  Point,
+  scalePoint,
+} from "../pointUtils";
 import config from "../../../config";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
+
+// calculate mouse position on canvas relative to top left canvas point on page
+function calculateMouse(
+  event: React.MouseEvent | MouseEvent,
+  canvas: HTMLCanvasElement
+): Point {
+  const viewportMousePos = { x: event.pageX, y: event.pageY };
+  const boundingRect = canvas.getBoundingClientRect();
+  const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
+  return diffPoints(viewportMousePos, topLeftCanvasPos);
+}
 
 export default function usePanZoomCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement>
@@ -23,8 +38,8 @@ export default function usePanZoomCanvas(
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [offset, setOffset] = useState<Point>(ORIGIN);
-  const mousePos = useMousePos(canvasRef);
-  const lastMousePos = useLast(mousePos);
+  const mousePosRef = useRef<Point>(ORIGIN);
+  const lastMousePosRef = useRef<Point>(ORIGIN);
 
   // set view
   const setView = useCallback(
@@ -44,36 +59,51 @@ export default function usePanZoomCanvas(
   );
 
   // functions for panning
-  const mouseMove = useCallback(() => {
-    if (context && lastMousePos.current) {
-      const mouseDiff = scalePoint(
-        diffPoints(mousePos, lastMousePos.current),
-        scale
-      );
-      setOffset(diffPoints(offset, mouseDiff));
-    }
-  }, [context, lastMousePos, mousePos, offset, scale]);
+  const mouseMove = useCallback(
+    (event: React.MouseEvent | MouseEvent) => {
+      if (context) {
+        // update mouse position
+        const newMousePos = calculateMouse(event, context.canvas);
+        lastMousePosRef.current = mousePosRef.current;
+        mousePosRef.current = newMousePos;
+
+        const mouseDiff = scalePoint(
+          diffPoints(mousePosRef.current, lastMousePosRef.current),
+          scale
+        );
+        setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
+      }
+    },
+    [context, scale]
+  );
 
   const mouseUp = useCallback(() => {
     document.removeEventListener("mousemove", mouseMove);
     document.removeEventListener("mouseup", mouseUp);
   }, [mouseMove]);
 
-  const startPan = useCallback(() => {
-    document.addEventListener("mousemove", mouseMove);
-    document.addEventListener("mouseup", mouseUp);
-  }, [mouseMove, mouseUp]);
+  const startPan = useCallback(
+    (event: React.MouseEvent | MouseEvent) => {
+      if (context) {
+        document.addEventListener("mousemove", mouseMove);
+        document.addEventListener("mouseup", mouseUp);
+        mousePosRef.current = calculateMouse(event, context.canvas);
+      }
+    },
+    [context, mouseMove, mouseUp]
+  );
 
   // add event listener on canvas for zoom
   useLayoutEffect(() => {
-    const canvasElem = canvasRef.current;
-    if (canvasElem === null) {
-      return;
-    }
-
     function handleWheel(event: WheelEvent) {
       event.preventDefault();
       if (context) {
+        // update mouse position
+        const newMousePos = calculateMouse(event, context.canvas);
+        lastMousePosRef.current = mousePosRef.current;
+        mousePosRef.current = newMousePos;
+
+        // calculate new scale/zoom
         const zoom = 1 - event.deltaY / zoomSensitivity;
         const newScale = scale * zoom;
         if (newScale > maxZoom || newScale < minZoom) {
@@ -81,8 +111,8 @@ export default function usePanZoomCanvas(
         }
 
         // offset the canvas such that the point under the mouse doesn't move
-        const lastMouse = scalePoint(mousePos, scale);
-        const newMouse = scalePoint(mousePos, newScale);
+        const lastMouse = scalePoint(mousePosRef.current, scale);
+        const newMouse = scalePoint(mousePosRef.current, newScale);
         const mouseOffset = diffPoints(lastMouse, newMouse);
 
         setOffset(diffPoints(offset, mouseOffset));
@@ -90,9 +120,12 @@ export default function usePanZoomCanvas(
       }
     }
 
-    canvasElem.addEventListener("wheel", handleWheel);
-    return () => canvasElem.removeEventListener("wheel", handleWheel);
-  }, [canvasRef, context, mousePos, offset, scale]);
+    const canvasElem = canvasRef.current;
+    if (canvasElem) {
+      canvasElem.addEventListener("wheel", handleWheel);
+      return () => canvasElem.removeEventListener("wheel", handleWheel);
+    }
+  }, [canvasRef, context, offset, scale]);
 
   return [context, setView, offset, scale, startPan];
 }

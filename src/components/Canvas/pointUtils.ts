@@ -9,6 +9,10 @@ export function makePoint(x: number, y: number): Point {
   return { x, y };
 }
 
+export function addPoints(p1: Point, p2: Point): Point {
+  return { x: p1.x + p2.x, y: p1.y + p2.y };
+}
+
 export function diffPoints(p1: Point, p2: Point): Point {
   return { x: p1.x - p2.x, y: p1.y - p2.y };
 }
