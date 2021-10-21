@@ -37,6 +37,14 @@ const {
   defaultResistanceDegKPerW,
 } = config;
 
+export type CanvasState = {
+  context: CanvasRenderingContext2D | null;
+  offset: Point;
+  scale: number;
+};
+
+export type SavedCanvasState = Omit<CanvasState, "context">;
+
 export type CanvasProps = {
   nodes: AppNode[];
   connections: AppConnection[];
@@ -48,10 +56,8 @@ export type CanvasProps = {
   canvasWidth: number;
   canvasHeight: number;
   devicePixelRatio: number;
-  savedOffset: Point;
-  setSavedOffset: React.Dispatch<React.SetStateAction<Point>>;
-  savedScale: number;
-  setSavedScale: React.Dispatch<React.SetStateAction<number>>;
+  savedCanvasState: SavedCanvasState;
+  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
   draw: (context: CanvasRenderingContext2D) => void;
   handleDoubleClick: (
     event: React.MouseEvent,
@@ -80,6 +86,8 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     draw,
     handleDoubleClick,
     onMouseDown,
+    savedCanvasState,
+    setSavedCanvasState,
   } = props;
 
   // hooks
@@ -270,14 +278,13 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   return (
     <StyledCanvasWrapper>
       <Controls
-        context={context}
-        offset={offset}
-        scale={scale}
         setView={setView}
-        savedOffset={props.savedOffset}
-        setSavedOffset={props.setSavedOffset}
-        savedScale={props.savedScale}
-        setSavedScale={props.setSavedScale}
+        canvasState={{ context, offset, scale }}
+        savedCanvasState={{
+          offset: savedCanvasState.offset,
+          scale: savedCanvasState.scale,
+        }}
+        setSavedCanvasState={setSavedCanvasState}
       />
       <StyledCanvas
         ref={canvasRef}

@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components/macro";
 import { Point } from "./pointUtils";
+import { CanvasState, SavedCanvasState } from "./Canvas";
 
 const StyledBottomLeftButton = styled.button`
   position: absolute;
@@ -15,18 +16,14 @@ const StyledBottomRightButton = styled(StyledBottomLeftButton)`
 `;
 
 type ControlsProps = {
-  context: CanvasRenderingContext2D | null;
-  offset: Point;
-  scale: number;
   setView: (
     canvas: CanvasRenderingContext2D,
     offset: Point,
     scale: number
   ) => void;
-  savedOffset: Point;
-  setSavedOffset: React.Dispatch<React.SetStateAction<Point>>;
-  savedScale: number;
-  setSavedScale: React.Dispatch<React.SetStateAction<number>>;
+  canvasState: CanvasState;
+  savedCanvasState: SavedCanvasState;
+  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
 };
 
 export default function Controls(props: ControlsProps): React.ReactElement {
@@ -34,16 +31,22 @@ export default function Controls(props: ControlsProps): React.ReactElement {
     <>
       <StyledBottomLeftButton
         onClick={() => {
-          props.setSavedOffset(props.offset);
-          props.setSavedScale(props.scale);
+          props.setSavedCanvasState({
+            offset: props.canvasState.offset,
+            scale: props.canvasState.scale,
+          });
         }}
       >
         Save View
       </StyledBottomLeftButton>
       <StyledBottomRightButton
         onClick={() =>
-          props.context &&
-          props.setView(props.context, props.savedOffset, props.savedScale)
+          props.canvasState.context &&
+          props.setView(
+            props.canvasState.context,
+            props.savedCanvasState.offset,
+            props.savedCanvasState.scale
+          )
         }
       >
         Reset View

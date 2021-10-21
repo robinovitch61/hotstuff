@@ -11,7 +11,7 @@ import Sidebar from "./Sidebar/Sidebar";
 import Plot from "./Plot/Plot";
 import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
-import Canvas from "./Canvas/Canvas";
+import Canvas, { SavedCanvasState } from "./Canvas/Canvas";
 import {
   drawConnection,
   drawNode,
@@ -211,8 +211,10 @@ export default function App(): React.ReactElement {
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
   // const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
-  const [savedOffset, setSavedOffset] = useState<Point>(ORIGIN);
-  const [savedScale, setSavedScale] = useState<number>(1);
+  const [savedCanvasState, setSavedCanvasState] = useState<SavedCanvasState>({
+    offset: ORIGIN,
+    scale: 1,
+  });
   const [size, ratio] = useWindowSize();
 
   const [windowWidth, windowHeight] = size;
@@ -408,10 +410,8 @@ export default function App(): React.ReactElement {
             canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
             devicePixelRatio={ratio}
-            savedOffset={savedOffset}
-            setSavedOffset={setSavedOffset}
-            savedScale={savedScale}
-            setSavedScale={setSavedScale}
+            savedCanvasState={savedCanvasState}
+            setSavedCanvasState={setSavedCanvasState}
             draw={draw}
             handleDoubleClick={handleDoubleClick}
             onMouseDown={onMouseDown}
