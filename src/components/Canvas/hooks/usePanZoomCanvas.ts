@@ -8,19 +8,9 @@ import {
 } from "../pointUtils";
 import config from "../../../config";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { calculateMouse } from "../canvasUtils";
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
-
-// calculate mouse position on canvas relative to top left canvas point on page
-function calculateMouse(
-  event: React.MouseEvent | MouseEvent,
-  canvas: HTMLCanvasElement
-): Point {
-  const viewportMousePos = { x: event.pageX, y: event.pageY };
-  const boundingRect = canvas.getBoundingClientRect();
-  const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
-  return diffPoints(viewportMousePos, topLeftCanvasPos);
-}
 
 export default function usePanZoomCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement>

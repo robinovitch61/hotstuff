@@ -46,46 +46,33 @@ export type CanvasState = {
 export type SavedCanvasState = Omit<CanvasState, "context">;
 
 export type CanvasProps = {
-  nodes: AppNode[];
-  connections: AppConnection[];
-  addNode: (node: AppNode) => void;
-  updateNodes: (nodes: AppNode[]) => void;
-  updateActiveNodes: (nodeIds: string[], sticky: boolean) => void;
-  clearActiveNodes: () => void;
-  setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>;
   canvasWidth: number;
   canvasHeight: number;
   devicePixelRatio: number;
-  savedCanvasState: SavedCanvasState;
-  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
   draw: (context: CanvasRenderingContext2D) => void;
+  onMouseDown: (
+    event: React.MouseEvent | MouseEvent,
+    canvasState: CanvasState,
+    defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
+  ) => void;
   handleDoubleClick: (
     event: React.MouseEvent,
     offset: Point,
     scale: number
   ) => void;
-  onMouseDown: (
-    event: React.MouseEvent | MouseEvent,
-    defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
-  ) => void;
+  savedCanvasState: SavedCanvasState;
+  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
 };
 
 export default function Canvas(props: CanvasProps): React.ReactElement {
   // destructure props
   const {
-    nodes,
-    connections,
-    canvasHeight,
     canvasWidth,
+    canvasHeight,
     devicePixelRatio,
-    addNode,
-    updateNodes,
-    updateActiveNodes,
-    clearActiveNodes,
-    setAppConnections,
     draw,
-    handleDoubleClick,
     onMouseDown,
+    handleDoubleClick,
     savedCanvasState,
     setSavedCanvasState,
   } = props;
@@ -293,7 +280,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         cssWidth={canvasWidth}
         cssHeight={canvasHeight}
         onMouseDown={(event: React.MouseEvent | MouseEvent) =>
-          onMouseDown(event, () => startPan(event))
+          onMouseDown(event, { context, offset, scale }, () => startPan(event))
         }
         onDoubleClick={(event: React.MouseEvent) =>
           handleDoubleClick(event, offset, scale)

@@ -1,6 +1,7 @@
 import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
 import { AppNode } from "../App";
+import * as React from "react";
 
 const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
 
@@ -228,4 +229,14 @@ export function mouseToNodeCoords(
   scale: number
 ): Point {
   return diffPoints(scalePoint(makePoint(mouse.x, mouse.y), scale), offset);
+}
+
+export function calculateMouse(
+  event: React.MouseEvent | MouseEvent,
+  canvas: HTMLCanvasElement
+): Point {
+  const viewportMousePos = { x: event.pageX, y: event.pageY };
+  const boundingRect = canvas.getBoundingClientRect();
+  const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
+  return diffPoints(viewportMousePos, topLeftCanvasPos);
 }

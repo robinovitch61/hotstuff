@@ -13,8 +13,10 @@ import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
 import Canvas, { SavedCanvasState } from "./Canvas/Canvas";
 import {
+  calculateMouse,
   drawConnection,
   drawNode,
+  intersectsCircle,
   mouseToNodeCoords,
 } from "./Canvas/canvasUtils";
 
@@ -78,110 +80,6 @@ const testAppNodes: AppNode[] = [
   },
   {
     ...test2,
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-  },
-  {
-    ...makeNode({
-      name: "test2",
-      temperatureDegC: 50,
-      capacitanceJPerDegK: 200,
-      powerGenW: 0,
-      isBoundary: false,
-    }),
     center: { x: 650, y: 450 },
     radius: defaultNodeRadius,
     color: "red",
@@ -388,33 +286,74 @@ export default function App(): React.ReactElement {
       };
       addNode(newAppNode);
     },
-    [addNode]
+    [addNode, appNodes]
   );
 
-  const onMouseDown = useCallback((event, defaultBehavior) => {
-    defaultBehavior(event);
-  }, []);
+  const onMouseDown = useCallback(
+    (event, canvasState, defaultBehavior) => {
+      // calculate where the user clicked in the node coordinate system
+      const clickedOnCanvas = calculateMouse(event, canvasState.context.canvas);
+      const nodeCoords = mouseToNodeCoords(
+        clickedOnCanvas,
+        canvasState.offset,
+        canvasState.scale
+      );
+
+      const activeNodeIds = appNodes
+        .filter((node) => node.isActive)
+        .map((node) => node.id);
+
+      const clickedNode = appNodes.find((node) =>
+        intersectsCircle(nodeCoords, node.center, node.radius)
+      );
+
+      if (clickedNode) {
+        if (event.altKey) {
+          clearActiveNodes();
+          updateActiveNodes([clickedNode.id], false);
+          // startMakeConnection(event);
+        } else if (event.shiftKey && activeNodeIds.includes(clickedNode.id)) {
+          updateActiveNodes(
+            activeNodeIds.filter((id) => id !== clickedNode.id),
+            false
+          );
+        } else {
+          const sticky =
+            event.shiftKey ||
+            (activeNodeIds.length > 1 && clickedNode.isActive);
+          updateActiveNodes([clickedNode.id], sticky);
+          // startNodeMove(event);
+        }
+      } else {
+        // if (event.shiftKey) {
+        //   startMultiSelectRef.current = mouseToNodeCoords(
+        //     mousePos,
+        //     offset,
+        //     scale
+        //   );
+        //   startMultiSelect(event);
+        // } else {
+        clearActiveNodes();
+        defaultBehavior(event);
+        // }
+      }
+    },
+    [appNodes, clearActiveNodes, updateActiveNodes]
+  );
 
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
         <StyledCanvas height={canvasHeight}>
           <Canvas
-            nodes={appNodes}
-            connections={appConnections}
-            addNode={addNode}
-            updateNodes={updateNodes}
-            updateActiveNodes={updateActiveNodes}
-            clearActiveNodes={clearActiveNodes}
-            setAppConnections={setAppConnections}
-            canvasHeight={canvasHeight}
             canvasWidth={canvasWidth}
+            canvasHeight={canvasHeight}
             devicePixelRatio={ratio}
+            draw={draw}
+            onMouseDown={onMouseDown}
+            handleDoubleClick={handleDoubleClick}
             savedCanvasState={savedCanvasState}
             setSavedCanvasState={setSavedCanvasState}
-            draw={draw}
-            handleDoubleClick={handleDoubleClick}
-            onMouseDown={onMouseDown}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />
