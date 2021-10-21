@@ -6,17 +6,23 @@ import {
 } from "hotstuff-network";
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { ORIGIN, Point } from "./Canvas/pointUtils";
+import { makePoint, ORIGIN, Point } from "./Canvas/pointUtils";
 import Sidebar from "./Sidebar/Sidebar";
 import Plot from "./Plot/Plot";
 import config from "../config";
 import useWindowSize from "./Canvas/hooks/useWindowSize";
 import Canvas from "./Canvas/Canvas";
+import {
+  drawConnection,
+  drawNode,
+  mouseToNodeCoords,
+} from "./Canvas/canvasUtils";
 
 const {
   sidebarWidthPerc: editorWidthPerc,
   canvasHeightPerc,
   defaultNodeRadius,
+  newNodeNamePrefix,
 } = config;
 
 export type AppNode = HSNode & {
@@ -321,6 +327,72 @@ export default function App(): React.ReactElement {
     );
   }, [appNodes]);
 
+  const draw = useCallback(
+    (context: CanvasRenderingContext2D) => {
+      appNodes.map((node) => {
+        drawNode(
+          context,
+          node.center,
+          node.radius,
+          node.isActive,
+          node.isBoundary
+          // node.temperatureDegC,
+          // node.capacitanceJPerDegK
+        );
+      });
+
+      appConnections.map((conn) => {
+        const { source, target } = conn;
+        const sourceAppNode = appNodes.filter(
+          (node) => node.id === source.id
+        )[0];
+        const targetAppNode = appNodes.filter(
+          (node) => node.id === target.id
+        )[0];
+        drawConnection(context, sourceAppNode, targetAppNode);
+      });
+    },
+    [appConnections, appNodes]
+  );
+
+  const handleDoubleClick = useCallback(
+    (
+      event: React.MouseEvent<HTMLCanvasElement>,
+      offset: Point,
+      scale: number
+    ) => {
+      if (event.shiftKey || event.altKey) {
+        return;
+      }
+      const numNewNodes = appNodes.filter((node) =>
+        node.name.startsWith(newNodeNamePrefix)
+      ).length;
+      const newNode = makeNode({
+        name:
+          numNewNodes === 0
+            ? `${newNodeNamePrefix}`
+            : `${newNodeNamePrefix} (${numNewNodes + 1})`,
+        temperatureDegC: 0,
+        capacitanceJPerDegK: 0,
+        powerGenW: 0,
+        isBoundary: false,
+      });
+      const newAppNode = {
+        ...newNode,
+        center: mouseToNodeCoords(
+          makePoint(event.clientX, event.clientY),
+          offset,
+          scale
+        ),
+        radius: defaultNodeRadius,
+        color: "red",
+        isActive: false,
+      };
+      addNode(newAppNode);
+    },
+    [addNode]
+  );
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -340,6 +412,8 @@ export default function App(): React.ReactElement {
             setSavedOffset={setSavedOffset}
             savedScale={savedScale}
             setSavedScale={setSavedScale}
+            draw={draw}
+            handleDoubleClick={handleDoubleClick}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />
