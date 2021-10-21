@@ -49,9 +49,8 @@ export type NodeTableProps = {
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
-  const [sortState, setSortState] = useState<SortState<AppNode>>(
-    defaultNodeSortState
-  );
+  const [sortState, setSortState] =
+    useState<SortState<AppNode>>(defaultNodeSortState);
 
   function sortByState(first: AppNode, second: AppNode): number {
     if (first[sortState.key] > second[sortState.key]) {

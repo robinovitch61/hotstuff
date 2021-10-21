@@ -78,9 +78,8 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
 
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [context, setView, offset, scale, startPan] = usePanZoomCanvas(
-    canvasRef
-  );
+  const [context, setView, offset, scale, startPan] =
+    usePanZoomCanvas(canvasRef);
   // const [nodeDelta, startNodeMove] = useNodeMove();
   // const [
   //   connectionMousePos,
@@ -159,7 +158,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       const renderCtx = canvasRef.current.getContext("2d");
       setView(renderCtx, makePoint(0, 0), 1);
     }
-  }, [canvasHeight, canvasWidth, canvasRef, context, setView]);
+  }, [setView]);
 
   // draw
   useLayoutEffect(() => {
