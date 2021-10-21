@@ -266,10 +266,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       <Controls
         setView={setView}
         canvasState={{ context, offset, scale }}
-        savedCanvasState={{
-          offset: savedCanvasState.offset,
-          scale: savedCanvasState.scale,
-        }}
+        savedCanvasState={savedCanvasState}
         setSavedCanvasState={setSavedCanvasState}
       />
       <StyledCanvas

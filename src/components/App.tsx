@@ -306,64 +306,6 @@ export default function App(): React.ReactElement {
     [addNode, appNodes]
   );
 
-  // const [
-  //   connectionMousePos,
-  //   isConnectionDone,
-  //   startMakeConnection,
-  // ] = useClickAndDrag();
-  //
-  // // draw connection if it's being made
-  // useLayoutEffect(() => {
-  //   // at this point only the selected node should be active
-  //   const activeNodes = appNodes.filter((node) => node.isActive);
-  //   if (activeNodes.length !== 1) {
-  //     return;
-  //   }
-  //   const activeNode = activeNodes[0];
-  //
-  //   if (context && !isConnectionDone) {
-  //     drawArrow(
-  //       context,
-  //       activeNode.center,
-  //       mouseToNodeCoords(connectionMousePos, offset, scale),
-  //       "grey"
-  //     );
-  //   } else if (isConnectionDone) {
-  //     nodes.map((node) => {
-  //       if (
-  //         intersectsCircle(
-  //           mouseToNodeCoords(
-  //             makePoint(connectionMousePos.x, connectionMousePos.y),
-  //             offset,
-  //             scale
-  //           ),
-  //           node.center,
-  //           node.radius
-  //         ) &&
-  //         node.id !== activeNode.id &&
-  //         !connections.some(
-  //           (conn) =>
-  //             (conn.source.id === node.id &&
-  //               conn.target.id === activeNode.id) ||
-  //             (conn.target.id === node.id && conn.source.id === activeNode.id)
-  //         )
-  //       ) {
-  //         const newConnection = {
-  //           ...makeConnection({
-  //             source: activeNode,
-  //             target: node,
-  //             resistanceDegKPerW: defaultResistanceDegKPerW,
-  //             kind: defaultConnectionKind,
-  //           }),
-  //           sourceName: activeNode.name,
-  //           targetName: node.name,
-  //         };
-  //         setAppConnections([...connections, newConnection]);
-  //       }
-  //     });
-  //   }
-  // }, [connectionMousePos, isConnectionDone]); // incomplete deps array here but infinite loop otherwise...I think it's fine
-
   const drawConnectionBeingMade = useCallback(
     (
       event: React.MouseEvent | MouseEvent,
