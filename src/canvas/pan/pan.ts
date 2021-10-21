@@ -28,6 +28,9 @@ function scalePoint(p1: Point, scale: number): Point {
 // constants
 const ORIGIN = Object.freeze({ x: 0, y: 0 });
 const SQUARE_SIZE = 20;
+const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
+const MAX_SCALE = 50;
+const MIN_SCALE = 0.1;
 
 // dom
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -37,12 +40,12 @@ const debugDiv = document.getElementById("debug") as HTMLDivElement;
 // "props"
 const initialScale = 0.75;
 const initialOffset = { x: 10, y: 20 };
-const scale = initialScale;
 
 // "state"
 let mousePos = ORIGIN;
 let lastMousePos = ORIGIN;
 let offset = initialOffset;
+const scale = initialScale;
 
 function draw() {
   window.requestAnimationFrame(draw);
@@ -50,7 +53,7 @@ function draw() {
   // clear canvas
   context.canvas.width = context.canvas.width;
 
-  // transform coordinates
+  // transform coordinates - scale multiplied by devicePixelRatio
   context.scale(scale, scale);
   context.translate(offset.x, offset.y);
 
@@ -69,24 +72,27 @@ function draw() {
   context.moveTo(0, 0);
   context.lineTo(50, 0);
   context.stroke();
-  debugDiv.innerText = `mouse: ${JSON.stringify(mousePos)}
+  debugDiv.innerText = `scale: ${scale}
+    mouse: ${JSON.stringify(mousePos)}
     offset: ${JSON.stringify(offset)}
   `;
 }
 
-// track mouse
-function handleUpdateMouse(event: MouseEvent) {
-  event.preventDefault();
+// calculate mouse position on canvas relative to top left canvas point on page
+function calculateMouse(event: MouseEvent, canvas: HTMLCanvasElement): Point {
   const viewportMousePos = { x: event.pageX, y: event.pageY };
   const boundingRect = canvas.getBoundingClientRect();
   const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
-  lastMousePos = mousePos;
-  mousePos = diffPoints(viewportMousePos, topLeftCanvasPos);
+  return diffPoints(viewportMousePos, topLeftCanvasPos);
 }
-document.addEventListener("mousemove", handleUpdateMouse);
 
 // panning
-const mouseMove = () => {
+const mouseMove = (event: MouseEvent) => {
+  // update mouse position
+  const newMousePos = calculateMouse(event, canvas);
+  lastMousePos = mousePos;
+  mousePos = newMousePos;
+
   const mouseDiff = scalePoint(diffPoints(mousePos, lastMousePos), scale);
   offset = addPoints(offset, mouseDiff);
 };
@@ -94,9 +100,12 @@ const mouseUp = () => {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp);
 };
-const startPan = () => {
+const startPan = (event: MouseEvent) => {
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
+
+  // set initial mouse position in case user hasn't moved mouse yet
+  mousePos = calculateMouse(event, canvas);
 };
 canvas.addEventListener("mousedown", startPan);
 

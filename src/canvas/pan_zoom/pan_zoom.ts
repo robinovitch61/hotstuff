@@ -53,7 +53,7 @@ function draw() {
   // clear canvas
   context.canvas.width = context.canvas.width;
 
-  // transform coordinates
+  // transform coordinates - scale multiplied by devicePixelRatio
   context.scale(scale, scale);
   context.translate(offset.x, offset.y);
 
@@ -78,20 +78,24 @@ function draw() {
   `;
 }
 
-// track mouse
-function handleUpdateMouse(event: MouseEvent) {
-  event.preventDefault();
+// calculate mouse position on canvas relative to top left canvas point on page
+function calculateMouse(event: MouseEvent, canvas: HTMLCanvasElement): Point {
   const viewportMousePos = { x: event.pageX, y: event.pageY };
   const boundingRect = canvas.getBoundingClientRect();
   const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
-  lastMousePos = mousePos;
-  mousePos = diffPoints(viewportMousePos, topLeftCanvasPos);
+  return diffPoints(viewportMousePos, topLeftCanvasPos);
 }
-document.addEventListener("mousemove", handleUpdateMouse);
 
 // zoom
 function handleWheel(event: WheelEvent) {
   event.preventDefault();
+
+  // update mouse position
+  const newMousePos = calculateMouse(event, canvas);
+  lastMousePos = mousePos;
+  mousePos = newMousePos;
+
+  // calculate new scale/zoom
   const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
   const newScale = scale * zoom;
   if (MIN_SCALE > newScale || newScale > MAX_SCALE) {
@@ -109,7 +113,12 @@ function handleWheel(event: WheelEvent) {
 canvas.addEventListener("wheel", handleWheel);
 
 // panning
-const mouseMove = () => {
+const mouseMove = (event: MouseEvent) => {
+  // update mouse position
+  const newMousePos = calculateMouse(event, canvas);
+  lastMousePos = mousePos;
+  mousePos = newMousePos;
+
   const mouseDiff = scalePoint(diffPoints(mousePos, lastMousePos), scale);
   offset = addPoints(offset, mouseDiff);
 };
@@ -117,9 +126,12 @@ const mouseUp = () => {
   document.removeEventListener("mousemove", mouseMove);
   document.removeEventListener("mouseup", mouseUp);
 };
-const startPan = () => {
+const startPan = (event: MouseEvent) => {
   document.addEventListener("mousemove", mouseMove);
   document.addEventListener("mouseup", mouseUp);
+
+  // set initial mouse position in case user hasn't moved mouse yet
+  mousePos = calculateMouse(event, canvas);
 };
 canvas.addEventListener("mousedown", startPan);
 

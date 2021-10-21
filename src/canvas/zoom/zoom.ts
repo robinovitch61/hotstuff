@@ -14,6 +14,13 @@ const diffPoints = (p1: Point, p2: Point) => {
   };
 };
 
+const addPoints = (p1: Point, p2: Point) => {
+  return {
+    x: p1.x + p2.x,
+    y: p1.y + p2.y,
+  };
+};
+
 function scalePoint(p1: Point, scale: number): Point {
   return { x: p1.x / scale, y: p1.y / scale };
 }
@@ -46,7 +53,7 @@ function draw() {
   // clear canvas
   context.canvas.width = context.canvas.width;
 
-  // transform coordinates
+  // transform coordinates - scale multiplied by devicePixelRatio
   context.scale(scale, scale);
   context.translate(offset.x, offset.y);
 
@@ -71,20 +78,24 @@ function draw() {
   `;
 }
 
-// track mouse
-function handleUpdateMouse(event: MouseEvent) {
-  event.preventDefault();
+// calculate mouse position on canvas relative to top left canvas point on page
+function calculateMouse(event: MouseEvent, canvas: HTMLCanvasElement): Point {
   const viewportMousePos = { x: event.pageX, y: event.pageY };
   const boundingRect = canvas.getBoundingClientRect();
   const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
-  lastMousePos = mousePos;
-  mousePos = diffPoints(viewportMousePos, topLeftCanvasPos);
+  return diffPoints(viewportMousePos, topLeftCanvasPos);
 }
-document.addEventListener("mousemove", handleUpdateMouse);
 
 // zoom
 function handleWheel(event: WheelEvent) {
   event.preventDefault();
+
+  // update mouse position
+  const newMousePos = calculateMouse(event, canvas);
+  lastMousePos = mousePos;
+  mousePos = newMousePos;
+
+  // calculate new scale/zoom
   const zoom = 1 - event.deltaY / ZOOM_SENSITIVITY;
   const newScale = scale * zoom;
   if (MIN_SCALE > newScale || newScale > MAX_SCALE) {
