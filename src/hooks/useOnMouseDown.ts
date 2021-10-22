@@ -44,9 +44,8 @@ export default function useOnMouseDown(
     ) => {
       const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
 
-      const activeNodeIds = appNodes
-        .filter((node) => node.isActive)
-        .map((node) => node.id);
+      const activeNodes = appNodes.filter((node) => node.isActive);
+      const activeNodeIds = activeNodes.map((node) => node.id);
 
       const clickedNode = appNodes.find((node) =>
         intersectsCircle(nodeCoordsOfMouse, node.center, node.radius)
@@ -60,7 +59,7 @@ export default function useOnMouseDown(
             activeNodeIds.filter((id) => id !== clickedNode.id)
           );
         } else {
-          moveNode(event, clickedNode, canvasState);
+          moveNode(event, clickedNode, activeNodes, canvasState);
         }
       } else {
         if (event.shiftKey) {
