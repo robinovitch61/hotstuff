@@ -385,11 +385,21 @@ export default function App(): React.ReactElement {
             false
           );
         } else {
-          const sticky =
-            event.shiftKey ||
-            (activeNodeIds.length > 1 && clickedNode.isActive);
-          updateActiveNodes([clickedNode.id], sticky);
-          // startNodeMove(event);
+          // clicked node without alt key - make active and/or drag node around
+          clickedNode.isActive = true;
+          const moveNode = (event: React.MouseEvent | MouseEvent) => {
+            if (canvasState.context) {
+              clickedNode.center = mouseToNodeCoords(event, canvasState);
+              clearAndRedraw(canvasState);
+            }
+          };
+          const mouseUp = () => {
+            document.removeEventListener("mousemove", moveNode);
+            document.removeEventListener("mouseup", mouseUp);
+            updateNodes([clickedNode]);
+          };
+          document.addEventListener("mousemove", moveNode);
+          document.addEventListener("mouseup", mouseUp);
         }
       } else {
         if (event.shiftKey) {
