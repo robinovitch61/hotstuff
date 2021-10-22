@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import config from "../../../config";
-import { AppConnection, AppNode } from "../../App";
+import { AppConnection, AppNode } from "../../../App";
 import EditableTable, { ColOption, Column } from "./EditableTable";
 import { SortState } from "./SortableTableHeader";
 

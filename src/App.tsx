@@ -4,27 +4,24 @@ import {
   makeConnection,
   makeNode,
 } from "hotstuff-network";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { makePoint, ORIGIN, Point } from "./Canvas/pointUtils";
-import Sidebar from "./Sidebar/Sidebar";
-import Plot from "./Plot/Plot";
-import config from "../config";
-import useWindowSize from "./Canvas/hooks/useWindowSize";
-import Canvas, { CanvasState, SavedCanvasState } from "./Canvas/Canvas";
+import { ORIGIN, Point } from "./components/Canvas/pointUtils";
+import Sidebar from "./components/Sidebar/Sidebar";
+import Plot from "./components/Plot/Plot";
+import config from "./config";
+import useWindowSize from "./components/Canvas/hooks/useWindowSize";
+import Canvas, {
+  CanvasState,
+  SavedCanvasState,
+} from "./components/Canvas/Canvas";
 import {
   drawArrow,
   drawConnection,
   drawNode,
   intersectsCircle,
   mouseToNodeCoords,
-} from "./Canvas/canvasUtils";
-import useClickAndDrag from "./Canvas/hooks/useClickAndDrag";
+} from "./components/Canvas/canvasUtils";
 
 const {
   sidebarWidthPerc: editorWidthPerc,

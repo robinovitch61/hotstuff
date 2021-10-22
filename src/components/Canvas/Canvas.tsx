@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
-import { AppConnection, AppNode } from "../App";
+import { AppConnection, AppNode } from "../../App";
 import {
   drawArrow,
   drawClearBox,

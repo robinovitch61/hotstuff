@@ -1,6 +1,6 @@
 import { diffPoints, makePoint, ORIGIN, Point, scalePoint } from "./pointUtils";
 import config from "../../config";
-import { AppNode } from "../App";
+import { AppNode } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
 

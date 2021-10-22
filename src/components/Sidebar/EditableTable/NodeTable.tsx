@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import config from "../../../config";
-import { AppNode } from "../../App";
+import { AppNode } from "../../../App";
 import EditableTable, { Column } from "./EditableTable";
 import { SortState } from "./SortableTableHeader";
 
