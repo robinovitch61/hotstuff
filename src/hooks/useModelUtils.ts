@@ -93,7 +93,7 @@ export default function useModelUtils(
       setAppNodes(
         appNodes.map((node) => ({
           ...node,
-          isActive: activeNodeIds.includes(node.id) ? node.isActive : false,
+          isActive: activeNodeIds.includes(node.id),
         }))
       );
     },

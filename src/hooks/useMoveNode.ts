@@ -21,7 +21,7 @@ export default function useMoveNode(
       clickedNode: AppNode,
       canvasState: CanvasState
     ) => {
-      updateNodes([{ ...clickedNode, isActive: true }], true);
+      updateNodes([{ ...clickedNode, isActive: true }], !event.shiftKey);
       lastMouseRef.current = mouseToNodeCoords(event, canvasState);
       clickedNodeCenterRef.current = clickedNode.center;
 
@@ -49,7 +49,7 @@ export default function useMoveNode(
                 center: clickedNodeCenterRef.current,
               },
             ],
-            true
+            !event.shiftKey
           );
         }
       };

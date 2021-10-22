@@ -64,7 +64,6 @@ export default function useOnMouseDown(
         }
       } else {
         if (event.shiftKey) {
-          // TODO: clear active nodes outside box on release
           multiSelect(event, canvasState);
         } else {
           clearActiveNodes();
