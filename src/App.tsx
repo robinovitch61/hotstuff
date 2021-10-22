@@ -17,9 +17,11 @@ import Canvas, {
 } from "./components/Canvas/Canvas";
 import {
   drawArrow,
+  drawClearBox,
   drawConnection,
   drawNode,
   intersectsCircle,
+  isInsideBox,
   mouseToNodeCoords,
 } from "./components/Canvas/canvasUtils";
 
@@ -208,13 +210,13 @@ export default function App(): React.ReactElement {
   );
 
   const updateActiveNodes = useCallback(
-    (activeNodeIds: string[], sticky: boolean) => {
+    (activeNodeIds: string[], keepOtherActiveNodes: boolean) => {
       setAppNodes(
         appNodes.map((node) => ({
           ...node,
           isActive: activeNodeIds.includes(node.id)
             ? true
-            : sticky
+            : keepOtherActiveNodes
             ? node.isActive
             : false,
         }))
@@ -403,12 +405,31 @@ export default function App(): React.ReactElement {
         }
       } else {
         if (event.shiftKey) {
-          // startMultiSelectRef.current = mouseToNodeCoords(
-          //   mousePos,
-          //   offset,
-          //   scale
-          // );
-          // startMultiSelect(event);
+          // draw multi-select box
+          const boxStart = mouseToNodeCoords(event, canvasState);
+          const drawBox = (event: React.MouseEvent | MouseEvent) => {
+            if (canvasState.context) {
+              clearAndRedraw(canvasState);
+              drawClearBox(
+                canvasState.context,
+                boxStart,
+                mouseToNodeCoords(event, canvasState),
+                "grey"
+              );
+            }
+          };
+          const mouseUp = (event: React.MouseEvent | MouseEvent) => {
+            document.removeEventListener("mousemove", drawBox);
+            document.removeEventListener("mouseup", mouseUp);
+
+            const boxEnd = mouseToNodeCoords(event, canvasState);
+            const extraActiveNodeIds = appNodes
+              .filter((node) => isInsideBox(boxStart, boxEnd, node.center))
+              .map((node) => node.id);
+            updateActiveNodes(extraActiveNodeIds, true);
+          };
+          document.addEventListener("mousemove", drawBox);
+          document.addEventListener("mouseup", mouseUp);
         } else {
           clearActiveNodes();
           defaultBehavior(event);
@@ -422,6 +443,7 @@ export default function App(): React.ReactElement {
       clearAndRedraw,
       drawConnectionBeingMade,
       updateActiveNodes,
+      updateNodes,
     ]
   );
 
