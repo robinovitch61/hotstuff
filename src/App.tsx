@@ -25,6 +25,7 @@ import {
   mouseToNodeCoords,
 } from "./components/Canvas/canvasUtils";
 import useDraw from "./hooks/useDraw";
+import useAddNode from "./hooks/useAddNode";
 
 const {
   sidebarWidthPerc: editorWidthPerc,
@@ -116,7 +117,8 @@ export default function App(): React.ReactElement {
   // const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
-  const draw = useDraw(appNodes, appConnections);
+  const [draw, clearAndRedraw] = useDraw(appNodes, appConnections);
+  const [addNode, handleDoubleClick] = useAddNode(appNodes, setAppNodes);
   // const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
   const [savedCanvasState, setSavedCanvasState] = useState<SavedCanvasState>({
     offset: ORIGIN,
@@ -141,18 +143,6 @@ export default function App(): React.ReactElement {
   }, []);
 
   // node modifiers
-  const addNode = useCallback(
-    (node: AppNode) => {
-      const newNodes: AppNode[] = appNodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }));
-      newNodes.push({ ...node, isActive: true });
-      setAppNodes(newNodes);
-    },
-    [appNodes]
-  );
-
   const deleteConnectionsForNode = useCallback(
     (nodeId: string) => {
       setAppConnections(
@@ -235,51 +225,6 @@ export default function App(): React.ReactElement {
       }))
     );
   }, [appNodes]);
-
-  const clearAndRedraw = useCallback(
-    (canvasState: CanvasState) => {
-      if (canvasState.context) {
-        canvasState.context.clearRect(
-          -canvasState.offset.x,
-          -canvasState.offset.y,
-          canvasWidth / canvasState.scale,
-          canvasHeight / canvasState.scale
-        );
-        draw(canvasState.context);
-      }
-    },
-    [canvasHeight, canvasWidth, draw]
-  );
-
-  const handleDoubleClick = useCallback(
-    (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
-      if (event.shiftKey || event.altKey) {
-        return;
-      }
-      const numNewNodes = appNodes.filter((node) =>
-        node.name.startsWith(newNodeNamePrefix)
-      ).length;
-      const newNode = makeNode({
-        name:
-          numNewNodes === 0
-            ? `${newNodeNamePrefix}`
-            : `${newNodeNamePrefix} (${numNewNodes + 1})`,
-        temperatureDegC: 0,
-        capacitanceJPerDegK: 0,
-        powerGenW: 0,
-        isBoundary: false,
-      });
-      const newAppNode = {
-        ...newNode,
-        center: mouseToNodeCoords(event, canvasState),
-        radius: defaultNodeRadius,
-        color: "red",
-        isActive: false,
-      };
-      addNode(newAppNode);
-    },
-    [addNode, appNodes]
-  );
 
   const drawConnectionBeingMade = useCallback(
     (

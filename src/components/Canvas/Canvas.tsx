@@ -41,9 +41,14 @@ export type CanvasState = {
   context: CanvasRenderingContext2D | null;
   offset: Point;
   scale: number;
+  canvasWidth: number;
+  canvasHeight: number;
 };
 
-export type SavedCanvasState = Omit<CanvasState, "context">;
+export type SavedCanvasState = {
+  offset: Point;
+  scale: number;
+};
 
 export type CanvasProps = {
   canvasWidth: number;
@@ -274,7 +279,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     <StyledCanvasWrapper>
       <Controls
         setView={setView}
-        canvasState={{ context, offset, scale }}
+        canvasState={{ context, offset, scale, canvasWidth, canvasHeight }}
         savedCanvasState={savedCanvasState}
         setSavedCanvasState={setSavedCanvasState}
       />
@@ -285,10 +290,20 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         cssWidth={canvasWidth}
         cssHeight={canvasHeight}
         onMouseDown={(event: React.MouseEvent | MouseEvent) =>
-          onMouseDown(event, { context, offset, scale }, () => startPan(event))
+          onMouseDown(
+            event,
+            { context, offset, scale, canvasWidth, canvasHeight },
+            () => startPan(event)
+          )
         }
         onDoubleClick={(event: React.MouseEvent) =>
-          handleDoubleClick(event, { context, offset, scale })
+          handleDoubleClick(event, {
+            context,
+            offset,
+            scale,
+            canvasWidth,
+            canvasHeight,
+          })
         }
       />
     </StyledCanvasWrapper>

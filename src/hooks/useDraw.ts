@@ -1,12 +1,16 @@
 import { useCallback } from "react";
 import { drawConnection, drawNode } from "../components/Canvas/canvasUtils";
 import { AppConnection, AppNode } from "../App";
+import { CanvasState } from "../components/Canvas/Canvas";
 
 export default function useDraw(
   appNodes: AppNode[],
   appConnections: AppConnection[]
-) {
-  return useCallback(
+): [
+  (context: CanvasRenderingContext2D) => void,
+  (canvasState: CanvasState) => void
+] {
+  const draw = useCallback(
     (context: CanvasRenderingContext2D) => {
       appNodes.map((node) => {
         drawNode(
@@ -31,4 +35,21 @@ export default function useDraw(
     },
     [appConnections, appNodes]
   );
+
+  const clearAndRedraw = useCallback(
+    (canvasState: CanvasState) => {
+      if (canvasState.context) {
+        canvasState.context.clearRect(
+          -canvasState.offset.x,
+          -canvasState.offset.y,
+          canvasState.canvasWidth / canvasState.scale,
+          canvasState.canvasHeight / canvasState.scale
+        );
+        draw(canvasState.context);
+      }
+    },
+    [draw]
+  );
+
+  return [draw, clearAndRedraw];
 }
