@@ -29,7 +29,7 @@ export default function useOnMouseDown(
     setAppConnections,
     clearAndRedraw
   );
-  const moveNode = useMoveNode(updateNodes, clearAndRedraw);
+  const moveNode = useMoveNode(updateNodes);
   const multiSelect = useMultiSelect(
     appNodes,
     updateActiveNodes,

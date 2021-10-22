@@ -1,3 +1,4 @@
+// TODO LEO: move this up to src/
 export type Point = {
   x: number;
   y: number;
@@ -20,3 +21,7 @@ export function diffPoints(p1: Point, p2: Point): Point {
 export function scalePoint(p1: Point, scale: number): Point {
   return { x: p1.x / scale, y: p1.y / scale };
 }
+
+// export function distanceBetweenPoints(p1: Point, p2: Point): number {
+//   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+// }
