@@ -2,7 +2,7 @@ import { HSConnection } from "hotstuff-network";
 
 const config = {
   canvasHeightPerc: 0.75,
-  sidebarWidthPerc: 0.3,
+  editorWidthPerc: 0.3,
   defaultTotalTimeSeconds: 10,
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 20,

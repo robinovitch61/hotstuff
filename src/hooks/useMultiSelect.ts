@@ -14,7 +14,7 @@ export default function useMultiSelect(
     keepOtherActiveNodes: boolean
   ) => void,
   clearAndRedraw: (canvasState: CanvasState) => void
-) {
+): (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => void {
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       const boxStart = mouseToNodeCoords(event, canvasState);

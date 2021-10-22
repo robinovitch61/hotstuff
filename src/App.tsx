@@ -4,42 +4,20 @@ import {
   makeConnection,
   makeNode,
 } from "hotstuff-network";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ORIGIN, Point } from "./components/Canvas/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
 import config from "./config";
 import useWindowSize from "./components/Canvas/hooks/useWindowSize";
-import Canvas, {
-  CanvasState,
-  SavedCanvasState,
-} from "./components/Canvas/Canvas";
-import {
-  drawArrow,
-  drawClearBox,
-  drawConnection,
-  drawNode,
-  intersectsCircle,
-  isInsideBox,
-  mouseToNodeCoords,
-} from "./components/Canvas/canvasUtils";
+import Canvas, { SavedCanvasState } from "./components/Canvas/Canvas";
 import useDraw from "./hooks/useDraw";
 import useAddNode from "./hooks/useAddNode";
-import useAddConnection from "./hooks/useAddConnection";
 import useModelUtils from "./hooks/useModelUtils";
-import useMoveNode from "./hooks/useMoveNode";
-import useMultiSelect from "./hooks/useMultiSelect";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 
-const {
-  sidebarWidthPerc: editorWidthPerc,
-  canvasHeightPerc,
-  defaultNodeRadius,
-  newNodeNamePrefix,
-  defaultResistanceDegKPerW,
-  defaultConnectionKind,
-} = config;
+const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
 
 export type AppNode = HSNode & {
   center: Point;

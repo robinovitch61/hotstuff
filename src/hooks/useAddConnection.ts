@@ -16,7 +16,11 @@ export default function useAddConnection(
   appConnections: AppConnection[],
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>,
   clearAndRedraw: (canvasState: CanvasState) => void
-) {
+): (
+  event: React.MouseEvent | MouseEvent,
+  clickedNode: AppNode,
+  canvasState: CanvasState
+) => void {
   const drawConnectionBeingMade = useCallback(
     (
       event: React.MouseEvent | MouseEvent,

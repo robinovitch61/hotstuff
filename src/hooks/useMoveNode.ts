@@ -6,7 +6,11 @@ import { AppNode } from "../App";
 export default function useMoveNode(
   updateNodes: (nodesToUpdate: AppNode[]) => void,
   clearAndRedraw: (canvasState: CanvasState) => void
-) {
+): (
+  event: React.MouseEvent | MouseEvent,
+  clickedNode: AppNode,
+  canvasState: CanvasState
+) => void {
   return useCallback(
     (
       event: React.MouseEvent | MouseEvent,

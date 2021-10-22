@@ -21,7 +21,11 @@ export default function useOnMouseDown(
   ) => void,
   clearActiveNodes: () => void,
   clearAndRedraw: (canvasState: CanvasState) => void
-) {
+): (
+  event: React.MouseEvent | MouseEvent,
+  canvasState: CanvasState,
+  defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
+) => void {
   const makeNewConnection = useAddConnection(
     appNodes,
     appConnections,
@@ -36,7 +40,11 @@ export default function useOnMouseDown(
   );
 
   return useCallback(
-    (event, canvasState, defaultBehavior) => {
+    (
+      event: React.MouseEvent | MouseEvent,
+      canvasState: CanvasState,
+      defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
+    ) => {
       const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
 
       const activeNodeIds = appNodes

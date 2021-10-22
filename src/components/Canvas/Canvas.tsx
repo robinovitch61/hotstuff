@@ -1,22 +1,8 @@
 import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
-import { AppConnection, AppNode } from "../../App";
-import {
-  drawArrow,
-  drawClearBox,
-  drawConnection,
-  drawNode,
-  intersectsCircle,
-  isInsideBox,
-  mouseToNodeCoords,
-} from "./canvasUtils";
-import config from "../../config";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { diffPoints, makePoint, Point, scalePoint } from "./pointUtils";
-import { makeConnection, makeNode } from "hotstuff-network";
-import useNodeMove from "./hooks/useNodeMove";
-import useClickAndDrag from "./hooks/useClickAndDrag";
+import { makePoint, Point } from "./pointUtils";
 import Controls from "./Controls";
 
 const StyledCanvasWrapper = styled.div`
@@ -29,13 +15,6 @@ const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
   width: ${({ cssWidth }) => `${cssWidth}px`};
   height: ${({ cssHeight }) => `${cssHeight}px`};
 `;
-
-const {
-  newNodeNamePrefix,
-  defaultNodeRadius,
-  defaultConnectionKind,
-  defaultResistanceDegKPerW,
-} = config;
 
 export type CanvasState = {
   context: CanvasRenderingContext2D | null;
@@ -187,93 +166,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     offset.y,
     scale,
   ]);
-
-  // // move active nodes if click and drag
-  // useLayoutEffect(() => {
-  //   const activeNodes = nodes.filter((node) => node.isActive);
-  //   if (activeNodes.length === 0) {
-  //     return;
-  //   }
-  //   const newActiveNodes = activeNodes.map((activeNode) => ({
-  //     ...activeNode,
-  //     isActive: true,
-  //     center: diffPoints(activeNode.center, scalePoint(nodeDelta, scale)),
-  //   }));
-  //
-  //   updateNodes(newActiveNodes);
-  // }, [nodeDelta]); // incomplete deps array here but infinite loop otherwise...I think it's fine
-
-  // // draw connection if it's being made
-  // useLayoutEffect(() => {
-  //   // at this point only the selected node should be active
-  //   const activeNodes = nodes.filter((node) => node.isActive);
-  //   if (activeNodes.length !== 1) {
-  //     return;
-  //   }
-  //   const activeNode = activeNodes[0];
-  //
-  //   if (context && !isConnectionDone) {
-  //     drawArrow(
-  //       context,
-  //       activeNode.center,
-  //       mouseToNodeCoords(connectionMousePos, offset, scale),
-  //       "grey"
-  //     );
-  //   } else if (isConnectionDone) {
-  //     nodes.map((node) => {
-  //       if (
-  //         intersectsCircle(
-  //           mouseToNodeCoords(
-  //             makePoint(connectionMousePos.x, connectionMousePos.y),
-  //             offset,
-  //             scale
-  //           ),
-  //           node.center,
-  //           node.radius
-  //         ) &&
-  //         node.id !== activeNode.id &&
-  //         !connections.some(
-  //           (conn) =>
-  //             (conn.source.id === node.id &&
-  //               conn.target.id === activeNode.id) ||
-  //             (conn.target.id === node.id && conn.source.id === activeNode.id)
-  //         )
-  //       ) {
-  //         const newConnection = {
-  //           ...makeConnection({
-  //             source: activeNode,
-  //             target: node,
-  //             resistanceDegKPerW: defaultResistanceDegKPerW,
-  //             kind: defaultConnectionKind,
-  //           }),
-  //           sourceName: activeNode.name,
-  //           targetName: node.name,
-  //         };
-  //         setAppConnections([...connections, newConnection]);
-  //       }
-  //     });
-  //   }
-  // }, [connectionMousePos, context, isConnectionDone]); // incomplete deps array here but infinite loop otherwise...I think it's fine
-  //
-  // // draw box during multi select
-  // useLayoutEffect(() => {
-  //   if (context && startMultiSelectRef.current && !isMultiSelectDone) {
-  //     drawClearBox(
-  //       context,
-  //       startMultiSelectRef.current,
-  //       mouseToNodeCoords(multiSelectMousePos, offset, scale),
-  //       "grey"
-  //     );
-  //   } else if (isMultiSelectDone && startMultiSelectRef.current) {
-  //     const startBoxPoint = startMultiSelectRef.current;
-  //     const endBoxPoint = mouseToNodeCoords(multiSelectMousePos, offset, scale);
-  //
-  //     const extraActiveNodeIds = nodes
-  //       .filter((node) => isInsideBox(startBoxPoint, endBoxPoint, node.center))
-  //       .map((node) => node.id);
-  //     updateActiveNodes(extraActiveNodeIds, true);
-  //   }
-  // }, [context, multiSelectMousePos, isMultiSelectDone]); // incomplete deps array here but infinite loop otherwise...I think it's fine
 
   return (
     <StyledCanvasWrapper>

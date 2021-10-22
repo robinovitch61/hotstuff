@@ -10,7 +10,7 @@ const { newNodeNamePrefix, defaultNodeRadius } = config;
 export default function useAddNode(
   appNodes: AppNode[],
   addNode: (node: AppNode) => void
-) {
+): (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => void {
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       if (event.shiftKey || event.altKey) {
