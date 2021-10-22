@@ -23,6 +23,7 @@ export default function useMoveNode(
         mouseToNodeCoords(event, canvasState),
         clickedNode.center
       );
+      const shiftKeyPressed = event.shiftKey;
       const moveNode = (event: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
           const newClickedCenter = diffPoints(
@@ -36,7 +37,7 @@ export default function useMoveNode(
                 isActive: true,
                 center: newClickedCenter,
               },
-              ...(clickedNode.isActive
+              ...(clickedNode.isActive || shiftKeyPressed
                 ? activeNodes.map((node) => {
                     const distanceFromClickedCenter = diffPoints(
                       clickedNode.center,
