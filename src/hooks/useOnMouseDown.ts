@@ -14,11 +14,8 @@ export default function useOnMouseDown(
   appNodes: AppNode[],
   appConnections: AppConnection[],
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>,
-  updateNodes: (nodesToUpdate: AppNode[]) => void,
-  updateActiveNodes: (
-    activeNodeIds: string[],
-    keepOtherActiveNodes: boolean
-  ) => void,
+  updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void,
+  updateActiveNodes: (activeNodeIds: string[]) => void,
   clearActiveNodes: () => void,
   clearAndRedraw: (canvasState: CanvasState) => void
 ): (
@@ -60,18 +57,16 @@ export default function useOnMouseDown(
           makeNewConnection(event, clickedNode, canvasState);
         } else if (event.shiftKey && activeNodeIds.includes(clickedNode.id)) {
           updateActiveNodes(
-            activeNodeIds.filter((id) => id !== clickedNode.id),
-            false
+            activeNodeIds.filter((id) => id !== clickedNode.id)
           );
         } else {
-          // clicked node without alt key - make active and/or drag node around
           moveNode(event, clickedNode, canvasState);
         }
       } else {
         if (event.shiftKey) {
+          // TODO: clear active nodes outside box on release
           multiSelect(event, canvasState);
         } else {
-          // clicked on canvas, not a node
           clearActiveNodes();
           defaultBehavior(event);
         }

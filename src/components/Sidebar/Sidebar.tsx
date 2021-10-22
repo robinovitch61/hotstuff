@@ -29,7 +29,7 @@ type SidebarProps = {
   nodes: AppNode[];
   connections: AppConnection[];
   addNode: (node: AppNode) => void;
-  updateNodes: (nodes: AppNode[]) => void;
+  updateNodes: (nodes: AppNode[], clearActiveNodes: boolean) => void;
   deleteNodes: (nodeIds: string[]) => void;
   updateConnections: (connections: AppConnection[]) => void;
   deleteConnections: (connectionIds: string[]) => void;
@@ -41,7 +41,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
   const nodeTable = (
     <NodeTable
       rows={props.nodes}
-      onUpdateRow={(node: AppNode) => props.updateNodes([node])}
+      onUpdateRow={(node: AppNode) => props.updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => props.deleteNodes([node.id])}
     />
   );

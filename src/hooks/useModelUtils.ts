@@ -9,11 +9,11 @@ export default function useModelUtils(
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>
 ): [
   (node: AppNode) => void,
-  (nodesToUpdate: AppNode[]) => void,
+  (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void,
   (nodeIds: string[]) => void,
   (connsToUpdate: AppConnection[]) => void,
   (connIds: string[]) => void,
-  (activeNodeIds: string[], keepOtherActiveNodes: boolean) => void,
+  (activeNodeIds: string[]) => void,
   () => void
 ] {
   const addNode = useCallback(
@@ -29,13 +29,19 @@ export default function useModelUtils(
   );
 
   const updateNodes = useCallback(
-    (nodesToUpdate: AppNode[]) => {
-      const nodeIdsToUpdate = nodesToUpdate.map((node) => node.id);
+    (nodesToUpdate: AppNode[], clearActiveNodes = false) => {
       const newNodes = appNodes.map((node) => {
-        if (nodeIdsToUpdate.includes(node.id)) {
-          return nodesToUpdate.filter((newNode) => newNode.id === node.id)[0];
+        const nodeToUpdate = nodesToUpdate.find(
+          (newNode) => newNode.id === node.id
+        );
+        if (nodeToUpdate) {
+          return nodeToUpdate;
         } else {
-          return node;
+          if (clearActiveNodes) {
+            return { ...node, isActive: false };
+          } else {
+            return node;
+          }
         }
       });
       setAppNodes(newNodes);
@@ -83,15 +89,11 @@ export default function useModelUtils(
   );
 
   const updateActiveNodes = useCallback(
-    (activeNodeIds: string[], keepOtherActiveNodes: boolean) => {
+    (activeNodeIds: string[]) => {
       setAppNodes(
         appNodes.map((node) => ({
           ...node,
-          isActive: activeNodeIds.includes(node.id)
-            ? true
-            : keepOtherActiveNodes
-            ? node.isActive
-            : false,
+          isActive: activeNodeIds.includes(node.id) ? node.isActive : false,
         }))
       );
     },
