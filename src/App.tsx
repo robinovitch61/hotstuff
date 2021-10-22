@@ -24,6 +24,7 @@ import {
   isInsideBox,
   mouseToNodeCoords,
 } from "./components/Canvas/canvasUtils";
+import useDraw from "./hooks/useDraw";
 
 const {
   sidebarWidthPerc: editorWidthPerc,
@@ -115,6 +116,7 @@ export default function App(): React.ReactElement {
   // const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
+  const draw = useDraw(appNodes, appConnections);
   // const [activeNode, setActiveNode] = useState<AppNode | undefined>(undefined);
   const [savedCanvasState, setSavedCanvasState] = useState<SavedCanvasState>({
     offset: ORIGIN,
@@ -234,32 +236,6 @@ export default function App(): React.ReactElement {
     );
   }, [appNodes]);
 
-  const draw = useCallback(
-    (context: CanvasRenderingContext2D) => {
-      appNodes.map((node) => {
-        drawNode(
-          context,
-          node.center,
-          node.radius,
-          node.isActive,
-          node.isBoundary
-          // node.temperatureDegC,
-          // node.capacitanceJPerDegK
-        );
-      });
-
-      appConnections.map((conn) => {
-        const { source, target } = conn;
-        const sourceAppNode = appNodes.find((node) => node.id === source.id);
-        const targetAppNode = appNodes.find((node) => node.id === target.id);
-        if (sourceAppNode && targetAppNode) {
-          drawConnection(context, sourceAppNode, targetAppNode);
-        }
-      });
-    },
-    [appConnections, appNodes]
-  );
-
   const clearAndRedraw = useCallback(
     (canvasState: CanvasState) => {
       if (canvasState.context) {
@@ -325,6 +301,111 @@ export default function App(): React.ReactElement {
     [clearAndRedraw]
   );
 
+  const newConnection = useCallback(
+    (
+      event: React.MouseEvent | MouseEvent,
+      clickedNode: AppNode,
+      canvasState: CanvasState
+    ) => {
+      const drawConnWrapper = (event: React.MouseEvent | MouseEvent) => {
+        drawConnectionBeingMade(event, clickedNode, canvasState);
+      };
+
+      const mouseUp = (event: React.MouseEvent | MouseEvent) => {
+        document.removeEventListener("mousemove", drawConnWrapper);
+        document.removeEventListener("mouseup", mouseUp);
+
+        // if arrow released on a node, make new connection
+        const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
+        const mouseUpOnNode = appNodes.find(
+          (node) =>
+            intersectsCircle(nodeCoordsOfMouse, node.center, node.radius) &&
+            node.id !== clickedNode.id &&
+            !appConnections.some(
+              (conn) =>
+                (conn.source.id === node.id &&
+                  conn.target.id === clickedNode.id) ||
+                (conn.target.id === node.id &&
+                  conn.source.id === clickedNode.id)
+            )
+        );
+
+        if (mouseUpOnNode) {
+          const newConnection = {
+            ...makeConnection({
+              source: clickedNode,
+              target: mouseUpOnNode,
+              resistanceDegKPerW: defaultResistanceDegKPerW,
+              kind: defaultConnectionKind,
+            }),
+            sourceName: clickedNode.name,
+            targetName: mouseUpOnNode.name,
+          };
+          setAppConnections([...appConnections, newConnection]);
+        } else {
+          clearAndRedraw(canvasState);
+        }
+      };
+      document.addEventListener("mousemove", drawConnWrapper);
+      document.addEventListener("mouseup", mouseUp);
+    },
+    [appConnections, appNodes, clearAndRedraw, drawConnectionBeingMade]
+  );
+
+  const moveNode = useCallback(
+    (
+      event: React.MouseEvent | MouseEvent,
+      clickedNode: AppNode,
+      canvasState: CanvasState
+    ) => {
+      clickedNode.isActive = true;
+      const moveNode = (event: React.MouseEvent | MouseEvent) => {
+        if (canvasState.context) {
+          clickedNode.center = mouseToNodeCoords(event, canvasState);
+          clearAndRedraw(canvasState);
+        }
+      };
+      const mouseUp = () => {
+        document.removeEventListener("mousemove", moveNode);
+        document.removeEventListener("mouseup", mouseUp);
+        updateNodes([clickedNode]);
+      };
+      document.addEventListener("mousemove", moveNode);
+      document.addEventListener("mouseup", mouseUp);
+    },
+    [clearAndRedraw, updateNodes]
+  );
+
+  const multiSelect = useCallback(
+    (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
+      const boxStart = mouseToNodeCoords(event, canvasState);
+      const drawBox = (event: React.MouseEvent | MouseEvent) => {
+        if (canvasState.context) {
+          clearAndRedraw(canvasState);
+          drawClearBox(
+            canvasState.context,
+            boxStart,
+            mouseToNodeCoords(event, canvasState),
+            "grey"
+          );
+        }
+      };
+      const mouseUp = (event: React.MouseEvent | MouseEvent) => {
+        document.removeEventListener("mousemove", drawBox);
+        document.removeEventListener("mouseup", mouseUp);
+
+        const boxEnd = mouseToNodeCoords(event, canvasState);
+        const extraActiveNodeIds = appNodes
+          .filter((node) => isInsideBox(boxStart, boxEnd, node.center))
+          .map((node) => node.id);
+        updateActiveNodes(extraActiveNodeIds, true);
+      };
+      document.addEventListener("mousemove", drawBox);
+      document.addEventListener("mouseup", mouseUp);
+    },
+    [appNodes, clearAndRedraw, updateActiveNodes]
+  );
+
   const onMouseDown = useCallback(
     (event, canvasState, defaultBehavior) => {
       const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
@@ -339,48 +420,7 @@ export default function App(): React.ReactElement {
 
       if (clickedNode) {
         if (event.altKey) {
-          // node clicked with alt key - making new connection
-          const drawConnWrapper = (event: React.MouseEvent | MouseEvent) => {
-            drawConnectionBeingMade(event, clickedNode, canvasState);
-          };
-
-          const mouseUp = (event: React.MouseEvent | MouseEvent) => {
-            document.removeEventListener("mousemove", drawConnWrapper);
-            document.removeEventListener("mouseup", mouseUp);
-
-            // if arrow released on a node, make new connection
-            const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
-            const mouseUpOnNode = appNodes.find(
-              (node) =>
-                intersectsCircle(nodeCoordsOfMouse, node.center, node.radius) &&
-                node.id !== clickedNode.id &&
-                !appConnections.some(
-                  (conn) =>
-                    (conn.source.id === node.id &&
-                      conn.target.id === clickedNode.id) ||
-                    (conn.target.id === node.id &&
-                      conn.source.id === clickedNode.id)
-                )
-            );
-
-            if (mouseUpOnNode) {
-              const newConnection = {
-                ...makeConnection({
-                  source: clickedNode,
-                  target: mouseUpOnNode,
-                  resistanceDegKPerW: defaultResistanceDegKPerW,
-                  kind: defaultConnectionKind,
-                }),
-                sourceName: clickedNode.name,
-                targetName: mouseUpOnNode.name,
-              };
-              setAppConnections([...appConnections, newConnection]);
-            } else {
-              clearAndRedraw(canvasState);
-            }
-          };
-          document.addEventListener("mousemove", drawConnWrapper);
-          document.addEventListener("mouseup", mouseUp);
+          newConnection(event, clickedNode, canvasState);
         } else if (event.shiftKey && activeNodeIds.includes(clickedNode.id)) {
           updateActiveNodes(
             activeNodeIds.filter((id) => id !== clickedNode.id),
@@ -388,62 +428,25 @@ export default function App(): React.ReactElement {
           );
         } else {
           // clicked node without alt key - make active and/or drag node around
-          clickedNode.isActive = true;
-          const moveNode = (event: React.MouseEvent | MouseEvent) => {
-            if (canvasState.context) {
-              clickedNode.center = mouseToNodeCoords(event, canvasState);
-              clearAndRedraw(canvasState);
-            }
-          };
-          const mouseUp = () => {
-            document.removeEventListener("mousemove", moveNode);
-            document.removeEventListener("mouseup", mouseUp);
-            updateNodes([clickedNode]);
-          };
-          document.addEventListener("mousemove", moveNode);
-          document.addEventListener("mouseup", mouseUp);
+          moveNode(event, clickedNode, canvasState);
         }
       } else {
         if (event.shiftKey) {
-          // draw multi-select box
-          const boxStart = mouseToNodeCoords(event, canvasState);
-          const drawBox = (event: React.MouseEvent | MouseEvent) => {
-            if (canvasState.context) {
-              clearAndRedraw(canvasState);
-              drawClearBox(
-                canvasState.context,
-                boxStart,
-                mouseToNodeCoords(event, canvasState),
-                "grey"
-              );
-            }
-          };
-          const mouseUp = (event: React.MouseEvent | MouseEvent) => {
-            document.removeEventListener("mousemove", drawBox);
-            document.removeEventListener("mouseup", mouseUp);
-
-            const boxEnd = mouseToNodeCoords(event, canvasState);
-            const extraActiveNodeIds = appNodes
-              .filter((node) => isInsideBox(boxStart, boxEnd, node.center))
-              .map((node) => node.id);
-            updateActiveNodes(extraActiveNodeIds, true);
-          };
-          document.addEventListener("mousemove", drawBox);
-          document.addEventListener("mouseup", mouseUp);
+          multiSelect(event, canvasState);
         } else {
+          // clicked on canvas, not a node
           clearActiveNodes();
           defaultBehavior(event);
         }
       }
     },
     [
-      appConnections,
       appNodes,
       clearActiveNodes,
-      clearAndRedraw,
-      drawConnectionBeingMade,
+      moveNode,
+      multiSelect,
+      newConnection,
       updateActiveNodes,
-      updateNodes,
     ]
   );
 
