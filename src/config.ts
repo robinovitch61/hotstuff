@@ -9,7 +9,7 @@ const config = {
   defaultResistanceDegKPerW: 10,
   defaultConnectionKind: "bi" as HSConnection["kind"],
   newNodeNamePrefix: "New Node",
-  zoomSensitivity: 500, // bigger = less zoom per click
+  zoomSensitivity: 1000, // bigger = less zoom per click
   minZoom: 0.25,
   maxZoom: 5,
   activeNodeOutlineWidth: 5,

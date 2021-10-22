@@ -48,7 +48,6 @@ export type CanvasProps = {
 };
 
 export default function Canvas(props: CanvasProps): React.ReactElement {
-  // destructure props
   const {
     canvasWidth,
     canvasHeight,
@@ -64,76 +63,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [context, setView, offset, scale, startPan] =
     usePanZoomCanvas(canvasRef);
-  // const [nodeDelta, startNodeMove] = useNodeMove();
-  // const [
-  //   connectionMousePos,
-  //   isConnectionDone,
-  //   startMakeConnection,
-  // ] = useClickAndDrag();
-  // const [
-  //   multiSelectMousePos,
-  //   isMultiSelectDone,
-  //   startMultiSelect,
-  // ] = useClickAndDrag();
-  // const startMultiSelectRef = useRef<Point | undefined>(undefined);
-
-  // function handleOnMouseDown(event: React.MouseEvent<HTMLCanvasElement>) {
-  //   const canvas = canvasRef.current;
-  //   if (canvas === null) {
-  //     return;
-  //   }
-  //
-  //   let nodeClicked = false;
-  //   const activeNodeIds = nodes
-  //     .filter((node) => node.isActive)
-  //     .map((node) => node.id);
-  //   nodes.some((node) => {
-  //     if (
-  //       intersectsCircle(
-  //         mouseToNodeCoords(
-  //           makePoint(event.clientX, event.clientY),
-  //           offset,
-  //           scale
-  //         ),
-  //         node.center,
-  //         node.radius
-  //       )
-  //     ) {
-  //       nodeClicked = true;
-  //
-  //       if (event.altKey) {
-  //         clearActiveNodes();
-  //         updateActiveNodes([node.id], false);
-  //         startMakeConnection(event);
-  //       } else if (event.shiftKey && activeNodeIds.includes(node.id)) {
-  //         updateActiveNodes(
-  //           activeNodeIds.filter((id) => id !== node.id),
-  //           false
-  //         );
-  //       } else {
-  //         const sticky =
-  //           event.shiftKey || (activeNodeIds.length > 1 && node.isActive);
-  //         updateActiveNodes([node.id], sticky);
-  //         startNodeMove(event);
-  //       }
-  //       return true; // short circuits the rest of the some loop
-  //     }
-  //   });
-  //
-  //   if (!nodeClicked) {
-  //     if (event.shiftKey) {
-  //       startMultiSelectRef.current = mouseToNodeCoords(
-  //         makePoint(event.clientX, event.clientY),
-  //         offset,
-  //         scale
-  //       );
-  //       startMultiSelect(event);
-  //     } else {
-  //       clearActiveNodes();
-  //       startPan(event);
-  //     }
-  //   }
-  // }
 
   // setup canvas and set context
   useLayoutEffect(() => {
