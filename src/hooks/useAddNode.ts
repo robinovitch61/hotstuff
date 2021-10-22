@@ -9,26 +9,9 @@ const { newNodeNamePrefix, defaultNodeRadius } = config;
 
 export default function useAddNode(
   appNodes: AppNode[],
-  setAppNodes: (
-    value: ((prevState: AppNode[]) => AppNode[]) | AppNode[]
-  ) => void
-): [
-  (node: AppNode) => void,
-  (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => void
-] {
-  const addNode = useCallback(
-    (node: AppNode) => {
-      const newNodes: AppNode[] = appNodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }));
-      newNodes.push({ ...node, isActive: true });
-      setAppNodes(newNodes);
-    },
-    [appNodes, setAppNodes]
-  );
-
-  const handleDoubleClick = useCallback(
+  addNode: (node: AppNode) => void
+) {
+  return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       if (event.shiftKey || event.altKey) {
         return;
@@ -57,5 +40,4 @@ export default function useAddNode(
     },
     [addNode, appNodes]
   );
-  return [addNode, handleDoubleClick];
 }
