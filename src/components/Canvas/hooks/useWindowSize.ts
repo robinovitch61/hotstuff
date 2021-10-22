@@ -1,7 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 
 export default function useWindowSize(): [[number, number], number] {
-  // [width, height]
   const [size, setSize] = useState<[number, number]>([0, 0]);
   const [ratio, setRatio] = useState(1);
 

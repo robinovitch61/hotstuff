@@ -164,14 +164,24 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   useLayoutEffect(() => {
     if (context) {
       // clear canvas
-      context.canvas.width = context.canvas.width;
+      context.canvas.width = canvasWidth * devicePixelRatio;
+      context.canvas.height = canvasHeight * devicePixelRatio;
 
       context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
       context.translate(offset.x, offset.y);
 
       draw(context);
     }
-  }, [context, devicePixelRatio, draw, offset.x, offset.y, scale]);
+  }, [
+    canvasHeight,
+    canvasWidth,
+    context,
+    devicePixelRatio,
+    draw,
+    offset.x,
+    offset.y,
+    scale,
+  ]);
 
   // // move active nodes if click and drag
   // useLayoutEffect(() => {
