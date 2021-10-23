@@ -1,4 +1,3 @@
-// TODO LEO: move this up to src/
 export type Point = {
   x: number;
   y: number;

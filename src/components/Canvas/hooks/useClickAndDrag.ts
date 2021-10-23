@@ -3,7 +3,7 @@ import {
   useCallback,
   useState,
 } from "react";
-import { ORIGIN, Point } from "../pointUtils";
+import { ORIGIN, Point } from "../../../pointUtils";
 
 export default function useClickAndDrag(): [
   Point,

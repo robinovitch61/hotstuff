@@ -4,7 +4,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { diffPoints, ORIGIN, Point } from "../pointUtils";
+import { diffPoints, ORIGIN, Point } from "../../../pointUtils";
 
 export default function useNodeMove(): [
   Point,

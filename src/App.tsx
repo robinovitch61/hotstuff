@@ -6,7 +6,7 @@ import {
 } from "hotstuff-network";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { ORIGIN, Point } from "./components/Canvas/pointUtils";
+import { ORIGIN, Point } from "./pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
 import config from "./config";
