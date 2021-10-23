@@ -1,8 +1,8 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
-import { addPoints, diffPoints } from "../utils/pointUtils";
+import { diffPoints } from "../utils/pointUtils";
 
 export default function useMoveNode(
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void
@@ -30,31 +30,30 @@ export default function useMoveNode(
             mouseToNodeCoords(event, canvasState),
             offsetMouseToCenter
           );
-          updateNodes(
-            [
-              {
-                ...clickedNode,
-                isActive: true,
-                center: newClickedCenter,
-              },
-              ...(clickedNode.isActive || shiftKeyPressed
-                ? activeNodes.map((node) => {
-                    const distanceFromClickedCenter = diffPoints(
-                      clickedNode.center,
-                      node.center
-                    );
-                    return {
-                      ...node,
-                      center: diffPoints(
-                        newClickedCenter,
-                        distanceFromClickedCenter
-                      ),
-                    };
-                  })
-                : []),
-            ],
-            !event.shiftKey
-          );
+          const newClickedNode = {
+            ...clickedNode,
+            isActive: true,
+            center: newClickedCenter,
+          };
+
+          const newActiveNodes =
+            clickedNode.isActive || shiftKeyPressed
+              ? activeNodes.map((node) => {
+                  const distanceFromClickedCenter = diffPoints(
+                    clickedNode.center,
+                    node.center
+                  );
+                  return {
+                    ...node,
+                    center: diffPoints(
+                      newClickedCenter,
+                      distanceFromClickedCenter
+                    ),
+                  };
+                })
+              : [];
+
+          updateNodes([newClickedNode, ...newActiveNodes], !event.shiftKey);
         }
       };
       const mouseUp = () => {
@@ -70,7 +69,7 @@ export default function useMoveNode(
             isActive: true,
           },
         ],
-        !event.shiftKey
+        false
       );
     },
     [updateNodes]

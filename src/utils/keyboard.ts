@@ -3,7 +3,7 @@ import { AppNode } from "../App";
 
 export default function setUpKeyboardListener(
   setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>
-) {
+): void {
   document.addEventListener(
     "keydown",
     (event: React.KeyboardEvent | KeyboardEvent) => {
