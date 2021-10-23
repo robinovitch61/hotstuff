@@ -1,6 +1,6 @@
 # Hot Stuff
 
 TODO:
-- [ ] Cmd A to make all nodes active (?)
+- [ ] Improve boundary stripes
 - [ ] Delete active nodes when del/backspace pressed
 - [ ] Highlight active nodes in table

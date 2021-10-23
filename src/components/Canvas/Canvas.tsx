@@ -2,7 +2,7 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { makePoint, Point } from "../../pointUtils";
+import { makePoint, Point } from "../../utils/pointUtils";
 import Controls from "./Controls";
 
 const StyledCanvasWrapper = styled.div`

@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
-import { addPoints, diffPoints } from "../pointUtils";
+import { addPoints, diffPoints } from "../utils/pointUtils";
 
 export default function useMoveNode(
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void

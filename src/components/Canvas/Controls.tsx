@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
-import { Point } from "../../pointUtils";
+import { Point } from "../../utils/pointUtils";
 import { CanvasState, SavedCanvasState } from "./Canvas";
 
 const StyledBottomLeftButton = styled.button`

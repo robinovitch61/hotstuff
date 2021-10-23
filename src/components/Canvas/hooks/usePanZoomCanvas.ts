@@ -5,7 +5,7 @@ import {
   ORIGIN,
   Point,
   scalePoint,
-} from "../../../pointUtils";
+} from "../../../utils/pointUtils";
 import config from "../../../config";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { calculateCanvasMouse } from "../canvasUtils";

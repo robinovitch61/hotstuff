@@ -3,7 +3,7 @@ import {
   useCallback,
   useState,
 } from "react";
-import { ORIGIN, Point } from "../../../pointUtils";
+import { ORIGIN, Point } from "../../../utils/pointUtils";
 
 export default function useMakeConnection(): [
   Point,

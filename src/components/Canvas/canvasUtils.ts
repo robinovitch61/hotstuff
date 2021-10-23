@@ -1,4 +1,4 @@
-import { diffPoints, ORIGIN, Point, scalePoint } from "../../pointUtils";
+import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
 import config from "../../config";
 import { AppNode } from "../../App";
 import * as React from "react";

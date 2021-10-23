@@ -6,7 +6,7 @@ import {
 } from "hotstuff-network";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { ORIGIN, Point } from "./pointUtils";
+import { ORIGIN, Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
 import config from "./config";
@@ -16,6 +16,7 @@ import useDraw from "./hooks/useDraw";
 import useAddNode from "./hooks/useAddNode";
 import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
+import setUpKeyboardListener from "./utils/keyboard";
 
 const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
 
@@ -137,10 +138,10 @@ export default function App(): React.ReactElement {
   const plotHeight = (1 - canvasHeightPerc) * windowHeight;
   const editorWidth = editorWidthPerc * windowWidth;
 
-  // TODO: REMOVE
   useEffect(() => {
     setAppNodes(testAppNodes);
     setAppConnections(testAppConnections);
+    setUpKeyboardListener(setAppNodes);
   }, []);
 
   return (
