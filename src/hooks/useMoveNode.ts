@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
@@ -12,6 +12,8 @@ export default function useMoveNode(
   activeNodes: AppNode[],
   canvasState: CanvasState
 ) => void {
+  const movedRef = useRef<boolean>(false);
+
   return useCallback(
     (
       event: React.MouseEvent | MouseEvent,
@@ -26,6 +28,7 @@ export default function useMoveNode(
       const shiftKeyPressed = event.shiftKey;
       const moveNode = (event: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
+          movedRef.current = true;
           const newClickedCenter = diffPoints(
             mouseToNodeCoords(event, canvasState),
             offsetMouseToCenter
@@ -56,21 +59,26 @@ export default function useMoveNode(
           updateNodes([newClickedNode, ...newActiveNodes], !event.shiftKey);
         }
       };
-      const mouseUp = () => {
+      const mouseUp = (event: React.MouseEvent | MouseEvent) => {
         document.removeEventListener("mousemove", moveNode);
         document.removeEventListener("mouseup", mouseUp);
+        updateNodes(
+          [
+            {
+              ...clickedNode,
+              center: diffPoints(
+                mouseToNodeCoords(event, canvasState),
+                offsetMouseToCenter
+              ),
+              isActive: true,
+            },
+          ],
+          !movedRef.current && !shiftKeyPressed
+        );
+        movedRef.current = false;
       };
       document.addEventListener("mousemove", moveNode);
       document.addEventListener("mouseup", mouseUp);
-      updateNodes(
-        [
-          {
-            ...clickedNode,
-            isActive: true,
-          },
-        ],
-        false
-      );
     },
     [updateNodes]
   );
