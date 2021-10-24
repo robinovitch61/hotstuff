@@ -3,9 +3,7 @@ import { useCallback } from "react";
 import { AppConnection, AppNode } from "../App";
 
 export default function useModelUtils(
-  appNodes: AppNode[],
   setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>,
-  appConnections: AppConnection[],
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>
 ): [
   (node: AppNode) => void,
@@ -18,96 +16,98 @@ export default function useModelUtils(
 ] {
   const addNode = useCallback(
     (node: AppNode) => {
-      const newNodes: AppNode[] = appNodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }));
-      newNodes.push({ ...node, isActive: true });
-      setAppNodes(newNodes);
+      setAppNodes((prevNodes) => {
+        const newNodes: AppNode[] = prevNodes.map((node) => ({
+          ...node,
+          isActive: false,
+        }));
+        newNodes.push({ ...node, isActive: true });
+        return newNodes;
+      });
     },
-    [appNodes, setAppNodes]
+    [setAppNodes]
   );
 
   const updateNodes = useCallback(
     (nodesToUpdate: AppNode[], clearActiveNodes = false) => {
-      const newNodes = appNodes.map((node) => {
-        const nodeToUpdate = nodesToUpdate.find(
-          (newNode) => newNode.id === node.id
-        );
-        if (nodeToUpdate) {
-          return nodeToUpdate;
-        } else {
-          if (clearActiveNodes) {
-            return { ...node, isActive: false };
+      setAppNodes((prevNodes) => {
+        return prevNodes.map((node) => {
+          const nodeToUpdate = nodesToUpdate.find(
+            (newNode) => newNode.id === node.id
+          );
+          if (nodeToUpdate) {
+            return nodeToUpdate;
           } else {
-            return node;
+            if (clearActiveNodes) {
+              return { ...node, isActive: false };
+            } else {
+              return node;
+            }
           }
-        }
+        });
       });
-      setAppNodes(newNodes);
     },
-    [appNodes, setAppNodes]
+    [setAppNodes]
   );
 
   const deleteNodes = useCallback(
     (nodeIds: string[]) => {
-      const deleteConnectionsForNode = (nodeId: string) => {
-        setAppConnections(
-          appConnections.filter(
-            (conn) => conn.source.id !== nodeId && conn.target.id !== nodeId
-          )
+      setAppConnections((prevConns) => {
+        return prevConns.filter(
+          (conn) =>
+            !nodeIds.includes(conn.source.id) &&
+            !nodeIds.includes(conn.target.id)
         );
-      };
-      nodeIds.forEach((id) => deleteConnectionsForNode(id));
-      setAppNodes(appNodes.filter((node) => !nodeIds.includes(node.id)));
+      });
+      setAppNodes((prevNodes) =>
+        prevNodes.filter((node) => !nodeIds.includes(node.id))
+      );
     },
-    [appConnections, appNodes, setAppConnections, setAppNodes]
+    [setAppConnections, setAppNodes]
   );
 
   const updateConnections = useCallback(
     (connsToUpdate: AppConnection[]) => {
       const connIdsToUpdate = connsToUpdate.map((conn) => conn.id);
-      const newConns = appConnections.map((conn) => {
-        if (connIdsToUpdate.includes(conn.id)) {
-          return connsToUpdate.filter((newConn) => newConn.id === conn.id)[0];
-        } else {
-          return conn;
-        }
+      setAppConnections((prevConns) => {
+        const oldConns = prevConns.filter(
+          (conn) => !connIdsToUpdate.includes(conn.id)
+        );
+        return [...connsToUpdate, ...oldConns];
       });
-      setAppConnections(newConns);
     },
-    [appConnections, setAppConnections]
+    [setAppConnections]
   );
 
   const deleteConnections = useCallback(
     (connIds: string[]) => {
-      setAppConnections(
-        appConnections.filter((conn) => !connIds.includes(conn.id))
+      setAppConnections((prevConns) =>
+        prevConns.filter((conn) => !connIds.includes(conn.id))
       );
     },
-    [appConnections, setAppConnections]
+    [setAppConnections]
   );
 
-  const updateActiveNodes = useCallback(
+  const setActiveNodes = useCallback(
     (activeNodeIds: string[]) => {
-      setAppNodes(
-        appNodes.map((node) => ({
+      setAppNodes((prevNodes) => {
+        return prevNodes.map((node) => ({
           ...node,
           isActive: activeNodeIds.includes(node.id),
-        }))
-      );
+        }));
+      });
     },
-    [appNodes, setAppNodes]
+    [setAppNodes]
   );
 
   const clearActiveNodes = useCallback(() => {
-    setAppNodes(
-      appNodes.map((node) => ({
+    setAppNodes((prevNodes) => {
+      return prevNodes.map((node) => ({
         ...node,
         isActive: false,
-      }))
-    );
-  }, [appNodes, setAppNodes]);
+      }));
+    });
+  }, [setAppNodes]);
 
   return [
     addNode,
@@ -115,7 +115,7 @@ export default function useModelUtils(
     deleteNodes,
     updateConnections,
     deleteConnections,
-    updateActiveNodes,
+    setActiveNodes,
     clearActiveNodes,
   ];
 }

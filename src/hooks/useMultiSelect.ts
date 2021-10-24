@@ -9,7 +9,7 @@ import { AppNode } from "../App";
 
 export default function useMultiSelect(
   appNodes: AppNode[],
-  updateActiveNodes: (activeNodeIds: string[]) => void,
+  setActiveNodes: (activeNodeIds: string[]) => void,
   clearAndRedraw: (canvasState: CanvasState) => void
 ): (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => void {
   return useCallback(
@@ -37,11 +37,11 @@ export default function useMultiSelect(
               isInsideBox(boxStart, boxEnd, node.center) || node.isActive
           )
           .map((node) => node.id);
-        updateActiveNodes(activeNodeIds);
+        setActiveNodes(activeNodeIds);
       };
       document.addEventListener("mousemove", drawBox);
       document.addEventListener("mouseup", mouseUp);
     },
-    [appNodes, clearAndRedraw, updateActiveNodes]
+    [appNodes, clearAndRedraw, setActiveNodes]
   );
 }

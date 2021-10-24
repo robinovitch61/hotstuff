@@ -16,7 +16,7 @@ import useDraw from "./hooks/useDraw";
 import useAddNode from "./hooks/useAddNode";
 import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
-import setUpKeyboardListener from "./utils/keyboard";
+import useKeyboardListeners from "./hooks/useKeyboardListeners";
 
 const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
 
@@ -107,9 +107,10 @@ export default function App(): React.ReactElement {
     deleteNodes,
     updateConnections,
     deleteConnections,
-    updateActiveNodes,
+    setActiveNodes,
     clearActiveNodes,
-  ] = useModelUtils(appNodes, setAppNodes, appConnections, setAppConnections);
+  ] = useModelUtils(setAppNodes, setAppConnections);
+  useKeyboardListeners(appNodes, setAppNodes, deleteNodes);
   const [draw, clearAndRedraw] = useDraw(appNodes, appConnections);
   const handleDoubleClick = useAddNode(appNodes, addNode);
   const onMouseDown = useOnMouseDown(
@@ -117,7 +118,7 @@ export default function App(): React.ReactElement {
     appConnections,
     setAppConnections,
     updateNodes,
-    updateActiveNodes,
+    setActiveNodes,
     clearActiveNodes,
     clearAndRedraw
   );
@@ -141,7 +142,6 @@ export default function App(): React.ReactElement {
   useEffect(() => {
     setAppNodes(testAppNodes);
     setAppConnections(testAppConnections);
-    setUpKeyboardListener(setAppNodes);
   }, []);
 
   return (
@@ -171,7 +171,7 @@ export default function App(): React.ReactElement {
         deleteNodes={deleteNodes}
         updateConnections={updateConnections}
         deleteConnections={deleteConnections}
-        updateActiveNodes={updateActiveNodes}
+        updateActiveNodes={setActiveNodes}
         clearActiveNodes={clearActiveNodes}
       />
     </StyledApp>

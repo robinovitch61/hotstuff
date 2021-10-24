@@ -15,7 +15,7 @@ export default function useOnMouseDown(
   appConnections: AppConnection[],
   setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>,
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void,
-  updateActiveNodes: (activeNodeIds: string[]) => void,
+  setActiveNodes: (activeNodeIds: string[]) => void,
   clearActiveNodes: () => void,
   clearAndRedraw: (canvasState: CanvasState) => void
 ): (
@@ -30,11 +30,7 @@ export default function useOnMouseDown(
     clearAndRedraw
   );
   const moveNode = useMoveNode(updateNodes);
-  const multiSelect = useMultiSelect(
-    appNodes,
-    updateActiveNodes,
-    clearAndRedraw
-  );
+  const multiSelect = useMultiSelect(appNodes, setActiveNodes, clearAndRedraw);
 
   return useCallback(
     (
@@ -55,9 +51,7 @@ export default function useOnMouseDown(
         if (event.altKey) {
           makeNewConnection(event, clickedNode, canvasState);
         } else if (event.shiftKey && activeNodeIds.includes(clickedNode.id)) {
-          updateActiveNodes(
-            activeNodeIds.filter((id) => id !== clickedNode.id)
-          );
+          setActiveNodes(activeNodeIds.filter((id) => id !== clickedNode.id));
         } else {
           moveNode(event, clickedNode, activeNodes, canvasState);
         }
@@ -76,7 +70,7 @@ export default function useOnMouseDown(
       moveNode,
       multiSelect,
       makeNewConnection,
-      updateActiveNodes,
+      setActiveNodes,
     ]
   );
 }
