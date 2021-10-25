@@ -3,11 +3,6 @@ import styled from "styled-components/macro";
 import TableRow from "./TableRow";
 import SortableTableHeader, { SortState } from "./SortableTableHeader";
 
-// TODO:
-// [] sticky default values, with escape to edit input and keep default value
-// [] StringBox, BooleanBox
-// [] Generic type inputs
-
 const StyledTableWrapper = styled.div`
   width: 100%;
 `;
@@ -45,11 +40,12 @@ export type EditableTableProps<T> = {
   heightOffsetPx?: number;
 };
 
-export interface IDHavingThing {
+export interface TableCompatibleType {
   id: string;
+  isActive: boolean;
 }
 
-export default function EditableTable<T extends IDHavingThing>(
+export default function EditableTable<T extends TableCompatibleType>(
   props: EditableTableProps<T>
 ): React.ReactElement {
   const tableRows = props.rowData.map((row) => {

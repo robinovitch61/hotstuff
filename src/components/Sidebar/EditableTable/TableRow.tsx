@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components/macro";
 import BooleanTableCell from "./BooleanTableCell";
-import { Column, IDHavingThing } from "./EditableTable";
+import { Column, TableCompatibleType } from "./EditableTable";
 import NumericalTableCell from "./NumericalTableCell";
 import DropDownTableCell from "./DropDownTableCell";
 import TextTableCell from "./TextTableCell";
@@ -45,7 +45,7 @@ const StyledDeleteCell = styled(StyledCell)`
   }
 `;
 
-export type TableRowProps<T extends IDHavingThing> = {
+export type TableRowProps<T extends TableCompatibleType> = {
   columns: Column<T>[];
   data: T;
   onUpdateRow: (data: T) => void;
@@ -55,7 +55,7 @@ export type TableRowProps<T extends IDHavingThing> = {
   heightOffsetPx?: number;
 };
 
-export default function TableRow<T extends IDHavingThing>(
+export default function TableRow<T extends TableCompatibleType>(
   props: TableRowProps<T>
 ): React.ReactElement {
   return (

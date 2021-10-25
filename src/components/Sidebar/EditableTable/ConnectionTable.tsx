@@ -9,6 +9,8 @@ const defaultConnectionSortState: SortState<AppConnection> = {
   direction: "ASC",
 };
 
+type AppConnectionTable = AppConnection & { isActive: boolean };
+
 export type ConnectionTableProps = {
   rows: AppConnection[];
   nodes: AppNode[];
@@ -113,8 +115,9 @@ export default function ConnectionTable(
     }
   }
 
+  const rowData = props.rows.map;
   return (
-    <EditableTable<AppConnection>
+    <EditableTable<AppConnectionTable>
       columns={connectionColumns}
       rowData={[...props.rows].sort(sortByState)}
       onUpdateRow={props.onUpdateRow}
