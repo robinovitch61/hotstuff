@@ -155,20 +155,53 @@ export function drawNode(
   // capacitanceJPerDegK: number // determines size?
 ): void {
   drawCircle(context, center, radius, "red");
+
+  // outline active nodes
   if (isActive) {
     drawCircleOutline(context, center, radius, "black");
   }
+
+  // pattern boundary nodes
   if (isBoundary) {
     context.save();
+    context.lineWidth = 2;
+    context.fillStyle = "#FFFFFF";
+
+    const delta = 4.5;
+    const buffer = 1;
+    const circle = 2;
+
+    // save the canvas above, now transform it for ease of drawing
+    context.translate(center.x, center.y);
+    context.rotate(Math.PI / 4);
+
+    // draw horizontal line
     context.beginPath();
-    const pattern = context.createPattern(getHashPattern(), "repeat");
-    if (pattern) {
-      context.fillStyle = pattern;
-      context.arc(center.x, center.y, radius, 0, 2 * Math.PI);
-      context.fill();
-      context.closePath();
-      context.restore();
+    context.moveTo(-radius, 0);
+    context.lineTo(radius, 0);
+    context.stroke();
+
+    // draw smaller horizontal lines offset vertically from center
+    let h = 0; // vertical distance from center
+    while (h + delta < radius) {
+      h = h + delta;
+      const newRadius = radius * Math.sin(Math.acos(h / radius));
+      context.moveTo(-newRadius - buffer, h);
+      context.lineTo(newRadius + buffer, h);
+      context.stroke();
+      context.moveTo(-newRadius - buffer, -h);
+      context.lineTo(newRadius + buffer, -h);
+      context.stroke();
     }
+    context.closePath();
+
+    // clip off the extra bits around the circle
+    context.beginPath();
+    context.arc(0, 0, radius + circle, 0, Math.PI * 2, false);
+    context.arc(0, 0, radius, 0, Math.PI * 2, true);
+    context.fill();
+
+    context.restore();
   }
 }
 
