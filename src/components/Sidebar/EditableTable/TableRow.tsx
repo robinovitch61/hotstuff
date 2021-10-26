@@ -6,23 +6,15 @@ import NumericalTableCell from "./NumericalTableCell";
 import DropDownTableCell from "./DropDownTableCell";
 import TextTableCell from "./TextTableCell";
 
-const StyledRow = styled.div<{ heightOffsetPx?: number }>`
+const StyledRow = styled.div<{ heightOffsetPx?: number; isActive: boolean }>`
   display: inline-flex;
   align-items: center;
-  width: 100%;
+  min-width: 100%;
   position: sticky;
   top: ${({ heightOffsetPx }) =>
     heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
-`;
-
-const StyledHighlight = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(112, 165, 255, 0.2);
-  pointer-events: none;
+  background: ${({ isActive }) =>
+    isActive ? "rgba(112, 165, 255, 0.2)" : "none"};
 `;
 
 const StyledCell = styled.div<{ width: number; minWidth?: number }>`
@@ -59,8 +51,7 @@ export default function TableRow<T extends TableCompatibleType>(
   props: TableRowProps<T>
 ): React.ReactElement {
   return (
-    <StyledRow heightOffsetPx={props.heightOffsetPx}>
-      <StyledHighlight className={props.isActive ? "active" : ""} />
+    <StyledRow heightOffsetPx={props.heightOffsetPx} isActive={props.isActive}>
       {props.columns.map((col) => {
         const cell =
           !!col.options && col.options.length > 0 && col.onSelectOption ? (

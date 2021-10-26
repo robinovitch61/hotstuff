@@ -56,7 +56,7 @@ export default function EditableTable<T extends TableCompatibleType>(
         data={row}
         onUpdateRow={props.onUpdateRow}
         onDeleteRow={props.onDeleteRow}
-        isActive={true}
+        isActive={row.isActive}
         isDeletable
         heightOffsetPx={props.heightOffsetPx}
       />

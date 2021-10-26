@@ -4,12 +4,12 @@ import { AppConnection, AppNode } from "../../../App";
 import EditableTable, { ColOption, Column } from "./EditableTable";
 import { SortState } from "./SortableTableHeader";
 
-const defaultConnectionSortState: SortState<AppConnection> = {
+type AppConnectionTable = AppConnection & { isActive: boolean };
+
+const defaultConnectionSortState: SortState<AppConnectionTable> = {
   key: "source",
   direction: "ASC",
 };
-
-type AppConnectionTable = AppConnection & { isActive: boolean };
 
 export type ConnectionTableProps = {
   rows: AppConnection[];
@@ -21,7 +21,7 @@ export type ConnectionTableProps = {
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
-  const [sortState, setSortState] = useState<SortState<AppConnection>>(
+  const [sortState, setSortState] = useState<SortState<AppConnectionTable>>(
     defaultConnectionSortState
   );
 
@@ -107,7 +107,10 @@ export default function ConnectionTable(
     [nodeOptions, props]
   );
 
-  function sortByState(first: AppConnection, second: AppConnection): number {
+  function sortByState(
+    first: AppConnectionTable,
+    second: AppConnectionTable
+  ): number {
     if (first[sortState.key] > second[sortState.key]) {
       return sortState.direction === "ASC" ? 1 : -1;
     } else {
@@ -115,14 +118,28 @@ export default function ConnectionTable(
     }
   }
 
-  const rowData = props.rows.map;
+  const activeNodeIds = props.nodes
+    .filter((node) => node.isActive)
+    .map((node) => node.id);
+
+  const rowData: AppConnectionTable[] = props.rows
+    .map((row) => {
+      return {
+        ...row,
+        isActive:
+          activeNodeIds.includes(row.source.id) ||
+          activeNodeIds.includes(row.target.id),
+      };
+    })
+    .sort(sortByState);
+
   return (
     <EditableTable<AppConnectionTable>
       columns={connectionColumns}
-      rowData={[...props.rows].sort(sortByState)}
+      rowData={rowData}
       onUpdateRow={props.onUpdateRow}
       onDeleteRow={props.onDeleteRow}
-      onUpdateSortState={(newSortState: SortState<AppConnection>) =>
+      onUpdateSortState={(newSortState: SortState<AppConnectionTable>) =>
         setSortState(newSortState)
       }
       sortState={sortState}

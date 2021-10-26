@@ -16,7 +16,7 @@ import useDraw from "./hooks/useDraw";
 import useAddNode from "./hooks/useAddNode";
 import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
-import useKeyboardListeners from "./hooks/useKeyboardListeners";
+import useKeyDown from "./hooks/useKeyDown";
 
 const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
 
@@ -110,7 +110,10 @@ export default function App(): React.ReactElement {
     setActiveNodes,
     clearActiveNodes,
   ] = useModelUtils(setAppNodes, setAppConnections);
-  useKeyboardListeners(appNodes, setAppNodes, deleteNodes);
+
+  const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
+  useKeyDown(keyboardActive, appNodes, setAppNodes, deleteNodes);
+
   const [draw, clearAndRedraw] = useDraw(appNodes, appConnections);
   const handleDoubleClick = useAddNode(appNodes, addNode);
   const onMouseDown = useOnMouseDown(
@@ -157,6 +160,7 @@ export default function App(): React.ReactElement {
             handleDoubleClick={handleDoubleClick}
             savedCanvasState={savedCanvasState}
             setSavedCanvasState={setSavedCanvasState}
+            setKeyboardActive={setKeyboardActive}
           />
         </StyledCanvas>
         <Plot height={plotHeight} />

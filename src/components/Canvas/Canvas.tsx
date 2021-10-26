@@ -4,6 +4,7 @@ import styled from "styled-components";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 import { makePoint, Point } from "../../utils/pointUtils";
 import Controls from "./Controls";
+import useOnClickCanvas from "./hooks/useOnClickCanvas";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -45,6 +46,7 @@ export type CanvasProps = {
   ) => void;
   savedCanvasState: SavedCanvasState;
   setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
+  setKeyboardActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Canvas(props: CanvasProps): React.ReactElement {
@@ -57,10 +59,12 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     handleDoubleClick,
     savedCanvasState,
     setSavedCanvasState,
+    setKeyboardActive,
   } = props;
 
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  useOnClickCanvas(canvasRef, setKeyboardActive);
   const [context, setView, offset, scale, startPan] =
     usePanZoomCanvas(canvasRef);
 
@@ -126,6 +130,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
             canvasHeight,
           })
         }
+        // onClick={(event: React.MouseEvent | MouseEvent) =>
+        //   onClick(event, canvasRef)
+        // }
       />
     </StyledCanvasWrapper>
   );

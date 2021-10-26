@@ -7,6 +7,7 @@ export const StyledInput = styled.input`
   height: 100%;
   text-align: center;
   padding: 0;
+  background: unset;
 
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
