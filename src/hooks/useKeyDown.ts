@@ -12,7 +12,9 @@ export default function useKeyDown(
       // console.log(
       //   `Key: ${event.key} with keycode ${event.keyCode} has been pressed`
       // );
+
       if (keyboardActive) {
+        // shift + A makes all nodes active
         if (event.metaKey) {
           if (event.keyCode === 65) {
             event.preventDefault();
@@ -23,10 +25,19 @@ export default function useKeyDown(
             );
           }
         }
+
+        // delete active nodes on back/del
         if (event.key === "Backspace" || event.key === "Delete") {
           event.preventDefault();
           deleteNodes(
             appNodes.filter((node) => node.isActive).map((node) => node.id)
+          );
+        }
+
+        // escape key makes all inactive
+        if (event.keyCode === 27) {
+          setAppNodes((prevNodes) =>
+            prevNodes.map((node) => ({ ...node, isActive: false }))
           );
         }
       }
