@@ -13,18 +13,21 @@ import config from "./config";
 import useWindowSize from "./components/Canvas/hooks/useWindowSize";
 import Canvas, { SavedCanvasState } from "./components/Canvas/Canvas";
 import useDraw from "./hooks/useDraw";
-import useAddNode from "./hooks/useAddNode";
+import useDoubleClick from "./hooks/useDoubleClick";
 import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
 
 const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
 
+export type Direction = "L" | "R" | "U" | "D";
+
 export type AppNode = HSNode & {
   center: Point;
   radius: number;
   color: string;
   isActive: boolean;
+  textDirection: Direction;
 };
 
 export type AppConnection = HSConnection & {
@@ -70,6 +73,7 @@ const testAppNodes: AppNode[] = [
     radius: defaultNodeRadius,
     color: "red",
     isActive: false,
+    textDirection: "D",
   },
   {
     ...test2,
@@ -77,6 +81,7 @@ const testAppNodes: AppNode[] = [
     radius: defaultNodeRadius,
     color: "red",
     isActive: false,
+    textDirection: "D",
   },
 ];
 
@@ -115,7 +120,7 @@ export default function App(): React.ReactElement {
   useKeyDown(keyboardActive, appNodes, setAppNodes, deleteNodes);
 
   const [draw, clearAndRedraw] = useDraw(appNodes, appConnections);
-  const handleDoubleClick = useAddNode(appNodes, addNode);
+  const handleDoubleClick = useDoubleClick(appNodes, addNode, updateNodes);
   const onMouseDown = useOnMouseDown(
     appNodes,
     appConnections,

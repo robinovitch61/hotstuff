@@ -1,24 +1,44 @@
 import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import { makeNode } from "hotstuff-network";
-import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
+import {
+  intersectsCircle,
+  mouseToNodeCoords,
+  rotatedDirection,
+} from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
 import config from "../config";
 
 const { newNodeNamePrefix, defaultNodeRadius } = config;
 
-export default function useAddNode(
+export default function useDoubleClick(
   appNodes: AppNode[],
-  addNode: (node: AppNode) => void
+  addNode: (node: AppNode) => void,
+  updateNodes: (nodes: AppNode[]) => void
 ): (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => void {
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
-      if (event.shiftKey || event.altKey) {
+      event.preventDefault();
+
+      const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
+
+      const doubleClickedNode = appNodes.find((node) =>
+        intersectsCircle(nodeCoordsOfMouse, node.center, node.radius)
+      );
+      if (doubleClickedNode) {
+        updateNodes([
+          {
+            ...doubleClickedNode,
+            textDirection: rotatedDirection(doubleClickedNode.textDirection),
+          },
+        ]);
         return;
       }
+
       const numNewNodes = appNodes.filter((node) =>
         node.name.startsWith(newNodeNamePrefix)
       ).length;
+
       const newNode = makeNode({
         name:
           numNewNodes === 0
@@ -29,15 +49,17 @@ export default function useAddNode(
         powerGenW: 0,
         isBoundary: false,
       });
-      const newAppNode = {
+
+      const newAppNode: AppNode = {
         ...newNode,
-        center: mouseToNodeCoords(event, canvasState),
+        center: nodeCoordsOfMouse,
         radius: defaultNodeRadius,
         color: "red",
         isActive: false,
+        textDirection: "D",
       };
       addNode(newAppNode);
     },
-    [addNode, appNodes]
+    [addNode, appNodes, updateNodes]
   );
 }

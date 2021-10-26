@@ -1,6 +1,6 @@
 import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
 import config from "../../config";
-import { AppNode } from "../../App";
+import { AppNode, Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
 
@@ -44,50 +44,112 @@ function drawCircleOutline(
   context.restore();
 }
 
-function getHashPattern(): HTMLCanvasElement {
-  // ty https://stackoverflow.com/a/47288427/8438955
-  const patternCanvas = document.createElement("canvas");
-  const patternContext = patternCanvas.getContext("2d");
-  if (patternContext) {
-    const colour = "black";
+function drawHashPattern(
+  context: CanvasRenderingContext2D,
+  center: Point,
+  radius: number
+) {
+  context.save();
+  context.lineWidth = 2;
+  context.fillStyle = "#FFFFFF";
 
-    const CANVAS_SIDE_LENGTH = 10;
-    const WIDTH = CANVAS_SIDE_LENGTH;
-    const HEIGHT = CANVAS_SIDE_LENGTH;
-    const DIVISIONS = 8;
+  const delta = 4.5;
+  const buffer = 1;
+  const circle = 2;
 
-    patternCanvas.width = WIDTH;
-    patternCanvas.height = HEIGHT;
-    patternContext.fillStyle = colour;
+  // save the canvas above, now transform it for ease of drawing
+  context.translate(center.x, center.y);
+  context.rotate(Math.PI / 4);
 
-    // Top line
-    patternContext.beginPath();
-    patternContext.moveTo(0, HEIGHT * (1 / DIVISIONS));
-    patternContext.lineTo(WIDTH * (1 / DIVISIONS), 0);
-    patternContext.lineTo(0, 0);
-    patternContext.lineTo(0, HEIGHT * (1 / DIVISIONS));
-    patternContext.fill();
+  // draw horizontal line
+  context.beginPath();
+  context.moveTo(-radius, 0);
+  context.lineTo(radius, 0);
+  context.stroke();
 
-    // Middle line
-    patternContext.beginPath();
-    patternContext.moveTo(WIDTH, HEIGHT * (1 / DIVISIONS));
-    patternContext.lineTo(WIDTH * (1 / DIVISIONS), HEIGHT);
-    patternContext.lineTo(0, HEIGHT);
-    patternContext.lineTo(0, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
-    patternContext.lineTo(WIDTH * ((DIVISIONS - 1) / DIVISIONS), 0);
-    patternContext.lineTo(WIDTH, 0);
-    patternContext.lineTo(WIDTH, HEIGHT * (1 / DIVISIONS));
-    patternContext.fill();
-
-    // Bottom line
-    patternContext.beginPath();
-    patternContext.moveTo(WIDTH, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
-    patternContext.lineTo(WIDTH * ((DIVISIONS - 1) / DIVISIONS), HEIGHT);
-    patternContext.lineTo(WIDTH, HEIGHT);
-    patternContext.lineTo(WIDTH, HEIGHT * ((DIVISIONS - 1) / DIVISIONS));
-    patternContext.fill();
+  // draw smaller horizontal lines offset vertically from center
+  let h = 0; // vertical distance from center
+  while (h + delta < radius) {
+    h = h + delta;
+    const newRadius = radius * Math.sin(Math.acos(h / radius));
+    context.moveTo(-newRadius - buffer, h);
+    context.lineTo(newRadius + buffer, h);
+    context.stroke();
+    context.moveTo(-newRadius - buffer, -h);
+    context.lineTo(newRadius + buffer, -h);
+    context.stroke();
   }
-  return patternCanvas;
+  context.closePath();
+
+  // clip off the extra bits around the circle
+  context.beginPath();
+  context.arc(0, 0, radius + circle, 0, Math.PI * 2, false);
+  context.arc(0, 0, radius, 0, Math.PI * 2, true);
+  context.fill();
+
+  context.restore();
+}
+
+function drawNodeName(
+  context: CanvasRenderingContext2D,
+  name: string,
+  center: Point,
+  radius: number,
+  textDirection: Direction
+) {
+  const bufferText = 2;
+  context.save();
+  context.font = "14px Helvetica";
+  const textMetrics = context.measureText(name);
+  const width = textMetrics.width;
+  context.translate(center.x, center.y);
+  if (textDirection === "D") {
+    context.fillText(
+      name,
+      -width / 2,
+      textMetrics.actualBoundingBoxAscent + radius + bufferText
+    );
+  } else if (textDirection === "R") {
+    context.fillText(
+      name,
+      radius + bufferText,
+      textMetrics.actualBoundingBoxAscent / 2
+    );
+  } else if (textDirection === "U") {
+    context.fillText(
+      name,
+      -width / 2,
+      -(textMetrics.actualBoundingBoxDescent + radius + bufferText)
+    );
+  } else {
+    context.fillText(
+      name,
+      -(width + radius + bufferText),
+      textMetrics.actualBoundingBoxAscent / 2
+    );
+  }
+  context.restore();
+}
+
+export function drawNode(
+  context: CanvasRenderingContext2D,
+  name: string,
+  center: Point,
+  radius: number,
+  isActive: boolean,
+  isBoundary: boolean,
+  textDirection: Direction
+  // temperatureDegC: number, // determines color?
+  // capacitanceJPerDegK: number // determines size?
+): void {
+  drawCircle(context, center, radius, "red");
+  if (isActive) {
+    drawCircleOutline(context, center, radius, "black");
+  }
+  if (isBoundary) {
+    drawHashPattern(context, center, radius);
+  }
+  drawNodeName(context, name, center, radius, textDirection);
 }
 
 export function drawArrow(
@@ -143,66 +205,6 @@ export function drawClearBox(
   context.closePath();
 
   context.restore();
-}
-
-export function drawNode(
-  context: CanvasRenderingContext2D,
-  center: Point,
-  radius: number,
-  isActive: boolean,
-  isBoundary: boolean
-  // temperatureDegC: number, // determines color?
-  // capacitanceJPerDegK: number // determines size?
-): void {
-  drawCircle(context, center, radius, "red");
-
-  // outline active nodes
-  if (isActive) {
-    drawCircleOutline(context, center, radius, "black");
-  }
-
-  // pattern boundary nodes
-  if (isBoundary) {
-    context.save();
-    context.lineWidth = 2;
-    context.fillStyle = "#FFFFFF";
-
-    const delta = 4.5;
-    const buffer = 1;
-    const circle = 2;
-
-    // save the canvas above, now transform it for ease of drawing
-    context.translate(center.x, center.y);
-    context.rotate(Math.PI / 4);
-
-    // draw horizontal line
-    context.beginPath();
-    context.moveTo(-radius, 0);
-    context.lineTo(radius, 0);
-    context.stroke();
-
-    // draw smaller horizontal lines offset vertically from center
-    let h = 0; // vertical distance from center
-    while (h + delta < radius) {
-      h = h + delta;
-      const newRadius = radius * Math.sin(Math.acos(h / radius));
-      context.moveTo(-newRadius - buffer, h);
-      context.lineTo(newRadius + buffer, h);
-      context.stroke();
-      context.moveTo(-newRadius - buffer, -h);
-      context.lineTo(newRadius + buffer, -h);
-      context.stroke();
-    }
-    context.closePath();
-
-    // clip off the extra bits around the circle
-    context.beginPath();
-    context.arc(0, 0, radius + circle, 0, Math.PI * 2, false);
-    context.arc(0, 0, radius, 0, Math.PI * 2, true);
-    context.fill();
-
-    context.restore();
-  }
 }
 
 export function drawConnection(
@@ -288,5 +290,18 @@ export function mouseToNodeCoords(
     );
   } else {
     return ORIGIN;
+  }
+}
+
+export function rotatedDirection(direction: Direction): Direction {
+  // assume rotate counter-clockwise
+  if (direction === "D") {
+    return "R";
+  } else if (direction === "R") {
+    return "U";
+  } else if (direction === "U") {
+    return "L";
+  } else {
+    return "D";
   }
 }

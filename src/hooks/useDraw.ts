@@ -15,10 +15,12 @@ export default function useDraw(
       appNodes.map((node) => {
         drawNode(
           context,
+          node.name,
           node.center,
           node.radius,
           node.isActive,
-          node.isBoundary
+          node.isBoundary,
+          node.textDirection
           // node.temperatureDegC,
           // node.capacitanceJPerDegK
         );
