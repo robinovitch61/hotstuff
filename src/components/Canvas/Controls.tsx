@@ -1,18 +1,18 @@
 import * as React from "react";
 import styled from "styled-components/macro";
-import { Point } from "../../utils/pointUtils";
+import { ORIGIN, Point } from "../../utils/pointUtils";
 import { CanvasState, SavedCanvasState } from "./Canvas";
 
-const StyledBottomLeftButton = styled.button`
+const StyledButtons = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
-  margin: 0.2em;
+  display: flex;
+  flex-direction: column;
 `;
 
-const StyledBottomRightButton = styled(StyledBottomLeftButton)`
-  left: unset;
-  right: 0;
+const StyledButton = styled.button`
+  margin: 0.2em;
 `;
 
 type ControlsProps = {
@@ -28,18 +28,16 @@ type ControlsProps = {
 
 export default function Controls(props: ControlsProps): React.ReactElement {
   return (
-    <>
-      <StyledBottomLeftButton
-        onClick={() => {
-          props.setSavedCanvasState({
-            offset: props.canvasState.offset,
-            scale: props.canvasState.scale,
-          });
-        }}
+    <StyledButtons>
+      <StyledButton
+        onClick={() =>
+          props.canvasState.context &&
+          props.setView(props.canvasState.context, ORIGIN, 1)
+        }
       >
-        Save View
-      </StyledBottomLeftButton>
-      <StyledBottomRightButton
+        Reset View
+      </StyledButton>
+      <StyledButton
         onClick={() =>
           props.canvasState.context &&
           props.setView(
@@ -49,8 +47,18 @@ export default function Controls(props: ControlsProps): React.ReactElement {
           )
         }
       >
-        Reset View
-      </StyledBottomRightButton>
-    </>
+        Saved View
+      </StyledButton>
+      <StyledButton
+        onClick={() => {
+          props.setSavedCanvasState({
+            offset: props.canvasState.offset,
+            scale: props.canvasState.scale,
+          });
+        }}
+      >
+        Save View
+      </StyledButton>
+    </StyledButtons>
   );
 }

@@ -1,8 +1,8 @@
 # Hot Stuff
 
 TODO:
-- [ ] Restore saved + reset view buttons
 - [ ] Connection options don't show self connections
+- [ ] No arrow while making connection (just line)
 - [ ] X, Table Tabs, Tab-selectable
 - [ ] Add node/connection in table
 - [ ] Draw double arrows for bidirectional
@@ -13,3 +13,4 @@ TODO:
 - [ ] Center view on a node button in table
 - [ ] Buttons for aligning selected nodes horizontally/vertically
 - [ ] Copy/paste cells and/or duplicate in table
+- [ ] View/Hide controls
