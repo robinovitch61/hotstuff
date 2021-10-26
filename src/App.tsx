@@ -38,6 +38,10 @@ export type AppConnection = HSConnection & {
 const StyledApp = styled.div<{ height: number }>`
   display: flex;
   height: ${(props) => props.height}px;
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
 `;
 
 const StyledWorkspace = styled.div<{ height: number; width: number }>`

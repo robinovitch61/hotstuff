@@ -4,9 +4,6 @@ import { Point } from "../../utils/pointUtils";
 import { CanvasState, SavedCanvasState } from "./Canvas";
 
 const StyledBottomLeftButton = styled.button`
-  //-webkit-user-select: none; /* Chrome/Safari */
-  //-moz-user-select: none; /* Firefox */
-  //-ms-user-select: none; /* IE10+ */
   position: absolute;
   bottom: 0;
   left: 0;
