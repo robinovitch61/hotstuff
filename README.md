@@ -1,7 +1,7 @@
 # Hot Stuff
 
 TODO:
-- [ ] Connection options don't show self connections
+- [ ] Connection options don't show option to connect to same source/target
 - [ ] No arrow while making connection (just line)
 - [ ] X, Table Tabs, Tab-selectable
 - [ ] Add node/connection in table

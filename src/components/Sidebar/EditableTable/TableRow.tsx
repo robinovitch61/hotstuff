@@ -58,14 +58,13 @@ export default function TableRow<T extends TableCompatibleType>(
             <DropDownTableCell
               rowId={props.data.id}
               options={col.options}
-              initialVal={
-                col.options.filter(
-                  (option) =>
-                    option.value === (props.data[col.key] as never) ||
-                    option.text === (props.data[col.key] as never)
-                )[0].value
-              }
+              setOption={col.options.find(
+                (option) =>
+                  option.id === (props.data[col.key] as never) ||
+                  option.text === (props.data[col.key] as never)
+              )}
               onSelectOption={col.onSelectOption}
+              optionsFilter={col.optionsFilter}
             />
           ) : typeof props.data[col.key] === "number" ? (
             <NumericalTableCell

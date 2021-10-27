@@ -17,8 +17,8 @@ const StyledTableBody = styled.div`
 `;
 
 export type ColOption = {
+  id: string;
   text: string;
-  value: string;
 };
 
 export type Column<T> = {
@@ -28,6 +28,7 @@ export type Column<T> = {
   minWidthPx?: number;
   options?: ColOption[];
   onSelectOption?: (id: string, option: ColOption) => void;
+  optionsFilter?: (option: ColOption) => ColOption[];
 };
 
 export type EditableTableProps<T> = {

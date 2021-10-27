@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import config from "../../../config";
 import { AppConnection, AppNode } from "../../../App";
 import EditableTable, { ColOption, Column } from "./EditableTable";
@@ -10,6 +10,21 @@ const defaultConnectionSortState: SortState<AppConnectionTable> = {
   key: "source",
   direction: "ASC",
 };
+
+const connectionTypes: ColOption[] = [
+  {
+    id: "bi",
+    text: "Bidirectional",
+  },
+  {
+    id: "uni",
+    text: "Unidirectional",
+  },
+  {
+    id: "rad",
+    text: "Radiative",
+  },
+];
 
 export type ConnectionTableProps = {
   rows: AppConnection[];
@@ -25,10 +40,50 @@ export default function ConnectionTable(
     defaultConnectionSortState
   );
 
-  const nodeOptions = props.nodes.map((node) => ({
+  const nodeOptions: ColOption[] = props.nodes.map((node) => ({
+    id: node.id,
     text: node.name,
-    value: node.id,
   }));
+
+  const onSelectNewSource = useCallback(
+    (id: string, option: ColOption) => {
+      const connection = props.rows.find((conn) => conn.id === id);
+      const newSourceNode = props.nodes.find((node) => node.id === option.id);
+      if (
+        !connection ||
+        !newSourceNode ||
+        newSourceNode.id === connection.target.id
+      ) {
+        return;
+      }
+      props.onUpdateRow({
+        ...connection,
+        source: newSourceNode,
+        sourceName: newSourceNode.name,
+      });
+    },
+    [props]
+  );
+
+  const onSelectNewTarget = useCallback(
+    (id: string, option: ColOption) => {
+      const connection = props.rows.find((conn) => conn.id === id);
+      const newTargetNode = props.nodes.find((node) => node.id === option.id);
+      if (
+        !connection ||
+        !newTargetNode ||
+        newTargetNode.id === connection.source.id
+      ) {
+        return;
+      }
+      props.onUpdateRow({
+        ...connection,
+        target: newTargetNode,
+        targetName: newTargetNode.name,
+      });
+    },
+    [props]
+  );
 
   const connectionColumns: Column<AppConnection>[] = useMemo(
     () => [
@@ -38,19 +93,7 @@ export default function ConnectionTable(
         width: 0.25,
         minWidthPx: 100,
         options: nodeOptions,
-        onSelectOption: (id: string, option: ColOption) => {
-          const connection = props.rows.filter((conn) => conn.id === id)[0];
-          const newSourceNode = props.nodes.filter(
-            (node) => node.id == option.value
-          )[0];
-          if (newSourceNode.id !== connection.target.id) {
-            props.onUpdateRow({
-              ...connection,
-              source: newSourceNode,
-              sourceName: newSourceNode.name,
-            });
-          }
-        },
+        onSelectOption: onSelectNewSource,
       },
       {
         text: "Target",
@@ -58,19 +101,7 @@ export default function ConnectionTable(
         width: 0.25,
         minWidthPx: 100,
         options: nodeOptions,
-        onSelectOption: (id: string, option: ColOption) => {
-          const connection = props.rows.filter((conn) => conn.id === id)[0];
-          const newTargetNode = props.nodes.filter(
-            (node) => node.id == option.value
-          )[0];
-          if (newTargetNode.id !== connection.source.id) {
-            props.onUpdateRow({
-              ...connection,
-              target: newTargetNode,
-              targetName: newTargetNode.name,
-            });
-          }
-        },
+        onSelectOption: onSelectNewTarget,
       },
       {
         text: "Resistance degK/W",
@@ -83,28 +114,15 @@ export default function ConnectionTable(
         key: "kind",
         width: 0.25,
         minWidthPx: 100,
-        options: [
-          {
-            text: "Bidirectional",
-            value: "bi",
-          },
-          {
-            text: "Unidirectional",
-            value: "uni",
-          },
-          {
-            text: "Radiative",
-            value: "rad",
-          },
-        ],
+        options: connectionTypes,
         onSelectOption: (id: string, option: ColOption) =>
           props.onUpdateRow({
             ...props.rows.filter((conn) => conn.id === id)[0],
-            kind: option.value as "bi" | "uni" | "rad",
+            kind: option.id as "bi" | "uni" | "rad",
           }),
       },
     ],
-    [nodeOptions, props]
+    [nodeOptions, onSelectNewSource, onSelectNewTarget, props]
   );
 
   function sortByState(

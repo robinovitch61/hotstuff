@@ -12,8 +12,9 @@ const StyledSelect = styled.select`
 export type DropDownTableCellProps = {
   rowId: string;
   options: ColOption[];
-  initialVal: string;
+  setOption?: ColOption;
   onSelectOption: (id: string, option: ColOption) => void;
+  optionsFilter?: (option: ColOption) => ColOption[];
 };
 
 export default function DropDownTableCell(
@@ -21,16 +22,18 @@ export default function DropDownTableCell(
 ): React.ReactElement {
   function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const newVal = event.target.value;
-    const selectedOption = props.options.filter(
-      (option) => option.value === newVal
-    )[0];
-    props.onSelectOption(props.rowId, selectedOption);
+
+    const selectedOption = props.options.find((option) => option.id === newVal);
+
+    if (selectedOption !== undefined) {
+      props.onSelectOption(props.rowId, selectedOption);
+    }
   }
 
   return (
-    <StyledSelect value={props.initialVal} onChange={handleChange}>
+    <StyledSelect value={props.setOption?.id} onChange={handleChange}>
       {props.options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option key={option.id} value={option.id}>
           {option.text}
         </option>
       ))}
