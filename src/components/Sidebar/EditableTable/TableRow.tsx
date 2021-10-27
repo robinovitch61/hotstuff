@@ -60,29 +60,29 @@ export default function TableRow<T extends TableCompatibleType>(
               options={col.options}
               setOption={col.options.find(
                 (option) =>
-                  option.id === (props.data[col.key] as never) ||
-                  option.text === (props.data[col.key] as never)
+                  option.id === props.data[col.key] ||
+                  option.text === props.data[col.key]
               )}
               onSelectOption={col.onSelectOption}
               optionsFilter={col.optionsFilter}
             />
           ) : typeof props.data[col.key] === "number" ? (
             <NumericalTableCell
-              initialVal={props.data[col.key] as never} // TODO
+              initialVal={props.data[col.key]}
               onBlur={(newVal) =>
                 props.onUpdateRow({ ...props.data, [col.key]: newVal })
               }
             />
           ) : typeof props.data[col.key] === "string" ? (
             <TextTableCell
-              initialVal={props.data[col.key] as never} // TODO
+              initialVal={props.data[col.key]}
               onBlur={(newVal) =>
                 props.onUpdateRow({ ...props.data, [col.key]: newVal })
               }
             />
           ) : (
             <BooleanTableCell
-              initialIsActive={props.data[col.key] as never} // TODO
+              initialIsActive={props.data[col.key]}
               onClick={(isActive) =>
                 props.onUpdateRow({ ...props.data, [col.key]: !isActive })
               }
@@ -100,7 +100,7 @@ export default function TableRow<T extends TableCompatibleType>(
         );
       })}
 
-      {!!props.isDeletable && (
+      {props.isDeletable && (
         <StyledDeleteCell
           width={0.1}
           minWidth={40}

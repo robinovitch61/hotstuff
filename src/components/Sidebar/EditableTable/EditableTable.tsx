@@ -41,7 +41,11 @@ export type EditableTableProps<T> = {
   heightOffsetPx?: number;
 };
 
-export interface TableCompatibleType {
+interface StringKeyed {
+  [key: string]: any;
+}
+
+export interface TableCompatibleType extends StringKeyed {
   id: string;
   isActive: boolean;
 }
