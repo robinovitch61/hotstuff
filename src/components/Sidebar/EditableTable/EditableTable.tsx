@@ -1,20 +1,7 @@
 import * as React from "react";
-import styled from "styled-components/macro";
 import TableRow from "./TableRow";
 import SortableTableHeader, { SortState } from "./SortableTableHeader";
-
-const StyledTableWrapper = styled.div`
-  width: 100%;
-`;
-
-const StyledTable = styled.div`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const StyledTableBody = styled.div`
-  width: 100%;
-`;
+import { StyledTable, StyledTableBody, StyledTableWrapper } from "./style";
 
 export type ColOption = {
   id: string;

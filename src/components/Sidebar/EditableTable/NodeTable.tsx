@@ -1,42 +1,68 @@
 import React, { useState } from "react";
 import config from "../../../config";
 import { AppNode } from "../../../App";
-import EditableTable, { Column } from "./EditableTable";
-import { SortState } from "./SortableTableHeader";
+import { ColOption } from "./EditableTable";
+import { SortDirection } from "./SortableTableHeader";
+import TextTableCell from "./TextTableCell";
+import {
+  StyledCell,
+  StyledColHeader,
+  StyledColText,
+  StyledDeleteCell,
+  StyledHeaderWrapper,
+  StyledRow,
+  StyledSortIcon,
+  StyledTable,
+  StyledTableBody,
+  StyledTableWrapper,
+} from "./style";
+import NumericalTableCell from "./NumericalTableCell";
+import BooleanTableCell from "./BooleanTableCell";
 
-const defaultNodeSortState: SortState<AppNode> = {
+type NodeTableSortState = { key: keyof AppNode; direction: SortDirection };
+
+const defaultNodeSortState: NodeTableSortState = {
   key: "name",
   direction: "ASC",
 };
 
-const nodeColumns: Column<AppNode>[] = [
+type NodeTableColumn = {
+  text: string;
+  key: keyof AppNode;
+  width: number; // 0 to 1
+  minWidthPx?: number;
+  options?: ColOption[];
+  onSelectOption?: (id: string, option: ColOption) => void;
+};
+
+const nodeColumns: NodeTableColumn[] = [
   {
-    text: "Name",
     key: "name",
+    text: "Name",
     width: 0.2,
     minWidthPx: 100,
   },
   {
-    text: "Temp degC",
     key: "temperatureDegC",
+    text: "Temp degC",
     width: 0.2,
     minWidthPx: 100,
   },
   {
-    text: "Capacitance J/degK",
     key: "capacitanceJPerDegK",
+    text: "Capacitance J/degK",
     width: 0.2,
     minWidthPx: 100,
   },
   {
-    text: "Power Gen W",
     key: "powerGenW",
+    text: "Power Gen W",
     width: 0.15,
     minWidthPx: 80,
   },
   {
-    text: "Boundary?",
     key: "isBoundary",
+    text: "Boundary?",
     width: 0.15,
     minWidthPx: 80,
   },
@@ -50,7 +76,7 @@ export type NodeTableProps = {
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
   const [sortState, setSortState] =
-    useState<SortState<AppNode>>(defaultNodeSortState);
+    useState<NodeTableSortState>(defaultNodeSortState);
 
   function sortByState(first: AppNode, second: AppNode): number {
     if (first[sortState.key] > second[sortState.key]) {
@@ -60,17 +86,111 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     }
   }
 
+  const sortedRows = props.rows.sort(sortByState);
+
+  const tableRows = sortedRows.map((row) => {
+    return (
+      <StyledRow
+        key={row.id}
+        heightOffsetPx={config.tabHeightPx}
+        isActive={row.isActive}
+      >
+        {nodeColumns.map((col) => {
+          const initialVal = row[col.key];
+          const tableCell =
+            typeof initialVal === "string" ? (
+              <TextTableCell
+                initialVal={initialVal}
+                onBlur={(newVal) =>
+                  props.onUpdateRow({ ...row, [col.key]: newVal })
+                }
+              />
+            ) : typeof initialVal === "number" &&
+              typeof row[col.key] === "number" ? (
+              <NumericalTableCell
+                initialVal={initialVal}
+                onBlur={(newVal) =>
+                  props.onUpdateRow({ ...row, temperatureDegC: newVal })
+                }
+              />
+            ) : typeof initialVal === "boolean" ? (
+              <BooleanTableCell
+                initialIsActive={initialVal}
+                onClick={(isActive) =>
+                  props.onUpdateRow({ ...row, isBoundary: !isActive })
+                }
+                showWhenActive={"✅"}
+              />
+            ) : (
+              <></>
+            );
+          return (
+            <StyledCell
+              key={col.key}
+              width={col.width}
+              minWidth={col.minWidthPx}
+            >
+              {tableCell}
+            </StyledCell>
+          );
+        })}
+        <StyledDeleteCell
+          width={0.1}
+          minWidth={40}
+          onClick={() => props.onDeleteRow(row)}
+        >
+          ❌
+        </StyledDeleteCell>
+      </StyledRow>
+    );
+  });
+
+  const sortIcon = !sortState
+    ? ""
+    : sortState.direction === "ASC"
+    ? "\u25B2"
+    : "\u25BC";
+
+  function oppositeSortDirection(sortDirection: SortDirection): SortDirection {
+    return sortDirection === "ASC" ? "DESC" : "ASC";
+  }
+
   return (
-    <EditableTable<AppNode>
-      columns={nodeColumns}
-      rowData={[...props.rows].sort(sortByState)}
-      onUpdateRow={props.onUpdateRow}
-      onDeleteRow={props.onDeleteRow}
-      onUpdateSortState={(newSortState: SortState<AppNode>) =>
-        setSortState(newSortState)
-      }
-      sortState={sortState}
-      heightOffsetPx={config.tabHeightPx}
-    />
+    <StyledTableWrapper>
+      <StyledTable>
+        <StyledHeaderWrapper heightOffsetPx={config.tabHeightPx}>
+          {nodeColumns.map((col) => {
+            const isSortedCol = sortState && sortState.key === col.key;
+            const onClick = () => {
+              setSortState({
+                key: col.key,
+                direction:
+                  !isSortedCol || !sortState
+                    ? "ASC"
+                    : oppositeSortDirection(sortState.direction),
+              });
+            };
+
+            return (
+              <StyledColHeader
+                key={col.key.toString()}
+                onClick={onClick}
+                width={col.width}
+                minWidth={col.minWidthPx}
+              >
+                <StyledColText>{col.text}</StyledColText>
+                <StyledSortIcon>{isSortedCol ? sortIcon : ""}</StyledSortIcon>
+              </StyledColHeader>
+            );
+          })}
+          <StyledColHeader
+            width={0.1}
+            minWidth={40}
+            style={{ cursor: "unset" }}
+          />
+        </StyledHeaderWrapper>
+        <StyledTableBody>{tableRows}</StyledTableBody>
+      </StyledTable>
+    </StyledTableWrapper>
   );
 }

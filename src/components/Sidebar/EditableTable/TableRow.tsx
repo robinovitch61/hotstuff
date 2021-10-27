@@ -1,41 +1,10 @@
 import * as React from "react";
-import styled from "styled-components/macro";
 import BooleanTableCell from "./BooleanTableCell";
 import { Column, TableCompatibleType } from "./EditableTable";
 import NumericalTableCell from "./NumericalTableCell";
 import DropDownTableCell from "./DropDownTableCell";
 import TextTableCell from "./TextTableCell";
-
-const StyledRow = styled.div<{ heightOffsetPx?: number; isActive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  min-width: 100%;
-  position: sticky;
-  top: ${({ heightOffsetPx }) =>
-    heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
-  background: ${({ isActive }) =>
-    isActive ? "rgba(112, 165, 255, 0.2)" : "none"};
-`;
-
-const StyledCell = styled.div<{ width: number; minWidth?: number }>`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #ddd;
-  height: 2em;
-  width: ${({ width }) => `${width * 100}%`};
-  min-width: ${({ minWidth }) => (!!minWidth ? `${minWidth}px` : "none")};
-`;
-
-const StyledDeleteCell = styled(StyledCell)`
-  cursor: pointer;
-  user-select: none;
-  min-width: 40px;
-
-  &:hover {
-    background: black;
-  }
-`;
+import { StyledCell, StyledDeleteCell, StyledRow } from "./style";
 
 export type TableRowProps<T extends TableCompatibleType> = {
   columns: Column<T>[];
