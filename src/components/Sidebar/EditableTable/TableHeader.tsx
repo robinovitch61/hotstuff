@@ -55,38 +55,11 @@ export default function TableHeader<T>(
           </StyledColHeader>
         );
       })}
-      <StyledColHeader width={0.1} minWidth={40} style={{ cursor: "unset" }} />
+      <StyledColHeader
+        width={config.tableDeleteCellWidthPerc}
+        minWidth={config.tableDeleteCellMinWidthPx}
+        style={{ cursor: "unset" }}
+      />
     </StyledHeaderWrapper>
-    // <StyledHeaderWrapper heightOffsetPx={config.tabHeightPx}>
-    //   {connectionColumns.map((col) => {
-    //     const isSortedCol = sortState && sortState.key === col.key;
-    //     const onClick = () => {
-    //       setSortState({
-    //         key: col.key,
-    //         direction:
-    //           !isSortedCol || !sortState
-    //             ? "ASC"
-    //             : oppositeSortDirection(sortState.direction),
-    //       });
-    //     };
-    //
-    //     return (
-    //       <StyledColHeader
-    //         key={col.key.toString()}
-    //         onClick={onClick}
-    //         width={col.width}
-    //         minWidth={col.minWidthPx}
-    //       >
-    //         <StyledColText>{col.text}</StyledColText>
-    //         <StyledSortIcon>{isSortedCol ? sortIcon : ""}</StyledSortIcon>
-    //       </StyledColHeader>
-    //     );
-    //   })}
-    //   <StyledColHeader
-    //     width={0.1}
-    //     minWidth={40}
-    //     style={{ cursor: "unset" }}
-    //   />
-    // </StyledHeaderWrapper>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import config from "../../../../config";
 import { AppConnection, AppNode } from "../../../../App";
 import {
@@ -12,13 +12,13 @@ import {
 import { CellOption, TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
+import useSortableTable from "../hooks/useSortableTable";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
-type ConnectionTableSortState = TableSortState<AppConnectionTable>;
 type ConnectionTableColumn = TableColumn<AppConnection>;
 type ConnectionType = "bi" | "uni" | "rad";
 
-const defaultConnectionSortState: ConnectionTableSortState = {
+const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
   key: "source",
   direction: "ASC",
 };
@@ -94,9 +94,10 @@ type ConnectionTableProps = {
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
-  const [sortState, setSortState] = useState<ConnectionTableSortState>(
-    defaultConnectionSortState
-  );
+  const [sortState, setSortState, sortByState] =
+    useSortableTable<AppConnectionTable>({
+      default: defaultConnectionSortState,
+    });
 
   const onSelectNewSource = useCallback(
     (id: string, option: CellOption) => {
@@ -197,17 +198,6 @@ export default function ConnectionTable(
     ]
   );
 
-  function sortByState(
-    first: AppConnectionTable,
-    second: AppConnectionTable
-  ): number {
-    if (first[sortState.key] > second[sortState.key]) {
-      return sortState.direction === "ASC" ? 1 : -1;
-    } else {
-      return sortState.direction === "ASC" ? -1 : 1;
-    }
-  }
-
   const activeNodeIds = props.nodes
     .filter((node) => node.isActive)
     .map((node) => node.id);
@@ -260,8 +250,8 @@ export default function ConnectionTable(
           );
         })}
         <StyledDeleteCell
-          width={0.1}
-          minWidth={40}
+          width={config.tableDeleteCellWidthPerc}
+          minWidth={config.tableDeleteCellMinWidthPx}
           onClick={() => props.onDeleteRow(row)}
         >
           ❌

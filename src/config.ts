@@ -14,6 +14,8 @@ const config = {
   maxZoom: 5,
   activeNodeOutlineWidth: 5,
   tabHeightPx: 25,
+  tableDeleteCellWidthPerc: 0.1,
+  tableDeleteCellMinWidthPx: 40,
 };
 
 export default config;

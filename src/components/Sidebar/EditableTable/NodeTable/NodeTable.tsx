@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import config from "../../../../config";
 import { AppNode } from "../../../../App";
 import {
@@ -12,11 +12,11 @@ import {
 import { TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
+import useSortableTable from "../hooks/useSortableTable";
 
-type NodeTableSortState = TableSortState<AppNode>;
 type NodeTableColumn = TableColumn<AppNode>;
 
-const defaultNodeSortState: NodeTableSortState = {
+const defaultNodeSortState: TableSortState<AppNode> = {
   key: "name",
   direction: "ASC",
 };
@@ -61,16 +61,9 @@ type NodeTableProps = {
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
-  const [sortState, setSortState] =
-    useState<NodeTableSortState>(defaultNodeSortState);
-
-  function sortByState(first: AppNode, second: AppNode): number {
-    if (first[sortState.key] > second[sortState.key]) {
-      return sortState.direction === "ASC" ? 1 : -1;
-    } else {
-      return sortState.direction === "ASC" ? -1 : 1;
-    }
-  }
+  const [sortState, setSortState, sortByState] = useSortableTable<AppNode>({
+    default: defaultNodeSortState,
+  });
 
   const sortedRows = props.rows.sort(sortByState);
 
@@ -100,8 +93,8 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
           );
         })}
         <StyledDeleteCell
-          width={0.1}
-          minWidth={40}
+          width={config.tableDeleteCellWidthPerc}
+          minWidth={config.tableDeleteCellMinWidthPx}
           onClick={() => props.onDeleteRow(row)}
         >
           ❌
