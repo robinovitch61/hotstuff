@@ -15,7 +15,7 @@ import useKeyDown from "./hooks/useKeyDown";
 import { defaultConnections, defaultNodes } from "./default";
 import { run } from "hotstuff-network";
 
-const { editorWidthPerc, canvasHeightPerc } = config;
+const { editorWidthPerc, canvasHeightPerc, plotMargin } = config;
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -121,7 +121,11 @@ export default function App(): React.ReactElement {
             setKeyboardActive={setKeyboardActive}
           />
         </StyledCanvas>
-        <Plot height={plotHeight} />
+        <Plot
+          height={plotHeight}
+          margin={plotMargin}
+          modelOutput={modelOutput}
+        />
       </StyledWorkspace>
       <Sidebar
         height={windowHeight}
@@ -140,7 +144,6 @@ export default function App(): React.ReactElement {
             timeStepS: timeStepS,
             totalTimeS: totalTimeS,
           });
-          console.log(output);
           setModelOutput(output);
         }}
       />

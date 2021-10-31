@@ -1,9 +1,12 @@
 import { HSConnection } from "hotstuff-network";
 
 const config = {
+  defaultTempDegC: 23,
+  defaultCapJPerDegK: 1,
+  defaultPowerGenW: 0,
   canvasHeightPerc: 0.75,
   editorWidthPerc: 0.3,
-  defaultTotalTimeSeconds: 10,
+  defaultTotalTimeSeconds: 60,
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
@@ -16,6 +19,12 @@ const config = {
   tabHeightPx: 25,
   tableDeleteCellWidthPerc: 0.1,
   tableDeleteCellMinWidthPx: 40,
+  plotMargin: {
+    left: 5,
+    right: 5,
+    top: 40,
+    bottom: 40,
+  },
 };
 
 export default config;

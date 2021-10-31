@@ -44,9 +44,9 @@ export default function useDoubleClick(
           numNewNodes === 0
             ? `${newNodeNamePrefix}`
             : `${newNodeNamePrefix} (${numNewNodes + 1})`,
-        temperatureDegC: 0,
-        capacitanceJPerDegK: 0,
-        powerGenW: 0,
+        temperatureDegC: config.defaultTempDegC,
+        capacitanceJPerDegK: config.defaultCapJPerDegK,
+        powerGenW: config.defaultPowerGenW,
         isBoundary: false,
       });
 

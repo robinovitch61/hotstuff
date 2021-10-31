@@ -4,16 +4,16 @@ import config from "./config";
 
 const test1 = makeNode({
   name: "test1",
-  temperatureDegC: 20,
-  capacitanceJPerDegK: 10,
+  temperatureDegC: 85,
+  capacitanceJPerDegK: 100,
   powerGenW: 0,
   isBoundary: true,
 });
 
 const test2 = makeNode({
   name: "test2",
-  temperatureDegC: 50,
-  capacitanceJPerDegK: 200,
+  temperatureDegC: 23,
+  capacitanceJPerDegK: 2,
   powerGenW: 0,
   isBoundary: false,
 });
