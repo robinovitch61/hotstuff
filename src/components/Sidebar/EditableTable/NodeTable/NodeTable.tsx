@@ -4,19 +4,16 @@ import { AppNode } from "../../../../App";
 import TextTableCell from "../cells/TextTableCell";
 import {
   StyledCell,
-  StyledColHeader,
-  StyledColText,
   StyledDeleteCell,
-  StyledHeaderWrapper,
   StyledRow,
-  StyledSortIcon,
   StyledTable,
   StyledTableBody,
   StyledTableWrapper,
 } from "../style";
 import NumericalTableCell from "../cells/NumericalTableCell";
 import BooleanTableCell from "../cells/BooleanTableCell";
-import { SortDirection, TableColumn, TableSortState } from "../types";
+import { TableColumn, TableSortState } from "../types";
+import TableHeader from "../TableHeader";
 
 type NodeTableSortState = TableSortState<AppNode>;
 type NodeTableColumn = TableColumn<AppNode>;
@@ -136,50 +133,14 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     );
   });
 
-  const sortIcon = !sortState
-    ? ""
-    : sortState.direction === "ASC"
-    ? "\u25B2"
-    : "\u25BC";
-
-  function oppositeSortDirection(sortDirection: SortDirection): SortDirection {
-    return sortDirection === "ASC" ? "DESC" : "ASC";
-  }
-
   return (
     <StyledTableWrapper>
       <StyledTable>
-        <StyledHeaderWrapper heightOffsetPx={config.tabHeightPx}>
-          {nodeColumns.map((col) => {
-            const isSortedCol = sortState && sortState.key === col.key;
-            const onClick = () => {
-              setSortState({
-                key: col.key,
-                direction:
-                  !isSortedCol || !sortState
-                    ? "ASC"
-                    : oppositeSortDirection(sortState.direction),
-              });
-            };
-
-            return (
-              <StyledColHeader
-                key={col.key.toString()}
-                onClick={onClick}
-                width={col.width}
-                minWidth={col.minWidthPx}
-              >
-                <StyledColText>{col.text}</StyledColText>
-                <StyledSortIcon>{isSortedCol ? sortIcon : ""}</StyledSortIcon>
-              </StyledColHeader>
-            );
-          })}
-          <StyledColHeader
-            width={0.1}
-            minWidth={40}
-            style={{ cursor: "unset" }}
-          />
-        </StyledHeaderWrapper>
+        <TableHeader<AppNode>
+          columns={nodeColumns}
+          sortState={sortState}
+          setSortState={setSortState}
+        />
         <StyledTableBody>{tableRows}</StyledTableBody>
       </StyledTable>
     </StyledTableWrapper>
