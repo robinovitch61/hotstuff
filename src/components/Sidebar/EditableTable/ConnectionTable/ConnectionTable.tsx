@@ -17,30 +17,17 @@ import DropDownTableCell from "../cells/DropDownTableCell";
 import TextTableCell from "../cells/TextTableCell";
 import NumericalTableCell from "../cells/NumericalTableCell";
 import BooleanTableCell from "../cells/BooleanTableCell";
-import { CellOption, SortDirection } from "../types";
+import {
+  CellOption,
+  SortDirection,
+  TableColumn,
+  TableSortState,
+} from "../types";
 
-export type AppConnectionTable = AppConnection & { isActive: boolean };
-
-export type ConnectionTableProps = {
-  rows: AppConnection[];
-  nodes: AppNode[];
-  onUpdateRow: (row: AppConnection) => void;
-  onDeleteRow: (row: AppConnection) => void;
-};
-
-export type ConnectionTableColumn = {
-  text: string;
-  key: keyof AppConnection;
-  width: number; // 0 to 1
-  minWidthPx?: number;
-  options?: CellOption[];
-  onSelectOption?: (id: string, option: CellOption) => void;
-};
-
-type ConnectionTableSortState = {
-  key: keyof AppConnectionTable;
-  direction: SortDirection;
-};
+type AppConnectionTable = AppConnection & { isActive: boolean };
+type ConnectionTableSortState = TableSortState<AppConnectionTable>;
+type ConnectionTableColumn = TableColumn<AppConnection>;
+type ConnectionType = "bi" | "uni" | "rad";
 
 const defaultConnectionSortState: ConnectionTableSortState = {
   key: "source",
@@ -108,17 +95,19 @@ function filterConnectionOptions(
   }
 }
 
+type ConnectionTableProps = {
+  rows: AppConnection[];
+  nodes: AppNode[];
+  onUpdateRow: (row: AppConnection) => void;
+  onDeleteRow: (row: AppConnection) => void;
+};
+
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
   const [sortState, setSortState] = useState<ConnectionTableSortState>(
     defaultConnectionSortState
   );
-
-  const nodeOptions: CellOption[] = props.nodes.map((node) => ({
-    id: node.id,
-    text: node.name,
-  }));
 
   const onSelectNewSource = useCallback(
     (id: string, option: CellOption) => {
@@ -160,6 +149,24 @@ export default function ConnectionTable(
     [props]
   );
 
+  const onSelectNewConnectionType = useCallback(
+    (id: string, option: CellOption) => {
+      const rowToUpdate = props.rows.find((conn) => conn.id === id);
+      if (rowToUpdate) {
+        props.onUpdateRow({
+          ...rowToUpdate,
+          kind: option.id as ConnectionType,
+        });
+      }
+    },
+    [props]
+  );
+
+  const nodeOptions: CellOption[] = props.nodes.map((node) => ({
+    id: node.id,
+    text: node.name,
+  }));
+
   const connectionColumns: ConnectionTableColumn[] = useMemo(
     () => [
       {
@@ -190,14 +197,15 @@ export default function ConnectionTable(
         width: 0.25,
         minWidthPx: 100,
         options: connectionTypes,
-        onSelectOption: (id: string, option: CellOption) =>
-          props.onUpdateRow({
-            ...props.rows.filter((conn) => conn.id === id)[0],
-            kind: option.id as "bi" | "uni" | "rad",
-          }),
+        onSelectOption: onSelectNewConnectionType,
       },
     ],
-    [nodeOptions, onSelectNewSource, onSelectNewTarget, props]
+    [
+      nodeOptions,
+      onSelectNewConnectionType,
+      onSelectNewSource,
+      onSelectNewTarget,
+    ]
   );
 
   function sortByState(

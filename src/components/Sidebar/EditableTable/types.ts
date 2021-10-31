@@ -4,3 +4,17 @@ export type CellOption = {
 };
 
 export type SortDirection = "ASC" | "DESC";
+
+export type TableColumn<T> = {
+  text: string;
+  key: keyof T;
+  width: number; // 0 to 1
+  minWidthPx?: number;
+  options?: CellOption[];
+  onSelectOption?: (id: string, option: CellOption) => void;
+};
+
+export type TableSortState<T> = {
+  key: keyof T;
+  direction: SortDirection;
+};

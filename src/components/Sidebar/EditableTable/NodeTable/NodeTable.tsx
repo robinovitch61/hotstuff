@@ -16,22 +16,14 @@ import {
 } from "../style";
 import NumericalTableCell from "../cells/NumericalTableCell";
 import BooleanTableCell from "../cells/BooleanTableCell";
-import { CellOption, SortDirection } from "../types";
+import { SortDirection, TableColumn, TableSortState } from "../types";
 
-type NodeTableSortState = { key: keyof AppNode; direction: SortDirection };
+type NodeTableSortState = TableSortState<AppNode>;
+type NodeTableColumn = TableColumn<AppNode>;
 
 const defaultNodeSortState: NodeTableSortState = {
   key: "name",
   direction: "ASC",
-};
-
-export type NodeTableColumn = {
-  text: string;
-  key: keyof AppNode;
-  width: number; // 0 to 1
-  minWidthPx?: number;
-  options?: CellOption[];
-  onSelectOption?: (id: string, option: CellOption) => void;
 };
 
 const nodeColumns: NodeTableColumn[] = [
@@ -67,7 +59,7 @@ const nodeColumns: NodeTableColumn[] = [
   },
 ];
 
-export type NodeTableProps = {
+type NodeTableProps = {
   rows: AppNode[];
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
