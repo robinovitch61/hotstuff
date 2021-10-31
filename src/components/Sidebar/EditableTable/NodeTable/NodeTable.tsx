@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import config from "../../../../config";
 import { AppNode } from "../../../../App";
-import TextTableCell from "../cells/TextTableCell";
 import {
   StyledCell,
   StyledDeleteCell,
@@ -10,10 +9,9 @@ import {
   StyledTableBody,
   StyledTableWrapper,
 } from "../style";
-import NumericalTableCell from "../cells/NumericalTableCell";
-import BooleanTableCell from "../cells/BooleanTableCell";
 import { TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
+import TableCell from "../TableCell";
 
 type NodeTableSortState = TableSortState<AppNode>;
 type NodeTableColumn = TableColumn<AppNode>;
@@ -84,34 +82,13 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         isActive={row.isActive}
       >
         {nodeColumns.map((col) => {
-          const initialVal = row[col.key];
-          const tableCell =
-            typeof initialVal === "string" ? (
-              <TextTableCell
-                initialVal={initialVal}
-                onBlur={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-              />
-            ) : typeof initialVal === "number" &&
-              typeof row[col.key] === "number" ? (
-              <NumericalTableCell
-                initialVal={initialVal}
-                onBlur={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-              />
-            ) : typeof initialVal === "boolean" ? (
-              <BooleanTableCell
-                initialIsActive={initialVal}
-                onClick={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-                showWhenActive={"✅"}
-              />
-            ) : (
-              <></>
-            );
+          const tableCell = (
+            <TableCell<AppNode>
+              row={row}
+              col={col}
+              onUpdateRow={props.onUpdateRow}
+            />
+          );
           return (
             <StyledCell
               key={col.key}

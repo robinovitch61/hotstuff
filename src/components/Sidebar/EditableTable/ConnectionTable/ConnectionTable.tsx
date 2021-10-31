@@ -9,14 +9,11 @@ import {
   StyledTableBody,
   StyledTableWrapper,
 } from "../style";
-import DropDownTableCell from "../cells/DropDownTableCell";
-import TextTableCell from "../cells/TextTableCell";
-import NumericalTableCell from "../cells/NumericalTableCell";
-import BooleanTableCell from "../cells/BooleanTableCell";
 import { CellOption, TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
+import TableCell from "../TableCell";
 
-type AppConnectionTable = AppConnection & { isActive: boolean };
+export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableSortState = TableSortState<AppConnectionTable>;
 type ConnectionTableColumn = TableColumn<AppConnection>;
 type ConnectionType = "bi" | "uni" | "rad";
@@ -234,50 +231,24 @@ export default function ConnectionTable(
         isActive={row.isActive}
       >
         {connectionColumns.map((col) => {
-          const initialVal = row[col.key];
-          const tableCell =
-            !!col.options && col.options.length > 0 && col.onSelectOption ? (
-              <DropDownTableCell
-                rowId={row.id}
-                options={filterConnectionOptions(
-                  col.key,
-                  col.options,
-                  row.source.id,
-                  row.target.id,
-                  props.rows
-                )}
-                setOption={col.options.find(
-                  (option) =>
-                    option.id === row[col.key] || option.text === row[col.key]
-                )}
-                onSelectOption={col.onSelectOption}
-              />
-            ) : typeof initialVal === "string" ? (
-              <TextTableCell
-                initialVal={initialVal}
-                onBlur={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-              />
-            ) : typeof initialVal === "number" &&
-              typeof row[col.key] === "number" ? (
-              <NumericalTableCell
-                initialVal={initialVal}
-                onBlur={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-              />
-            ) : typeof initialVal === "boolean" ? (
-              <BooleanTableCell
-                initialIsActive={initialVal}
-                onClick={(newVal) =>
-                  props.onUpdateRow({ ...row, [col.key]: newVal })
-                }
-                showWhenActive={"✅"}
-              />
-            ) : (
-              <></>
-            );
+          const tableCell = (
+            <TableCell<AppConnectionTable>
+              row={row}
+              col={col}
+              options={filterConnectionOptions(
+                col.key,
+                col.options || [],
+                row.source.id,
+                row.target.id,
+                props.rows
+              )}
+              initiallySetOption={col.options?.find(
+                (option) =>
+                  option.id === row[col.key] || option.text === row[col.key]
+              )}
+              onUpdateRow={props.onUpdateRow}
+            />
+          );
           return (
             <StyledCell
               key={col.key}
