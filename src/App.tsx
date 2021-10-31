@@ -1,9 +1,4 @@
-import {
-  HSConnection,
-  HSNode,
-  makeConnection,
-  makeNode,
-} from "hotstuff-network";
+import { HSConnection, HSNode, ModelOutput } from "hotstuff-network";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ORIGIN, Point } from "./utils/pointUtils";
@@ -17,8 +12,10 @@ import useDoubleClick from "./hooks/useDoubleClick";
 import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
+import { defaultConnections, defaultNodes } from "./default";
+import { run } from "hotstuff-network";
 
-const { editorWidthPerc, canvasHeightPerc, defaultNodeRadius } = config;
+const { editorWidthPerc, canvasHeightPerc } = config;
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -54,60 +51,12 @@ const StyledCanvas = styled.div<{ height: number }>`
   height: ${(props) => props.height}px;
 `;
 
-const test1 = makeNode({
-  name: "test1",
-  temperatureDegC: 20,
-  capacitanceJPerDegK: 10,
-  powerGenW: 0,
-  isBoundary: true,
-});
-
-const test2 = makeNode({
-  name: "test2",
-  temperatureDegC: 50,
-  capacitanceJPerDegK: 200,
-  powerGenW: 0,
-  isBoundary: false,
-});
-
-const testAppNodes: AppNode[] = [
-  {
-    ...test1,
-    center: { x: 200, y: 200 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-    textDirection: "D",
-  },
-  {
-    ...test2,
-    center: { x: 650, y: 450 },
-    radius: defaultNodeRadius,
-    color: "red",
-    isActive: false,
-    textDirection: "D",
-  },
-];
-
-const testAppConnections: AppConnection[] = [
-  {
-    ...makeConnection({
-      source: test1,
-      target: test2,
-      resistanceDegKPerW: 10,
-      kind: "bi",
-    }),
-    sourceName: test1.name,
-    targetName: test2.name,
-  },
-];
-
 export default function App(): React.ReactElement {
-  // const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
-  //   undefined
-  // );
-  // const [timeStepS, setTimeStepS] = useState(defaultTimeStepSeconds);
-  // const [totalTimeS, setTotalTimeS] = useState(defaultTotalTimeSeconds);
+  const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
+    undefined
+  );
+  const [timeStepS, setTimeStepS] = useState(config.defaultTimeStepSeconds);
+  const [totalTimeS, setTotalTimeS] = useState(config.defaultTotalTimeSeconds);
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
   const [
@@ -152,8 +101,8 @@ export default function App(): React.ReactElement {
   const editorWidth = editorWidthPerc * windowWidth;
 
   useEffect(() => {
-    setAppNodes(testAppNodes);
-    setAppConnections(testAppConnections);
+    setAppNodes(defaultNodes);
+    setAppConnections(defaultConnections);
   }, []);
 
   return (
@@ -179,13 +128,21 @@ export default function App(): React.ReactElement {
         width={editorWidth}
         nodes={appNodes}
         connections={appConnections}
-        addNode={addNode}
+        // addNode={addNode}
         updateNodes={updateNodes}
         deleteNodes={deleteNodes}
         updateConnections={updateConnections}
         deleteConnections={deleteConnections}
-        updateActiveNodes={setActiveNodes}
-        clearActiveNodes={clearActiveNodes}
+        onRunModel={() => {
+          const output = run({
+            nodes: appNodes,
+            connections: appConnections,
+            timeStepS: timeStepS,
+            totalTimeS: totalTimeS,
+          });
+          console.log(output);
+          setModelOutput(output);
+        }}
       />
     </StyledApp>
   );

@@ -259,8 +259,7 @@ export function calculateNewTemps(
   const a4Mult = matrixUtils.mult(A4, temps4);
   const sum = matrixUtils.add(aMult, matrixUtils.add(a4Mult, B));
   const deltaT = matrixUtils.multScalar(sum, timeStepS);
-  const result = matrixUtils.add(temps, deltaT);
-  return result;
+  return matrixUtils.add(temps, deltaT);
 }
 
 export function shapeOutput(

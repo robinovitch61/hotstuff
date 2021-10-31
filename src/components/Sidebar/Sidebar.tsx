@@ -28,13 +28,12 @@ type SidebarProps = {
   height: number;
   nodes: AppNode[];
   connections: AppConnection[];
-  addNode: (node: AppNode) => void;
+  // addNode: (node: AppNode) => void;
   updateNodes: (nodes: AppNode[], clearActiveNodes: boolean) => void;
   deleteNodes: (nodeIds: string[]) => void;
   updateConnections: (connections: AppConnection[]) => void;
   deleteConnections: (connectionIds: string[]) => void;
-  updateActiveNodes: (nodeIds: string[], sticky: boolean) => void;
-  clearActiveNodes: () => void;
+  onRunModel: () => void;
 };
 
 export default function Sidebar(props: SidebarProps): React.ReactElement {
@@ -70,7 +69,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         />
       </StyledTables>
       <StyledModelControlsWrapper>
-        <ModelControls onRunModel={() => alert("run!")} />
+        <ModelControls onRunModel={props.onRunModel} />
       </StyledModelControlsWrapper>
     </StyledEditor>
   );

@@ -1,6 +1,9 @@
 # Hot Stuff
 
 TODO:
+- [ ] Make the plots work
+- [ ] Persist app state to localhost
+- [ ] Default state is tutorial
 - [ ] X, Table Tabs, Tab-selectable
 - [ ] "+" button for node/connection in table
 - [ ] Escape while editing cell exits and resets default val
