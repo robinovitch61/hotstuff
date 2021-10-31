@@ -1,8 +1,8 @@
+import * as React from "react";
 import DropDownTableCell from "./cells/DropDownTableCell";
 import TextTableCell from "./cells/TextTableCell";
 import NumericalTableCell from "./cells/NumericalTableCell";
 import BooleanTableCell from "./cells/BooleanTableCell";
-import React from "react";
 import { CellOption, TableColumn } from "./types";
 
 type TableCellType = {

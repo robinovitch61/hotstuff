@@ -5,7 +5,7 @@ import {
   StyledHeaderWrapper,
   StyledSortIcon,
 } from "./style";
-import React from "react";
+import * as React from "react";
 import { SortDirection, TableColumn, TableSortState } from "./types";
 
 type TableHeaderProps<T> = {
