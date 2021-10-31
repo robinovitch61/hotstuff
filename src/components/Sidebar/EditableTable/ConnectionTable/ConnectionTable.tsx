@@ -62,17 +62,47 @@ const connectionTypes: CellOption[] = [
   },
 ];
 
-// TODO LEO: Cannot select option that would create a duplicate connection
-function filterOutSelfConnectionOption(
+function filterConnectionOptions(
   colKey: string,
   options: CellOption[],
   selectedSourceId: string,
-  selectedTargetId: string
+  selectedTargetId: string,
+  connections: AppConnection[]
 ): CellOption[] {
+  const otherConnections = connections.filter(
+    (conn) =>
+      !(
+        conn.source.id === selectedSourceId &&
+        conn.target.id === selectedTargetId
+      )
+  );
+
   if (colKey === "sourceName") {
-    return options.filter((option) => option.id !== selectedTargetId);
+    // options for source node
+    const noSelfConnectionOptions = options.filter(
+      (option) => option.id !== selectedTargetId
+    );
+    // for each source option, there is no other connection that already matches the source -> target or target -> source
+    return noSelfConnectionOptions.filter((option) => {
+      return !otherConnections.some(
+        (c) =>
+          (c.source.id === option.id && c.target.id === selectedTargetId) ||
+          (c.source.id === selectedTargetId && c.target.id === option.id)
+      );
+    });
   } else if (colKey === "targetName") {
-    return options.filter((option) => option.id !== selectedSourceId);
+    // options for target node
+    const noSelfConnectionOptions = options.filter(
+      (option) => option.id !== selectedSourceId
+    );
+    // for each target option, there is no other connection that already matches the source -> target or target -> source
+    return noSelfConnectionOptions.filter((option) => {
+      return !otherConnections.some(
+        (c) =>
+          (c.source.id === selectedSourceId && c.target.id === option.id) ||
+          (c.source.id === option.id && c.target.id === selectedSourceId)
+      );
+    });
   } else {
     return options;
   }
@@ -209,11 +239,12 @@ export default function ConnectionTable(
             !!col.options && col.options.length > 0 && col.onSelectOption ? (
               <DropDownTableCell
                 rowId={row.id}
-                options={filterOutSelfConnectionOption(
+                options={filterConnectionOptions(
                   col.key,
                   col.options,
                   row.source.id,
-                  row.target.id
+                  row.target.id,
+                  props.rows
                 )}
                 setOption={col.options.find(
                   (option) =>
