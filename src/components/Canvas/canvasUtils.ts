@@ -184,6 +184,33 @@ export function drawArrow(
   context.restore();
 }
 
+export function drawArrowWithoutHead(
+  context: CanvasRenderingContext2D,
+  start: Point,
+  end: Point,
+  color: string,
+  startOffset = 0,
+  endOffset = 0
+): void {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = color;
+  context.lineWidth = 2;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const angle = Math.atan2(dy, dx);
+  const length = Math.sqrt(dx * dx + dy * dy);
+  context.translate(start.x, start.y);
+  context.rotate(angle);
+  context.beginPath();
+  context.moveTo(startOffset, 0);
+  const adjLength = length - endOffset;
+  context.lineTo(adjLength, 0);
+  context.stroke();
+  context.closePath();
+  context.restore();
+}
+
 export function drawClearBox(
   context: CanvasRenderingContext2D,
   start: Point,
