@@ -13,10 +13,10 @@ import { CellOption, TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
+import { ConnectionKind } from "../../../types";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
-type ConnectionType = "bi" | "uni" | "rad";
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
   key: "source",
@@ -145,7 +145,7 @@ export default function ConnectionTable(
       if (rowToUpdate) {
         props.onUpdateRow({
           ...rowToUpdate,
-          kind: option.id as ConnectionType,
+          kind: option.id as ConnectionKind,
         });
       }
     },

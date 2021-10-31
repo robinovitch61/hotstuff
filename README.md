@@ -2,8 +2,7 @@
 
 TODO:
 - [ ] X, Table Tabs, Tab-selectable
-- [ ] + button for node/connection in table
-- [ ] Draw double arrows for bidirectional
+- [ ] "+" button for node/connection in table
 - [ ] Escape while editing cell exits and resets default val
 - [ ] Enter while editing cell exits same as tab
 - [ ] Make whatever you edit active node

@@ -27,11 +27,11 @@ export default function useDraw(
       });
 
       appConnections.map((conn) => {
-        const { source, target } = conn;
+        const { source, target, kind } = conn;
         const sourceAppNode = appNodes.find((node) => node.id === source.id);
         const targetAppNode = appNodes.find((node) => node.id === target.id);
         if (sourceAppNode && targetAppNode) {
-          drawConnection(context, sourceAppNode, targetAppNode);
+          drawConnection(context, sourceAppNode, targetAppNode, kind);
         }
       });
     },

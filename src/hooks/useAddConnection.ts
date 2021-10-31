@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import {
-  drawArrow,
   drawArrowWithoutHead,
   intersectsCircle,
   mouseToNodeCoords,

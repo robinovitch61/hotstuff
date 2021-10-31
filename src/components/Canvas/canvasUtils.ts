@@ -3,6 +3,7 @@ import config from "../../config";
 import { AppNode, Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
+import { ConnectionKind } from "../types";
 
 const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
 
@@ -152,7 +153,49 @@ export function drawNode(
   drawNodeName(context, name, center, radius, textDirection);
 }
 
-export function drawArrow(
+export function drawBidirectionalArrow(
+  context: CanvasRenderingContext2D,
+  start: Point,
+  end: Point,
+  color: string,
+  startOffset = 0,
+  endOffset = 0
+): void {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = color;
+  context.lineWidth = 2;
+  const headLength = 9;
+  const headWidth = 4;
+  const arrowGap = 0;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const angle = Math.atan2(dy, dx);
+  const length = Math.sqrt(dx * dx + dy * dy);
+  const adjLength = length - endOffset;
+
+  context.translate(start.x, start.y);
+  context.rotate(angle);
+
+  context.beginPath();
+  context.moveTo(startOffset, arrowGap);
+  context.lineTo(adjLength, arrowGap);
+  context.moveTo(adjLength - headLength, headWidth + arrowGap);
+  context.lineTo(adjLength, arrowGap);
+  context.lineTo(adjLength - headLength, -(headWidth - arrowGap));
+
+  context.moveTo(adjLength, -arrowGap);
+  context.lineTo(startOffset, -arrowGap);
+  context.moveTo(startOffset + headLength, -(headWidth + arrowGap));
+  context.lineTo(startOffset, -arrowGap);
+  context.lineTo(startOffset + headLength, headWidth - arrowGap);
+
+  context.stroke();
+  context.closePath();
+  context.restore();
+}
+
+export function drawUnidirectionalArrow(
   context: CanvasRenderingContext2D,
   start: Point,
   end: Point,
@@ -170,11 +213,13 @@ export function drawArrow(
   const dy = end.y - start.y;
   const angle = Math.atan2(dy, dx);
   const length = Math.sqrt(dx * dx + dy * dy);
+  const adjLength = length - endOffset;
+
   context.translate(start.x, start.y);
   context.rotate(angle);
+
   context.beginPath();
   context.moveTo(startOffset, 0);
-  const adjLength = length - endOffset;
   context.lineTo(adjLength, 0);
   context.moveTo(adjLength - headLength, -headWidth);
   context.lineTo(adjLength, 0);
@@ -237,16 +282,28 @@ export function drawClearBox(
 export function drawConnection(
   context: CanvasRenderingContext2D,
   source: AppNode,
-  target: AppNode
+  target: AppNode,
+  kind: ConnectionKind
 ): void {
-  drawArrow(
-    context,
-    source.center,
-    target.center,
-    "black",
-    source.radius,
-    target.radius
-  );
+  if (kind === "bi") {
+    drawBidirectionalArrow(
+      context,
+      source.center,
+      target.center,
+      "black",
+      source.radius,
+      target.radius
+    );
+  } else {
+    drawUnidirectionalArrow(
+      context,
+      source.center,
+      target.center,
+      "black",
+      source.radius,
+      target.radius
+    );
+  }
 }
 
 export function intersectsCircle(

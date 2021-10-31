@@ -30,7 +30,7 @@ export type HSConnectionParams = {
   source: HSNode;
   target: HSNode;
   resistanceDegKPerW: number;
-  kind: 'bi' | 'uni' | 'rad';
+  kind: 'bi' | 'uni' | 'rad'; // TODO LEO: Make this an exportable type so I don't have to define it again in UI code
 };
 
 export type HSConnection = HSConnectionParams & {
