@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
-import { ColOption } from "./EditableTable";
+import { CellOption } from "../types";
 
 const StyledSelect = styled.select`
   display: inline-flex;
@@ -11,10 +11,10 @@ const StyledSelect = styled.select`
 
 export type DropDownTableCellProps = {
   rowId: string;
-  options: ColOption[];
-  setOption?: ColOption;
-  onSelectOption: (id: string, option: ColOption) => void;
-  optionsFilter?: (option: ColOption) => ColOption[];
+  options: CellOption[];
+  setOption?: CellOption;
+  onSelectOption: (id: string, option: CellOption) => void;
+  optionsFilter?: (option: CellOption) => CellOption[];
 };
 
 export default function DropDownTableCell(

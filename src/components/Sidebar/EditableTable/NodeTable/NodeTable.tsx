@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import config from "../../../config";
-import { AppNode } from "../../../App";
-import { ColOption } from "./EditableTable";
-import { SortDirection } from "./SortableTableHeader";
-import TextTableCell from "./TextTableCell";
+import config from "../../../../config";
+import { AppNode } from "../../../../App";
+import TextTableCell from "../cells/TextTableCell";
 import {
   StyledCell,
   StyledColHeader,
@@ -15,9 +13,10 @@ import {
   StyledTable,
   StyledTableBody,
   StyledTableWrapper,
-} from "./style";
-import NumericalTableCell from "./NumericalTableCell";
-import BooleanTableCell from "./BooleanTableCell";
+} from "../style";
+import NumericalTableCell from "../cells/NumericalTableCell";
+import BooleanTableCell from "../cells/BooleanTableCell";
+import { CellOption, SortDirection } from "../types";
 
 type NodeTableSortState = { key: keyof AppNode; direction: SortDirection };
 
@@ -26,13 +25,13 @@ const defaultNodeSortState: NodeTableSortState = {
   direction: "ASC",
 };
 
-type NodeTableColumn = {
+export type NodeTableColumn = {
   text: string;
   key: keyof AppNode;
   width: number; // 0 to 1
   minWidthPx?: number;
-  options?: ColOption[];
-  onSelectOption?: (id: string, option: ColOption) => void;
+  options?: CellOption[];
+  onSelectOption?: (id: string, option: CellOption) => void;
 };
 
 const nodeColumns: NodeTableColumn[] = [
@@ -110,14 +109,14 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
               <NumericalTableCell
                 initialVal={initialVal}
                 onBlur={(newVal) =>
-                  props.onUpdateRow({ ...row, temperatureDegC: newVal })
+                  props.onUpdateRow({ ...row, [col.key]: newVal })
                 }
               />
             ) : typeof initialVal === "boolean" ? (
               <BooleanTableCell
                 initialIsActive={initialVal}
-                onClick={(isActive) =>
-                  props.onUpdateRow({ ...row, isBoundary: !isActive })
+                onClick={(newVal) =>
+                  props.onUpdateRow({ ...row, [col.key]: newVal })
                 }
                 showWhenActive={"✅"}
               />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyledInput } from "./sharedStyled";
+import { StyledInput } from "../style";
 
 export type TextTableCellProps = {
   initialVal: string;

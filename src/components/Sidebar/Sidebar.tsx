@@ -1,8 +1,8 @@
 import * as React from "react";
 import styled from "styled-components/macro";
 import { AppConnection, AppNode } from "../../App";
-import NodeTable from "./EditableTable/NodeTable";
-import ConnectionTable from "./EditableTable/ConnectionTable";
+import NodeTable from "./EditableTable/NodeTable/NodeTable";
+import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
 import ModelControls from "./ModelControls";
 
