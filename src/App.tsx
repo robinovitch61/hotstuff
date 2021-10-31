@@ -130,6 +130,8 @@ export default function App(): React.ReactElement {
       <Sidebar
         height={windowHeight}
         width={editorWidth}
+        timeStepS={timeStepS}
+        setTimeStepS={setTimeStepS}
         nodes={appNodes}
         connections={appConnections}
         // addNode={addNode}

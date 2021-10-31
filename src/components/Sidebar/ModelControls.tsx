@@ -1,8 +1,10 @@
 import * as React from "react";
 import styled from "styled-components/macro";
+import { StyledInput } from "./style";
 
 const StyledModelControlsWrapper = styled.div`
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   justify-content: center;
@@ -13,8 +15,12 @@ const StyledModelControlsWrapper = styled.div`
 
 const StyledRunButton = styled.button``;
 
+const StyledTimeControls = styled.div``;
+
 export type ModelControlsProps = {
   onRunModel: () => void;
+  timeStepS: number;
+  setTimeStepS: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function ModelControls(
@@ -22,6 +28,13 @@ export default function ModelControls(
 ): React.ReactElement {
   return (
     <StyledModelControlsWrapper>
+      <StyledTimeControls>
+        <StyledInput
+          type="number"
+          value={props.timeStepS}
+          onBlur={(e) => props.setTimeStepS(parseFloat(e.target.value))}
+        />
+      </StyledTimeControls>
       <StyledRunButton onClick={props.onRunModel}>Run Model</StyledRunButton>
     </StyledModelControlsWrapper>
   );

@@ -26,6 +26,8 @@ const StyledModelControlsWrapper = styled.div`
 type SidebarProps = {
   width: number;
   height: number;
+  timeStepS: number;
+  setTimeStepS: React.Dispatch<React.SetStateAction<number>>;
   nodes: AppNode[];
   connections: AppConnection[];
   // addNode: (node: AppNode) => void;
@@ -69,7 +71,11 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         />
       </StyledTables>
       <StyledModelControlsWrapper>
-        <ModelControls onRunModel={props.onRunModel} />
+        <ModelControls
+          onRunModel={props.onRunModel}
+          timeStepS={props.timeStepS}
+          setTimeStepS={props.setTimeStepS}
+        />
       </StyledModelControlsWrapper>
     </StyledEditor>
   );
