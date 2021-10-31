@@ -19,7 +19,7 @@ export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
-  key: "source",
+  key: "sourceName",
   direction: "ASC",
 };
 
