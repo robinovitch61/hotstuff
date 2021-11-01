@@ -29,13 +29,14 @@ export default function BooleanTableCell(
       tabIndex={0}
       onKeyUp={(event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
+          console.log("ye");
           setIsActive(!isActive);
-          props.onClick(isActive);
+          props.onClick(!isActive);
         }
       }}
       onClick={() => {
         setIsActive(!isActive);
-        props.onClick(isActive);
+        props.onClick(!isActive);
       }}
     >
       &nbsp;{isActive ? props.showWhenActive : ""}

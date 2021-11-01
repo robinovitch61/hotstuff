@@ -65,7 +65,9 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     default: defaultNodeSortState,
   });
 
-  const sortedRows = props.rows.sort(sortByState);
+  const { rows, onUpdateRow, onDeleteRow } = props;
+
+  const sortedRows = rows.sort(sortByState);
 
   const tableRows = sortedRows.map((row) => {
     return (
@@ -76,11 +78,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
       >
         {nodeColumns.map((col) => {
           const tableCell = (
-            <TableCell<AppNode>
-              row={row}
-              col={col}
-              onUpdateRow={props.onUpdateRow}
-            />
+            <TableCell<AppNode> row={row} col={col} onUpdateRow={onUpdateRow} />
           );
           return (
             <StyledCell
@@ -93,9 +91,15 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
           );
         })}
         <StyledDeleteCell
+          tabIndex={0}
+          onKeyUp={(event: React.KeyboardEvent) => {
+            if (event.key === "Enter") {
+              onDeleteRow(row);
+            }
+          }}
           width={config.tableDeleteCellWidthPerc}
           minWidth={config.tableDeleteCellMinWidthPx}
-          onClick={() => props.onDeleteRow(row)}
+          onClick={() => onDeleteRow(row)}
         >
           ❌
         </StyledDeleteCell>
