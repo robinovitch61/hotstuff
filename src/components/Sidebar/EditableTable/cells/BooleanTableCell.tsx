@@ -29,7 +29,6 @@ export default function BooleanTableCell(
       tabIndex={0}
       onKeyUp={(event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
-          console.log("ye");
           setIsActive(!isActive);
           props.onClick(!isActive);
         }

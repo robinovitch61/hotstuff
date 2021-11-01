@@ -9,10 +9,6 @@ export default function useKeyDown(
 ): void {
   useEffect(() => {
     const onKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
-      // console.log(
-      //   `Key: ${event.key} with keycode ${event.keyCode} has been pressed`
-      // );
-
       if (keyboardActive) {
         // shift + A makes all nodes active
         if (event.metaKey) {
