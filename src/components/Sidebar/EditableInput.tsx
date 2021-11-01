@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { StyledInput } from "./style";
 
 interface CanBeMadeString {
@@ -7,8 +7,6 @@ interface CanBeMadeString {
 
 type EditableInputProps<T> = {
   initialValue: T;
-  currentValue: string;
-  setCurrentValue: (value: string) => void;
   onBlur: (value: T) => void;
   getNewValue: (event: React.ChangeEvent<HTMLInputElement>) => T | undefined;
 };
@@ -16,18 +14,16 @@ type EditableInputProps<T> = {
 export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
-  const { initialValue, currentValue, setCurrentValue, onBlur, getNewValue } =
-    props;
+  const [value, setValue] = useState<string>(props.initialValue.toString());
 
-  const handleOnChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newVal = event.target.value;
-      if (newVal !== undefined) {
-        setCurrentValue(newVal);
-      }
-    },
-    [setCurrentValue]
-  );
+  const { initialValue, onBlur, getNewValue } = props;
+
+  function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const newVal = event.target.value;
+    if (newVal !== undefined) {
+      setValue(newVal);
+    }
+  }
 
   const handleOnBlur = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,20 +31,20 @@ export default function EditableInput<T extends CanBeMadeString>(
       if (event.target.value === initialValue.toString()) {
         return;
       } else if (newVal !== undefined) {
-        setCurrentValue(newVal.toString());
+        setValue(newVal.toString());
         onBlur(newVal);
       } else {
-        setCurrentValue(initialValue.toString());
+        setValue(initialValue.toString());
         onBlur(initialValue);
       }
     },
-    [getNewValue, initialValue, onBlur, setCurrentValue]
+    [getNewValue, initialValue, onBlur]
   );
 
   return (
     <StyledInput
       type="text"
-      value={currentValue}
+      value={value}
       onChange={handleOnChange}
       onBlur={handleOnBlur}
     />

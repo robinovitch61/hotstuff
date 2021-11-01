@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import EditableNumberInput from "../../EditableNumberInput";
 
 export type NumericalTableCellProps = {
@@ -9,13 +9,9 @@ export type NumericalTableCellProps = {
 export default function NumericalTableCell(
   props: NumericalTableCellProps
 ): React.ReactElement {
-  const [value, setValue] = useState<string>(props.initialVal.toString());
-
   return (
     <EditableNumberInput
       initialValue={props.initialVal}
-      currentValue={value}
-      setCurrentValue={setValue}
       onBlur={props.onBlur}
     />
   );

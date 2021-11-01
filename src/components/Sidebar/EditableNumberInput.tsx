@@ -15,8 +15,6 @@ function getFloatVal(
 
 type EditableNumberInputProps = {
   initialValue: number;
-  currentValue: string;
-  setCurrentValue: (value: string) => void;
   onBlur: (value: number) => void;
 };
 
@@ -26,8 +24,6 @@ export default function EditableNumberInput(
   return (
     <EditableInput<number>
       initialValue={props.initialValue}
-      currentValue={props.currentValue}
-      setCurrentValue={props.setCurrentValue}
       onBlur={props.onBlur}
       getNewValue={getFloatVal}
     />

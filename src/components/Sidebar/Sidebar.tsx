@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
-import { AppConnection, AppNode } from "../../App";
+import { AppConnection, AppNode, Timing } from "../../App";
 import NodeTable from "./EditableTable/NodeTable/NodeTable";
 import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
@@ -26,8 +26,8 @@ const StyledModelControlsWrapper = styled.div`
 type SidebarProps = {
   width: number;
   height: number;
-  timeStepS: number;
-  setTimeStepS: React.Dispatch<React.SetStateAction<number>>;
+  timing: Timing;
+  setTiming: React.Dispatch<React.SetStateAction<Timing>>;
   nodes: AppNode[];
   connections: AppConnection[];
   // addNode: (node: AppNode) => void;
@@ -73,8 +73,8 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       <StyledModelControlsWrapper>
         <ModelControls
           onRunModel={props.onRunModel}
-          timeStepS={props.timeStepS}
-          setTimeStepS={props.setTimeStepS}
+          timing={props.timing}
+          setTiming={props.setTiming}
         />
       </StyledModelControlsWrapper>
     </StyledEditor>

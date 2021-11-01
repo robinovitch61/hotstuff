@@ -32,6 +32,11 @@ export type AppConnection = HSConnection & {
   targetName: string;
 };
 
+export type Timing = {
+  timeStepS: number;
+  totalTimeS: number;
+};
+
 const StyledApp = styled.div<{ height: number }>`
   display: flex;
   height: ${(props) => props.height}px;
@@ -55,8 +60,10 @@ export default function App(): React.ReactElement {
   const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
     undefined
   );
-  const [timeStepS, setTimeStepS] = useState(config.defaultTimeStepSeconds);
-  const [totalTimeS, setTotalTimeS] = useState(config.defaultTotalTimeSeconds);
+  const [timing, setTiming] = useState<Timing>({
+    timeStepS: config.defaultTimeStepSeconds,
+    totalTimeS: config.defaultTotalTimeSeconds,
+  });
   const [appNodes, setAppNodes] = useState<AppNode[]>([]);
   const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
   const [
@@ -130,8 +137,8 @@ export default function App(): React.ReactElement {
       <Sidebar
         height={windowHeight}
         width={editorWidth}
-        timeStepS={timeStepS}
-        setTimeStepS={setTimeStepS}
+        timing={timing}
+        setTiming={setTiming}
         nodes={appNodes}
         connections={appConnections}
         // addNode={addNode}
@@ -143,8 +150,8 @@ export default function App(): React.ReactElement {
           const output = run({
             nodes: appNodes,
             connections: appConnections,
-            timeStepS: timeStepS,
-            totalTimeS: totalTimeS,
+            timeStepS: timing.timeStepS,
+            totalTimeS: timing.totalTimeS,
           });
           setModelOutput(output);
         }}
