@@ -105,6 +105,7 @@ export default function App(): React.ReactElement {
   const canvasHeight = windowHeight * canvasHeightPerc;
   const canvasWidth = windowWidth * (1 - editorWidthPerc);
   const plotHeight = (1 - canvasHeightPerc) * windowHeight;
+  const plotWidth = canvasWidth;
   const editorWidth = editorWidthPerc * windowWidth;
 
   useEffect(() => {
@@ -129,8 +130,11 @@ export default function App(): React.ReactElement {
           />
         </StyledCanvas>
         <Plot
-          height={plotHeight}
-          margin={plotMargin}
+          plotDimensions={{
+            height: plotHeight,
+            width: plotWidth,
+            margin: plotMargin,
+          }}
           modelOutput={modelOutput}
         />
       </StyledWorkspace>

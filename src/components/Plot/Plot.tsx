@@ -1,16 +1,8 @@
 import * as React from "react";
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Line } from "recharts";
 import styled from "styled-components";
 import { emptyOutput, ModelOutput } from "hotstuff-network";
+import LinePlot from "./LinePlot";
 
 const MAX_PLOT_POINTS_PER_NODE = 400;
 const colors = [
@@ -45,9 +37,10 @@ const StyledCharts = styled.div`
   /*  */
 }
 
-const StyledPlot = styled.div<{ height: number }>`
+const StyledPlot = styled.div<{ height: number; width: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
+  height: ${(props) => props.width}px;
   border-top: 3px solid black;
   margin: 0;
   padding: 0;
@@ -60,10 +53,10 @@ type Margin = {
   bottom: number;
 };
 
-type PlotProps = {
+export type PlotDimensions = {
   height: number;
+  width: number;
   margin: Margin;
-  modelOutput?: ModelOutput;
 };
 
 type PlotDataForTime = {
@@ -71,47 +64,44 @@ type PlotDataForTime = {
   [key: string]: number;
 };
 
-export default function Plot(props: PlotProps): React.ReactElement {
-  // show the temps of the first node as dots vertically along the svg
-  const plotParams = {
-    height: props.height,
-    margin: props.margin,
-  };
+function plotShape(data: ModelOutput): [PlotDataForTime[], PlotDataForTime[]] {
+  const lowerMag = Math.floor(Math.log10(data.totalTimeS));
+  const divisibleBy = Math.pow(10, lowerMag - 1);
 
-  function plotShape(
-    data: ModelOutput
-  ): [PlotDataForTime[], PlotDataForTime[]] {
-    const lowerMag = Math.floor(Math.log10(data.totalTimeS));
-    const divisibleBy = Math.pow(10, lowerMag - 1);
-
-    function include(val: number) {
-      return Math.abs(val % divisibleBy) === 0;
-    }
-
-    const includeAll = data.timeSeriesS.length < MAX_PLOT_POINTS_PER_NODE;
-
-    const tempsAtAllTimes: PlotDataForTime[] = [];
-    const heatTransfersAtAllTimes: PlotDataForTime[] = [];
-
-    data.timeSeriesS.forEach((t, idx) => {
-      if (includeAll || include(t)) {
-        const temp: PlotDataForTime = { time: t };
-        const ht: PlotDataForTime = { time: t };
-        data.nodeResults.forEach((nodeResult) => {
-          temp[nodeResult.node.name] = nodeResult.tempDegC[idx];
-        });
-        data.connectionResults.forEach((connectionResult) => {
-          ht[
-            `${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`
-          ] = connectionResult.heatTransferW[idx];
-        });
-        tempsAtAllTimes.push(temp);
-        heatTransfersAtAllTimes.push(ht);
-      }
-    });
-    return [tempsAtAllTimes, heatTransfersAtAllTimes];
+  function include(val: number) {
+    return Math.abs(val % divisibleBy) === 0;
   }
 
+  const includeAll = data.timeSeriesS.length < MAX_PLOT_POINTS_PER_NODE;
+
+  const tempsAtAllTimes: PlotDataForTime[] = [];
+  const heatTransfersAtAllTimes: PlotDataForTime[] = [];
+
+  data.timeSeriesS.forEach((t, idx) => {
+    if (includeAll || include(t)) {
+      const temp: PlotDataForTime = { time: t };
+      const ht: PlotDataForTime = { time: t };
+      data.nodeResults.forEach((nodeResult) => {
+        temp[nodeResult.node.name] = nodeResult.tempDegC[idx];
+      });
+      data.connectionResults.forEach((connectionResult) => {
+        ht[
+          `${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`
+        ] = connectionResult.heatTransferW[idx];
+      });
+      tempsAtAllTimes.push(temp);
+      heatTransfersAtAllTimes.push(ht);
+    }
+  });
+  return [tempsAtAllTimes, heatTransfersAtAllTimes];
+}
+
+type PlotProps = {
+  plotDimensions: PlotDimensions;
+  modelOutput?: ModelOutput;
+};
+
+export default function Plot(props: PlotProps): React.ReactElement {
   const res =
     !!props.modelOutput && props.modelOutput.nodeResults.length > 0
       ? props.modelOutput
@@ -119,109 +109,52 @@ export default function Plot(props: PlotProps): React.ReactElement {
 
   const [tempPlotData, heatTransferPlotData] = plotShape(res);
 
+  const tempLines: React.ReactElement[] = res.connectionResults.map(
+    (connectionResult, idx) => {
+      return (
+        <Line
+          key={connectionResult.connection.id}
+          type={"monotone"}
+          dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
+          stroke={colors[idx]}
+          activeDot={{ r: 8 }}
+        />
+      );
+    }
+  );
+
+  const heatTransferLines = res.nodeResults.map((nodeResult, idx) => {
+    return (
+      <Line
+        key={nodeResult.node.id}
+        type={"monotone"}
+        dataKey={nodeResult.node.name}
+        stroke={colors[idx]}
+        activeDot={{ r: 8 }}
+      />
+    );
+  });
+
   return (
-    <StyledPlot height={props.height}>
+    <StyledPlot
+      height={props.plotDimensions.height}
+      width={props.plotDimensions.width}
+    >
       <StyledCharts>
-        <ResponsiveContainer height={plotParams.height} className={"chart"}>
-          <LineChart
-            data={tempPlotData}
-            margin={{
-              top: 0,
-              right: plotParams.margin.right,
-              left: plotParams.margin.left,
-              bottom: plotParams.margin.bottom,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              label={{
-                value: "Time [seconds]",
-                position: "center",
-                dy: 20,
-              }}
-            />
-            <YAxis
-              label={{
-                value: "Temperature [degC]",
-                position: "center",
-                angle: -90,
-                dx: -20,
-              }}
-            />
-            <Tooltip />
-            <Legend
-              layout="horizontal"
-              verticalAlign="top"
-              align="center"
-              wrapperStyle={{
-                paddingLeft: "10px",
-              }}
-            />
-            {res.nodeResults.map((nodeResult, idx) => {
-              return (
-                <Line
-                  key={nodeResult.node.id}
-                  type={"monotone"}
-                  dataKey={nodeResult.node.name}
-                  stroke={colors[idx]}
-                  activeDot={{ r: 8 }}
-                />
-              );
-            })}
-          </LineChart>
-        </ResponsiveContainer>
-        <ResponsiveContainer height={plotParams.height} className={"chart"}>
-          <LineChart
-            height={plotParams.height}
-            data={heatTransferPlotData}
-            margin={{
-              top: 0,
-              right: plotParams.margin.right,
-              left: plotParams.margin.left,
-              bottom: plotParams.margin.bottom,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              label={{
-                value: "Time [seconds]",
-                position: "center",
-                dy: 20,
-              }}
-            />
-            <YAxis
-              label={{
-                value: "Heat Transfer [Watts]",
-                position: "center",
-                angle: -90,
-                dx: -20,
-              }}
-            />
-            <Tooltip />
-            <Legend
-              layout="horizontal"
-              verticalAlign="top"
-              align="center"
-              wrapperStyle={{
-                paddingLeft: "10px",
-              }}
-              // fontSize={5}
-            />
-            {res.connectionResults.map((connectionResult, idx) => {
-              return (
-                <Line
-                  key={connectionResult.connection.id}
-                  type={"monotone"}
-                  dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
-                  stroke={colors[idx]}
-                  activeDot={{ r: 8 }}
-                />
-              );
-            })}
-          </LineChart>
-        </ResponsiveContainer>
+        <LinePlot
+          plotDimensions={props.plotDimensions}
+          plotData={tempPlotData}
+          lines={tempLines}
+          xLabel={"Time [s]"}
+          yLabel={"Temperature [degC]"}
+        />
+        <LinePlot
+          plotDimensions={props.plotDimensions}
+          plotData={heatTransferPlotData}
+          lines={heatTransferLines}
+          xLabel={"Time [s]"}
+          yLabel={"Heat Transfer [Watts]"}
+        />
       </StyledCharts>
     </StyledPlot>
   );
