@@ -1,11 +1,18 @@
 # Hot Stuff
 
 TODO:
-- [ ] Make the plots work
-- [ ] Persist app state to localhost
+- [ ] Loading spinner while running model
+- [ ] More reasonable sig figs in plots
+- [ ] Resistance calculator
+- [ ] Ability to swap source/target in connection
+- [ ] Node color is temp, radius is capacitance
+- [ ] Persist app state to localstorage
+- [ ] Import/export app state
 - [ ] Default state is tutorial
-- [ ] X, Table Tabs, Tab-selectable
 - [ ] "+" button for node/connection in table
+- [ ] X, Table Tabs, Tab-selectable
+- [ ] Add the ability to change the plot/canvas/table size by dragging the borders
+
 - [ ] Escape while editing cell exits and resets default val
 - [ ] Enter while editing cell exits same as tab
 - [ ] Center view on a node button in table
