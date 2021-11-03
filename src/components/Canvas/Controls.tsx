@@ -47,7 +47,7 @@ export default function Controls(props: ControlsProps): React.ReactElement {
           )
         }
       >
-        Saved View
+        Reset View to Saved
       </StyledButton>
       <StyledButton
         onClick={() => {

@@ -15,7 +15,13 @@ import useKeyDown from "./hooks/useKeyDown";
 import { defaultConnections, defaultNodes } from "./default";
 import { run } from "hotstuff-network";
 
-const { editorWidthPerc, canvasHeightPerc, plotMargin } = config;
+const {
+  editorWidthPerc,
+  canvasHeightPerc,
+  plotMargin,
+  tabHeightPx,
+  plotHeightBufferPx,
+} = config;
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -104,7 +110,8 @@ export default function App(): React.ReactElement {
   const workspaceHeight = windowHeight;
   const canvasHeight = windowHeight * canvasHeightPerc;
   const canvasWidth = windowWidth * (1 - editorWidthPerc);
-  const plotHeight = (1 - canvasHeightPerc) * windowHeight;
+  const plotHeight =
+    (1 - canvasHeightPerc) * windowHeight - tabHeightPx - plotHeightBufferPx;
   const plotWidth = canvasWidth;
   const editorWidth = editorWidthPerc * windowWidth;
 

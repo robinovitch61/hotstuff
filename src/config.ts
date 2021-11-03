@@ -4,7 +4,7 @@ const config = {
   defaultTempDegC: 23,
   defaultCapJPerDegK: 1,
   defaultPowerGenW: 0,
-  canvasHeightPerc: 0.75,
+  canvasHeightPerc: 0.7,
   editorWidthPerc: 0.3,
   defaultTotalTimeSeconds: 60,
   defaultTimeStepSeconds: 0.1,
@@ -17,13 +17,14 @@ const config = {
   maxZoom: 5,
   activeNodeOutlineWidth: 5,
   tabHeightPx: 25,
+  plotHeightBufferPx: 10,
   tableDeleteCellWidthPerc: 0.1,
   tableDeleteCellMinWidthPx: 40,
   plotMargin: {
-    left: 5,
-    right: 5,
-    top: 40,
-    bottom: 40,
+    left: 10,
+    right: 20,
+    top: 20,
+    bottom: 20,
   },
 };
 

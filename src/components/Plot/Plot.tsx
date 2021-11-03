@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { Line } from "recharts";
 import styled from "styled-components";
 import { emptyOutput, ModelOutput } from "hotstuff-network";
@@ -22,7 +22,6 @@ const StyledCharts = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 2em;
 
   .chart {
     width: 60% !important;
@@ -42,7 +41,6 @@ const StyledCharts = styled.div`
 const StyledPlot = styled.div<{ height: number; width: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
-  height: ${(props) => props.width}px;
   border-top: 3px solid black;
   margin: 0;
   padding: 0;
@@ -121,6 +119,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
             dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
             stroke={colors[idx]}
             activeDot={{ r: 8 }}
+            isAnimationActive={false}
           />
         );
       }),
@@ -137,6 +136,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
             dataKey={nodeResult.node.name}
             stroke={colors[idx]}
             activeDot={{ r: 8 }}
+            isAnimationActive={false}
           />
         );
       }),
