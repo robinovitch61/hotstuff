@@ -14,18 +14,19 @@ type LinePlotProps = {
   plotDimensions: PlotDimensions;
   plotData?: ReadonlyArray<Record<string, unknown>>;
   lines: React.ReactElement[];
+  xAxisKey: string;
   xLabel: string;
   yLabel: string;
 };
 
 export default function LinePlot(props: LinePlotProps): React.ReactElement {
-  const { plotDimensions, plotData, lines, xLabel, yLabel } = props;
+  const { plotDimensions, plotData, lines, xAxisKey, xLabel, yLabel } = props;
 
   return (
     <ResponsiveContainer
       height={plotDimensions.height}
       width={plotDimensions.width}
-      className={"chart"}
+      className="chart"
     >
       <LineChart
         height={plotDimensions.height}
@@ -35,7 +36,7 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
-          dataKey="time"
+          dataKey={xAxisKey}
           label={{
             value: xLabel,
             position: "center",

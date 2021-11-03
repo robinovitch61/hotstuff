@@ -1,8 +1,10 @@
 import * as React from "react";
+import { useCallback, useMemo } from "react";
 import { Line } from "recharts";
 import styled from "styled-components";
 import { emptyOutput, ModelOutput } from "hotstuff-network";
 import LinePlot from "./LinePlot";
+import Tabs from "../Tabs/Tabs";
 
 const MAX_PLOT_POINTS_PER_NODE = 400;
 const colors = [
@@ -109,31 +111,59 @@ export default function Plot(props: PlotProps): React.ReactElement {
 
   const [tempPlotData, heatTransferPlotData] = plotShape(res);
 
-  const tempLines: React.ReactElement[] = res.connectionResults.map(
-    (connectionResult, idx) => {
-      return (
-        <Line
-          key={connectionResult.connection.id}
-          type={"monotone"}
-          dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
-          stroke={colors[idx]}
-          activeDot={{ r: 8 }}
-        />
-      );
-    }
+  const heatTransferLines = useMemo(
+    () =>
+      res.connectionResults.map((connectionResult, idx) => {
+        return (
+          <Line
+            key={connectionResult.connection.id}
+            type={"monotone"}
+            dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
+            stroke={colors[idx]}
+            activeDot={{ r: 8 }}
+          />
+        );
+      }),
+    [res.connectionResults]
   );
 
-  const heatTransferLines = res.nodeResults.map((nodeResult, idx) => {
-    return (
-      <Line
-        key={nodeResult.node.id}
-        type={"monotone"}
-        dataKey={nodeResult.node.name}
-        stroke={colors[idx]}
-        activeDot={{ r: 8 }}
-      />
-    );
-  });
+  const tempLines = useMemo(
+    () =>
+      res.nodeResults.map((nodeResult, idx) => {
+        return (
+          <Line
+            key={nodeResult.node.id}
+            type={"monotone"}
+            dataKey={nodeResult.node.name}
+            stroke={colors[idx]}
+            activeDot={{ r: 8 }}
+          />
+        );
+      }),
+    [res.nodeResults]
+  );
+
+  const tempPlot = (
+    <LinePlot
+      plotDimensions={props.plotDimensions}
+      plotData={tempPlotData}
+      lines={tempLines}
+      xAxisKey={"time"}
+      xLabel={"Time [s]"}
+      yLabel={"Temperature [degC]"}
+    />
+  );
+
+  const heatTransferPlot = (
+    <LinePlot
+      plotDimensions={props.plotDimensions}
+      plotData={heatTransferPlotData}
+      lines={heatTransferLines}
+      xAxisKey={"time"}
+      xLabel={"Time [s]"}
+      yLabel={"Heat Transfer [Watts]"}
+    />
+  );
 
   return (
     <StyledPlot
@@ -141,19 +171,19 @@ export default function Plot(props: PlotProps): React.ReactElement {
       width={props.plotDimensions.width}
     >
       <StyledCharts>
-        <LinePlot
-          plotDimensions={props.plotDimensions}
-          plotData={tempPlotData}
-          lines={tempLines}
-          xLabel={"Time [s]"}
-          yLabel={"Temperature [degC]"}
-        />
-        <LinePlot
-          plotDimensions={props.plotDimensions}
-          plotData={heatTransferPlotData}
-          lines={heatTransferLines}
-          xLabel={"Time [s]"}
-          yLabel={"Heat Transfer [Watts]"}
+        <Tabs
+          tabs={[
+            {
+              text: "Temperature",
+              component: tempPlot,
+              width: 0.5,
+            },
+            {
+              text: "Heat Transfer",
+              component: heatTransferPlot,
+              width: 0.5,
+            },
+          ]}
         />
       </StyledCharts>
     </StyledPlot>
