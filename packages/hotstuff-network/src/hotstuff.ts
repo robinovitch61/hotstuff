@@ -26,11 +26,13 @@ export type HSNode = HSNodeParams & {
   id: string;
 };
 
+export type ConnectionKind = 'bi' | 'uni' | 'rad';
+
 export type HSConnectionParams = {
   source: HSNode;
   target: HSNode;
   resistanceDegKPerW: number;
-  kind: 'bi' | 'uni' | 'rad'; // TODO LEO: Make this an exportable type so I don't have to define it again in UI code
+  kind: ConnectionKind;
 };
 
 export type HSConnection = HSConnectionParams & {
@@ -270,16 +272,16 @@ export function shapeOutput(
 ): Omit<ModelOutput, 'computeTimeS'> {
   const flatTemps = outputTemps.map((temp) => toCelcius(temp));
 
-  const temps = data.nodes.map((node, idx) => {
+  const temps: NodeResult[] = data.nodes.map((node: HSNode, idx: number) => {
     return {
-      node,
+      node: { ...node },
       tempDegC: flatTemps.map((temp) => temp[idx]),
     };
   });
 
-  const heatTransfer = data.connections.map((connection, idx) => {
+  const heatTransfer: ConnectionResult[] = data.connections.map((connection: HSConnection, idx: number) => {
     return {
-      connection,
+      connection: { ...connection },
       heatTransferW: outputHeatTransfer.map((ht) => ht[idx]),
     };
   });
