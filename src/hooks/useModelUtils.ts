@@ -46,8 +46,36 @@ export default function useModelUtils(
           }
         });
       });
+
+      setAppConnections((prevConns) => {
+        return prevConns.map((prevConn) => {
+          const newSourceNode = nodesToUpdate.find(
+            (nodeToUpdate) => prevConn.source.id == nodeToUpdate.id
+          );
+          if (newSourceNode) {
+            return {
+              ...prevConn,
+              source: newSourceNode,
+              sourceName: newSourceNode.name,
+            };
+          }
+
+          const newTargetNode = nodesToUpdate.find(
+            (nodeToUpdate) => prevConn.target.id == nodeToUpdate.id
+          );
+          if (newTargetNode) {
+            return {
+              ...prevConn,
+              target: newTargetNode,
+              targetName: newTargetNode.name,
+            };
+          }
+
+          return prevConn;
+        });
+      });
     },
-    [setAppNodes]
+    [setAppConnections, setAppNodes]
   );
 
   const deleteNodes = useCallback(

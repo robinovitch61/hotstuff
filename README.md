@@ -1,6 +1,8 @@
 # Hot Stuff
 
 TODO:
+- [ ] Fix stale labels in heat transfer plot
+- [ ] No double-click text rotate when shift held
 - [ ] Loading spinner while running model
 - [ ] More reasonable sig figs in plots
 - [ ] Resistance calculator

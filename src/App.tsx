@@ -164,6 +164,9 @@ export default function App(): React.ReactElement {
             timeStepS: timing.timeStepS,
             totalTimeS: timing.totalTimeS,
           });
+          if (output.errors?.length) {
+            output.errors.forEach((error) => console.error(error.message));
+          }
           setModelOutput(output);
         }}
       />
