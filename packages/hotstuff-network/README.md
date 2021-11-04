@@ -6,6 +6,14 @@ This is the thermal simulation code that powers [hotstuff.network](https://hotst
 npm i hotstuff-network
 ```
 
+### Dev
+
+**Releasing a new version:**
+```
+npm version patch
+npm publish
+```
+
 ### Usage
 ```typescript
 import { run, makeNode, makeConnection } from "hotstuff-network";
