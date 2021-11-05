@@ -1,5 +1,5 @@
-import { HSConnection, HSNode, ModelOutput } from "hotstuff-network";
-import React, { useEffect, useState } from "react";
+import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { ORIGIN, Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -13,7 +13,7 @@ import useModelUtils from "./hooks/useModelUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
 import { defaultConnections, defaultNodes } from "./default";
-import { run } from "hotstuff-network";
+import useLocalStorageState from "./hooks/useLocalStorageState";
 
 const {
   editorWidthPerc,
@@ -66,12 +66,20 @@ export default function App(): React.ReactElement {
   const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
     undefined
   );
-  const [timing, setTiming] = useState<Timing>({
-    timeStepS: config.defaultTimeStepSeconds,
-    totalTimeS: config.defaultTotalTimeSeconds,
-  });
-  const [appNodes, setAppNodes] = useState<AppNode[]>([]);
-  const [appConnections, setAppConnections] = useState<AppConnection[]>([]);
+  const [timing, setTiming] = useLocalStorageState<Timing>(
+    {
+      timeStepS: config.defaultTimeStepSeconds,
+      totalTimeS: config.defaultTotalTimeSeconds,
+    },
+    "hotstuffTiming"
+  );
+  const [appNodes, setAppNodes] = useLocalStorageState<AppNode[]>(
+    defaultNodes,
+    "hotstuffNodes"
+  );
+  const [appConnections, setAppConnections] = useLocalStorageState<
+    AppConnection[]
+  >(defaultConnections, "hotstuffConnections");
   const [
     addNode,
     updateNodes,
@@ -97,12 +105,16 @@ export default function App(): React.ReactElement {
     clearAndRedraw
   );
 
-  const [savedCanvasState, setSavedCanvasState] = useState<SavedCanvasState>({
-    offset: ORIGIN,
-    scale: 1,
-  });
-  const [size, ratio] = useWindowSize();
+  const [savedCanvasState, setSavedCanvasState] =
+    useLocalStorageState<SavedCanvasState>(
+      {
+        offset: ORIGIN,
+        scale: 1,
+      },
+      "hotstuffSavedCanvasState"
+    );
 
+  const [size, ratio] = useWindowSize();
   const [windowWidth, windowHeight] = size;
 
   // width/heights
@@ -114,11 +126,6 @@ export default function App(): React.ReactElement {
     (1 - canvasHeightPerc) * windowHeight - tabHeightPx - plotHeightBufferPx;
   const plotWidth = canvasWidth;
   const editorWidth = editorWidthPerc * windowWidth;
-
-  useEffect(() => {
-    setAppNodes(defaultNodes);
-    setAppConnections(defaultConnections);
-  }, []);
 
   return (
     <StyledApp height={windowHeight}>
