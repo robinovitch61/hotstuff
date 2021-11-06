@@ -4,6 +4,47 @@ import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
 import { diffPoints } from "../utils/pointUtils";
 
+function getNewAppNodes(
+  clickedMouseEvent: React.MouseEvent | MouseEvent,
+  currentMouseEvent: React.MouseEvent | MouseEvent,
+  canvasState: CanvasState,
+  clickedNode: AppNode,
+  shiftKeyPressed: boolean,
+  activeNodes: AppNode[]
+): AppNode[] {
+  const offsetMouseToCenter = diffPoints(
+    mouseToNodeCoords(clickedMouseEvent, canvasState),
+    clickedNode.center
+  );
+
+  const newClickedCenter = diffPoints(
+    mouseToNodeCoords(currentMouseEvent, canvasState),
+    offsetMouseToCenter
+  );
+
+  const newClickedNode = {
+    ...clickedNode,
+    isActive: true,
+    center: newClickedCenter,
+  };
+
+  const newActiveNodes =
+    clickedNode.isActive || shiftKeyPressed
+      ? activeNodes.map((node) => {
+          const distanceFromClickedCenter = diffPoints(
+            clickedNode.center,
+            node.center
+          );
+          return {
+            ...node,
+            center: diffPoints(newClickedCenter, distanceFromClickedCenter),
+          };
+        })
+      : [];
+
+  return [newClickedNode, ...newActiveNodes];
+}
+
 export default function useMoveNode(
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void
 ): (
@@ -16,84 +57,38 @@ export default function useMoveNode(
 
   return useCallback(
     (
-      event: React.MouseEvent | MouseEvent,
+      clickedMouseEvent: React.MouseEvent | MouseEvent,
       clickedNode: AppNode,
       activeNodes: AppNode[],
       canvasState: CanvasState
     ) => {
-      const offsetMouseToCenter = diffPoints(
-        mouseToNodeCoords(event, canvasState),
-        clickedNode.center
-      );
-      const shiftKeyPressed = event.shiftKey;
-      const moveNode = (event: React.MouseEvent | MouseEvent) => {
+      const shiftKeyPressed = clickedMouseEvent.shiftKey;
+      const moveNode = (currentMouseEvent: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
           movedRef.current = true;
-          const newClickedCenter = diffPoints(
-            mouseToNodeCoords(event, canvasState),
-            offsetMouseToCenter
+          const newNodes = getNewAppNodes(
+            clickedMouseEvent,
+            currentMouseEvent,
+            canvasState,
+            clickedNode,
+            shiftKeyPressed,
+            activeNodes
           );
-
-          const newClickedNode = {
-            ...clickedNode,
-            isActive: true,
-            center: newClickedCenter,
-          };
-
-          const newActiveNodes =
-            clickedNode.isActive || shiftKeyPressed
-              ? activeNodes.map((node) => {
-                  const distanceFromClickedCenter = diffPoints(
-                    clickedNode.center,
-                    node.center
-                  );
-                  return {
-                    ...node,
-                    center: diffPoints(
-                      newClickedCenter,
-                      distanceFromClickedCenter
-                    ),
-                  };
-                })
-              : [];
-
-          updateNodes([newClickedNode, ...newActiveNodes], !event.shiftKey);
+          updateNodes(newNodes, !currentMouseEvent.shiftKey);
         }
       };
-      const mouseUp = (event: React.MouseEvent | MouseEvent) => {
+      const mouseUp = (mouseUpEvent: React.MouseEvent | MouseEvent) => {
         document.removeEventListener("mousemove", moveNode);
         document.removeEventListener("mouseup", mouseUp);
-        const newClickedCenter = diffPoints(
-          mouseToNodeCoords(event, canvasState),
-          offsetMouseToCenter
+        const newNodes = getNewAppNodes(
+          clickedMouseEvent,
+          mouseUpEvent,
+          canvasState,
+          clickedNode,
+          shiftKeyPressed,
+          activeNodes
         );
-
-        const newClickedNode = {
-          ...clickedNode,
-          isActive: true,
-          center: newClickedCenter,
-        };
-
-        const newActiveNodes =
-          clickedNode.isActive || shiftKeyPressed
-            ? activeNodes.map((node) => {
-                const distanceFromClickedCenter = diffPoints(
-                  clickedNode.center,
-                  node.center
-                );
-                return {
-                  ...node,
-                  center: diffPoints(
-                    newClickedCenter,
-                    distanceFromClickedCenter
-                  ),
-                };
-              })
-            : [];
-        updateNodes(
-          [newClickedNode, ...newActiveNodes],
-          !movedRef.current && !shiftKeyPressed
-        );
+        updateNodes(newNodes, !movedRef.current && !shiftKeyPressed);
         movedRef.current = false;
       };
       document.addEventListener("mousemove", moveNode);
