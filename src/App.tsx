@@ -111,6 +111,7 @@ export default function App(): React.ReactElement {
       setAppState((prevState) => ({
         ...prevState,
         timing: newTiming,
+        output: undefined,
       }));
     },
     [setAppState]
