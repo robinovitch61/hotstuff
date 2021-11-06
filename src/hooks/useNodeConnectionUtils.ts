@@ -121,12 +121,15 @@ export default function useNodeConnectionUtils(
   );
 
   const clearActiveNodes = useCallback(() => {
-    setAppNodes(
-      appNodes.map((node) => ({
-        ...node,
-        isActive: false,
-      }))
-    );
+    const anyActiveNodes = appNodes.find((node) => node.isActive) !== undefined;
+    if (anyActiveNodes) {
+      setAppNodes(
+        appNodes.map((node) => ({
+          ...node,
+          isActive: false,
+        }))
+      );
+    }
   }, [appNodes, setAppNodes]);
 
   return [

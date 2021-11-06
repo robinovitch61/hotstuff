@@ -1,6 +1,7 @@
 # Hot Stuff
 
 TODO:
+- [ ] Do not clear active nodes if holding down click for pan canvas?
 - [ ] Reset all stored state button
 - [ ] Figure out why lag when lots of points (maybe limit # points?)
 - [ ] Clear model output on any change to appState that isn't `output`
