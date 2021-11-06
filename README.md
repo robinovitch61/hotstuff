@@ -1,7 +1,9 @@
 # Hot Stuff
 
 TODO:
+- [ ] Put canvas offset/scale in appState
 - [ ] Do not clear active nodes if holding down click for pan canvas?
+- [ ] Clear model output if changing anything in table, adding or deleting node/connection, or maybe just if anything relevant to model has changed if diff comparison is fast enough 
 - [ ] Reset all stored state button
 - [ ] Figure out why lag when lots of points (maybe limit # points?)
 - [ ] Clear model output on any change to appState that isn't `output`
