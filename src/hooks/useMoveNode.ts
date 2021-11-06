@@ -33,6 +33,7 @@ export default function useMoveNode(
             mouseToNodeCoords(event, canvasState),
             offsetMouseToCenter
           );
+
           const newClickedNode = {
             ...clickedNode,
             isActive: true,
@@ -62,17 +63,35 @@ export default function useMoveNode(
       const mouseUp = (event: React.MouseEvent | MouseEvent) => {
         document.removeEventListener("mousemove", moveNode);
         document.removeEventListener("mouseup", mouseUp);
+        const newClickedCenter = diffPoints(
+          mouseToNodeCoords(event, canvasState),
+          offsetMouseToCenter
+        );
+
+        const newClickedNode = {
+          ...clickedNode,
+          isActive: true,
+          center: newClickedCenter,
+        };
+
+        const newActiveNodes =
+          clickedNode.isActive || shiftKeyPressed
+            ? activeNodes.map((node) => {
+                const distanceFromClickedCenter = diffPoints(
+                  clickedNode.center,
+                  node.center
+                );
+                return {
+                  ...node,
+                  center: diffPoints(
+                    newClickedCenter,
+                    distanceFromClickedCenter
+                  ),
+                };
+              })
+            : [];
         updateNodes(
-          [
-            {
-              ...clickedNode,
-              center: diffPoints(
-                mouseToNodeCoords(event, canvasState),
-                offsetMouseToCenter
-              ),
-              isActive: true,
-            },
-          ],
+          [newClickedNode, ...newActiveNodes],
           !movedRef.current && !shiftKeyPressed
         );
         movedRef.current = false;

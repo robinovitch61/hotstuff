@@ -1,14 +1,15 @@
 # Hot Stuff
 
 TODO:
-- [ ] Fix stale labels in heat transfer plot
+- [ ] Reset all stored state button
+- [ ] Figure out why lag when lots of points (maybe limit # points?)
+- [ ] Clear model output on any change to appState that isn't `output`
 - [ ] No double-click text rotate when shift held
 - [ ] Loading spinner while running model
 - [ ] More reasonable sig figs in plots
 - [ ] Resistance calculator
 - [ ] Ability to swap source/target in connection
 - [ ] Node color is temp, radius is capacitance
-- [ ] Persist app state to localstorage
 - [ ] Import/export app state
 - [ ] Default state is tutorial
 - [ ] "+" button for node/connection in table
