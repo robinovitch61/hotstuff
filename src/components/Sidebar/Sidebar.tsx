@@ -27,7 +27,7 @@ type SidebarProps = {
   width: number;
   height: number;
   timing: Timing;
-  setTiming: React.Dispatch<React.SetStateAction<Timing>>;
+  setTiming: (newTiming: Timing) => void;
   nodes: AppNode[];
   connections: AppConnection[];
   // addNode: (node: AppNode) => void;

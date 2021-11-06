@@ -14,7 +14,7 @@ const { defaultResistanceDegKPerW, defaultConnectionKind } = config;
 export default function useAddConnection(
   appNodes: AppNode[],
   appConnections: AppConnection[],
-  setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>,
+  setAppConnections: (newConnections: AppConnection[]) => void,
   clearAndRedraw: (canvasState: CanvasState) => void
 ): (
   event: React.MouseEvent | MouseEvent,

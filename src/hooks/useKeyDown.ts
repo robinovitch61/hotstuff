@@ -4,7 +4,7 @@ import { AppNode } from "../App";
 export default function useKeyDown(
   keyboardActive: boolean,
   appNodes: AppNode[],
-  setAppNodes: React.Dispatch<React.SetStateAction<AppNode[]>>,
+  setAppNodes: (newNodes: AppNode[]) => void,
   deleteNodes: (nodeIds: string[]) => void
 ): void {
   useEffect(() => {
@@ -14,8 +14,8 @@ export default function useKeyDown(
         if (event.metaKey) {
           if (event.keyCode === 65) {
             event.preventDefault();
-            setAppNodes((prevNodes) =>
-              prevNodes.map((node) => {
+            setAppNodes(
+              appNodes.map((node) => {
                 return { ...node, isActive: true };
               })
             );
@@ -32,9 +32,7 @@ export default function useKeyDown(
 
         // escape key makes all inactive
         if (event.keyCode === 27) {
-          setAppNodes((prevNodes) =>
-            prevNodes.map((node) => ({ ...node, isActive: false }))
-          );
+          setAppNodes(appNodes.map((node) => ({ ...node, isActive: false })));
         }
       }
     };

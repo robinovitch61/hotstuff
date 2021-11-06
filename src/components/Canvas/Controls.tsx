@@ -19,7 +19,7 @@ type ControlsProps = {
   setView: (offset: Point, scale: number) => void;
   canvasState: CanvasState;
   savedCanvasState: SavedCanvasState;
-  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
+  setSavedCanvasState: (newSavedCanvasState: SavedCanvasState) => void;
 };
 
 export default function Controls(props: ControlsProps): React.ReactElement {

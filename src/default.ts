@@ -1,6 +1,7 @@
 import { makeConnection, makeNode } from "hotstuff-network";
 import { AppConnection, AppNode } from "./App";
 import config from "./config";
+import { ORIGIN } from "./utils/pointUtils";
 
 const test1 = makeNode({
   name: "test1",
@@ -49,3 +50,21 @@ export const defaultConnections: AppConnection[] = [
     targetName: test2.name,
   },
 ];
+
+export const defaultTiming = {
+  timeStepS: config.defaultTimeStepSeconds,
+  totalTimeS: config.defaultTotalTimeSeconds,
+};
+
+export const defaultSavedCanvasState = {
+  offset: ORIGIN,
+  scale: 1,
+};
+
+export const defaultAppState = {
+  output: undefined,
+  timing: defaultTiming,
+  nodes: defaultNodes,
+  connections: defaultConnections,
+  savedCanvasState: defaultSavedCanvasState,
+};

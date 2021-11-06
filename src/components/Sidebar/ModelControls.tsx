@@ -38,7 +38,7 @@ const StyledLabel = styled.label`
 export type ModelControlsProps = {
   onRunModel: () => void;
   timing: Timing;
-  setTiming: React.Dispatch<React.SetStateAction<Timing>>;
+  setTiming: (newTiming: Timing) => void;
 };
 
 export default function ModelControls(
@@ -55,10 +55,7 @@ export default function ModelControls(
             <EditableNumberInput
               initialValue={timing.totalTimeS}
               onBlur={(newTotalTimeS: number) =>
-                setTiming((prevTiming) => ({
-                  ...prevTiming,
-                  totalTimeS: newTotalTimeS,
-                }))
+                setTiming({ ...timing, totalTimeS: newTotalTimeS })
               }
             />
           </StyledInputWrapper>
@@ -69,10 +66,10 @@ export default function ModelControls(
             <EditableNumberInput
               initialValue={timing.timeStepS}
               onBlur={(newTimeStepS: number) =>
-                setTiming((prevTiming) => ({
-                  ...prevTiming,
+                setTiming({
+                  ...timing,
                   timeStepS: newTimeStepS,
-                }))
+                })
               }
             />
           </StyledInputWrapper>

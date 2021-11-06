@@ -13,7 +13,7 @@ import useMultiSelect from "./useMultiSelect";
 export default function useOnMouseDown(
   appNodes: AppNode[],
   appConnections: AppConnection[],
-  setAppConnections: React.Dispatch<React.SetStateAction<AppConnection[]>>,
+  setAppConnections: (newConnections: AppConnection[]) => void,
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void,
   setActiveNodes: (activeNodeIds: string[]) => void,
   clearActiveNodes: () => void,

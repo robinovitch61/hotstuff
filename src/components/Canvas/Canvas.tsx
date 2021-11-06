@@ -45,7 +45,7 @@ export type CanvasProps = {
     canvasState: CanvasState
   ) => void;
   savedCanvasState: SavedCanvasState;
-  setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
+  setSavedCanvasState: (newSavedCanvasState: SavedCanvasState) => void;
   setKeyboardActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
 

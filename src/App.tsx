@@ -1,7 +1,7 @@
 import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
-import { ORIGIN, Point } from "./utils/pointUtils";
+import { Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
 import config from "./config";
@@ -9,10 +9,10 @@ import useWindowSize from "./components/Canvas/hooks/useWindowSize";
 import Canvas, { SavedCanvasState } from "./components/Canvas/Canvas";
 import useDraw from "./hooks/useDraw";
 import useDoubleClick from "./hooks/useDoubleClick";
-import useModelUtils from "./hooks/useModelUtils";
+import useNodeConnectionUtils from "./hooks/useNodeConnectionUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
-import { defaultConnections, defaultNodes } from "./default";
+import { defaultAppState } from "./default";
 import useLocalStorageState from "./hooks/useLocalStorageState";
 
 const {
@@ -43,6 +43,14 @@ export type Timing = {
   totalTimeS: number;
 };
 
+export type AppState = {
+  output?: ModelOutput;
+  timing: Timing;
+  nodes: AppNode[];
+  connections: AppConnection[];
+  savedCanvasState: SavedCanvasState;
+};
+
 const StyledApp = styled.div<{ height: number }>`
   display: flex;
   height: ${(props) => props.height}px;
@@ -63,23 +71,61 @@ const StyledCanvas = styled.div<{ height: number }>`
 `;
 
 export default function App(): React.ReactElement {
-  const [modelOutput, setModelOutput] = useState<ModelOutput | undefined>(
-    undefined
+  const [appState, setAppState] = useLocalStorageState<AppState>(
+    defaultAppState,
+    "hotstuffAppState"
   );
-  const [timing, setTiming] = useLocalStorageState<Timing>(
-    {
-      timeStepS: config.defaultTimeStepSeconds,
-      totalTimeS: config.defaultTotalTimeSeconds,
+
+  const setAppNodes = useCallback(
+    (newNodes: AppNode[]) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        nodes: newNodes,
+      }));
     },
-    "hotstuffTiming"
+    [setAppState]
   );
-  const [appNodes, setAppNodes] = useLocalStorageState<AppNode[]>(
-    defaultNodes,
-    "hotstuffNodes"
+
+  const setAppConnections = useCallback(
+    (newConnections: AppConnection[]) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        connections: newConnections,
+      }));
+    },
+    [setAppState]
   );
-  const [appConnections, setAppConnections] = useLocalStorageState<
-    AppConnection[]
-  >(defaultConnections, "hotstuffConnections");
+
+  const setSavedCanvasState = useCallback(
+    (newSavedCanvasState: SavedCanvasState) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        savedCanvasState: newSavedCanvasState,
+      }));
+    },
+    [setAppState]
+  );
+
+  const setTiming = useCallback(
+    (newTiming: Timing) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        timing: newTiming,
+      }));
+    },
+    [setAppState]
+  );
+
+  const setModelOutput = useCallback(
+    (newModelOutput: ModelOutput) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        output: newModelOutput,
+      }));
+    },
+    [setAppState]
+  );
+
   const [
     addNode,
     updateNodes,
@@ -88,31 +134,31 @@ export default function App(): React.ReactElement {
     deleteConnections,
     setActiveNodes,
     clearActiveNodes,
-  ] = useModelUtils(setAppNodes, setAppConnections);
+  ] = useNodeConnectionUtils(
+    appState.nodes,
+    setAppNodes,
+    appState.connections,
+    setAppConnections
+  );
 
   const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
-  useKeyDown(keyboardActive, appNodes, setAppNodes, deleteNodes);
+  useKeyDown(keyboardActive, appState.nodes, setAppNodes, deleteNodes);
 
-  const [draw, clearAndRedraw] = useDraw(appNodes, appConnections);
-  const handleDoubleClick = useDoubleClick(appNodes, addNode, updateNodes);
+  const [draw, clearAndRedraw] = useDraw(appState.nodes, appState.connections);
+  const handleDoubleClick = useDoubleClick(
+    appState.nodes,
+    addNode,
+    updateNodes
+  );
   const onMouseDown = useOnMouseDown(
-    appNodes,
-    appConnections,
+    appState.nodes,
+    appState.connections,
     setAppConnections,
     updateNodes,
     setActiveNodes,
     clearActiveNodes,
     clearAndRedraw
   );
-
-  const [savedCanvasState, setSavedCanvasState] =
-    useLocalStorageState<SavedCanvasState>(
-      {
-        offset: ORIGIN,
-        scale: 1,
-      },
-      "hotstuffSavedCanvasState"
-    );
 
   const [size, ratio] = useWindowSize();
   const [windowWidth, windowHeight] = size;
@@ -138,7 +184,7 @@ export default function App(): React.ReactElement {
             draw={draw}
             onMouseDown={onMouseDown}
             handleDoubleClick={handleDoubleClick}
-            savedCanvasState={savedCanvasState}
+            savedCanvasState={appState.savedCanvasState}
             setSavedCanvasState={setSavedCanvasState}
             setKeyboardActive={setKeyboardActive}
           />
@@ -149,16 +195,16 @@ export default function App(): React.ReactElement {
             width: plotWidth,
             margin: plotMargin,
           }}
-          modelOutput={modelOutput}
+          modelOutput={appState.output}
         />
       </StyledWorkspace>
       <Sidebar
         height={windowHeight}
         width={editorWidth}
-        timing={timing}
+        timing={appState.timing}
         setTiming={setTiming}
-        nodes={appNodes}
-        connections={appConnections}
+        nodes={appState.nodes}
+        connections={appState.connections}
         // addNode={addNode}
         updateNodes={updateNodes}
         deleteNodes={deleteNodes}
@@ -166,10 +212,10 @@ export default function App(): React.ReactElement {
         deleteConnections={deleteConnections}
         onRunModel={() => {
           const output = run({
-            nodes: appNodes,
-            connections: appConnections,
-            timeStepS: timing.timeStepS,
-            totalTimeS: timing.totalTimeS,
+            nodes: appState.nodes,
+            connections: appState.connections,
+            timeStepS: appState.timing.timeStepS,
+            totalTimeS: appState.timing.totalTimeS,
           });
           if (output.errors?.length) {
             output.errors.forEach((error) => console.error(error.message));
