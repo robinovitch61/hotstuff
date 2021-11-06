@@ -2,7 +2,7 @@ import * as React from "react";
 import { useLayoutEffect, useRef } from "react";
 import styled from "styled-components";
 import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
-import { makePoint, Point } from "../../utils/pointUtils";
+import { Point } from "../../utils/pointUtils";
 import Controls from "./Controls";
 import useOnClickCanvas from "./hooks/useOnClickCanvas";
 
@@ -65,7 +65,7 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useOnClickCanvas(canvasRef, setKeyboardActive);
-  const [context, setView, offset, scale, startPan] =
+  const [context, setContext, setView, offset, scale, startPan] =
     usePanZoomCanvas(canvasRef);
 
   // setup canvas and set context
@@ -73,9 +73,9 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     if (canvasRef.current) {
       // get new drawing context
       const renderCtx = canvasRef.current.getContext("2d");
-      setView(renderCtx, makePoint(0, 0), 1);
+      setContext(renderCtx);
     }
-  }, [setView]);
+  }, [setContext]);
 
   // draw
   useLayoutEffect(() => {
@@ -130,9 +130,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
             canvasHeight,
           })
         }
-        // onClick={(event: React.MouseEvent | MouseEvent) =>
-        //   onClick(event, canvasRef)
-        // }
       />
     </StyledCanvasWrapper>
   );

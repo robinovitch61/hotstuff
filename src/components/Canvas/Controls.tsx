@@ -16,11 +16,7 @@ const StyledButton = styled.button`
 `;
 
 type ControlsProps = {
-  setView: (
-    canvas: CanvasRenderingContext2D,
-    offset: Point,
-    scale: number
-  ) => void;
+  setView: (offset: Point, scale: number) => void;
   canvasState: CanvasState;
   savedCanvasState: SavedCanvasState;
   setSavedCanvasState: React.Dispatch<React.SetStateAction<SavedCanvasState>>;
@@ -30,10 +26,7 @@ export default function Controls(props: ControlsProps): React.ReactElement {
   return (
     <StyledButtons>
       <StyledButton
-        onClick={() =>
-          props.canvasState.context &&
-          props.setView(props.canvasState.context, ORIGIN, 1)
-        }
+        onClick={() => props.canvasState.context && props.setView(ORIGIN, 1)}
       >
         Reset View
       </StyledButton>
@@ -41,7 +34,6 @@ export default function Controls(props: ControlsProps): React.ReactElement {
         onClick={() =>
           props.canvasState.context &&
           props.setView(
-            props.canvasState.context,
             props.savedCanvasState.offset,
             props.savedCanvasState.scale
           )
