@@ -5,7 +5,8 @@ import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { ConnectionKind } from "../types";
 
-const { activeNodeOutlineWidth: activeNodeStrokeWidth } = config;
+const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
+export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
 
 function drawCircle(
   context: CanvasRenderingContext2D,
@@ -34,11 +35,11 @@ function drawCircleOutline(
   context.arc(
     center.x,
     center.y,
-    radius - activeNodeStrokeWidth / 2,
+    radius - activeNodeOutlineWidthPx / 2,
     0,
     2 * Math.PI
   );
-  context.lineWidth = activeNodeStrokeWidth;
+  context.lineWidth = activeNodeOutlineWidthPx;
   context.strokeStyle = color;
   context.stroke();
   context.closePath();
@@ -397,16 +398,15 @@ export function determineRadius(
 ): number {
   const min = Math.min(...allCapacitances);
   const max = Math.max(...allCapacitances);
-  const minRadius = 20;
-  const maxRadius = 40;
   // cap = min -> minRadius
   // cap = max -> maxRadius
   // radius = (cap - min) / (max - min) * 20 + 10
   if (min === max) {
-    return Math.floor((minRadius + maxRadius) / 2);
+    return DEFAULT_RADIUS;
   }
   return (
-    ((capacitance - min) / (max - min)) * (maxRadius - minRadius) + minRadius
+    ((capacitance - min) / (max - min)) * (maxRadiusPx - minRadiusPx) +
+    minRadiusPx
   );
 }
 
@@ -414,5 +414,5 @@ export function determineColor(
   temperature: number,
   allTemperatures: number[]
 ): string {
-  return "grey";
+  return "red";
 }

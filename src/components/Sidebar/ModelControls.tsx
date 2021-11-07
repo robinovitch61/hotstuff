@@ -3,6 +3,7 @@ import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
 import { AppState, Timing } from "../../App";
 import { useState } from "react";
+import { defaultAppState } from "../../default";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -107,6 +108,10 @@ export default function ModelControls(
           Import Model
         </StyledButton>
       </StyledImport>
+
+      <StyledButton onClick={() => props.setAppState(defaultAppState)}>
+        Reset to Tutorial
+      </StyledButton>
     </StyledModelControlsWrapper>
   );
 }

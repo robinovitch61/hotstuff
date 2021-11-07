@@ -20,6 +20,9 @@ export default function useDoubleClick(
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       event.preventDefault();
+      if (event.shiftKey) {
+        return;
+      }
 
       const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
 
@@ -30,6 +33,7 @@ export default function useDoubleClick(
         );
         return intersectsCircle(nodeCoordsOfMouse, node.center, nodeRadius);
       });
+
       if (doubleClickedNode) {
         updateNodes([
           {
@@ -40,25 +44,22 @@ export default function useDoubleClick(
         return;
       }
 
-      const numNewNodes = appNodes.filter((node) =>
+      const numNodesWithDefaultPrefix = appNodes.filter((node) =>
         node.name.startsWith(newNodeNamePrefix)
       ).length;
-
       const newNode = makeNode({
         name:
-          numNewNodes === 0
+          numNodesWithDefaultPrefix === 0
             ? `${newNodeNamePrefix}`
-            : `${newNodeNamePrefix} (${numNewNodes + 1})`,
+            : `${newNodeNamePrefix} (${numNodesWithDefaultPrefix + 1})`,
         temperatureDegC: config.defaultTempDegC,
         capacitanceJPerDegK: config.defaultCapJPerDegK,
         powerGenW: config.defaultPowerGenW,
         isBoundary: false,
       });
-
       const newAppNode: AppNode = {
         ...newNode,
         center: nodeCoordsOfMouse,
-        color: "red",
         isActive: false,
         textDirection: "D",
       };

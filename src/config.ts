@@ -2,7 +2,7 @@ import { HSConnection } from "hotstuff-network";
 
 const config = {
   defaultTempDegC: 23,
-  defaultCapJPerDegK: 1,
+  defaultCapJPerDegK: 10,
   defaultPowerGenW: 0,
   canvasHeightPerc: 0.7,
   editorWidthPerc: 0.3,
@@ -15,7 +15,9 @@ const config = {
   zoomSensitivity: 1000, // bigger = less zoom per click
   minZoom: 0.25,
   maxZoom: 5,
-  activeNodeOutlineWidth: 5,
+  minRadiusPx: 20,
+  maxRadiusPx: 40,
+  activeNodeOutlineWidthPx: 5,
   tabHeightPx: 25,
   plotHeightBufferPx: 10,
   tableDeleteCellWidthPerc: 0.1,

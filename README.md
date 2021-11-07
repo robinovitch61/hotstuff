@@ -1,7 +1,7 @@
 # Hot Stuff
 
 TODO:
-- [ ] Node color is temp, radius is capacitance
+- [ ] Node color is temp
 - [ ] Default state is tutorial
 - [ ] "+" button for node/connection in table
 - [ ] No double-click text rotate when shift held
@@ -12,12 +12,15 @@ TODO:
 - [ ] Ability to swap source/target in connection table
 - [ ] X, Table Tabs, Tab-selectable
 - [ ] Add the ability to change the plot/canvas/table size by dragging the borders
+- [ ] Reset all stored state button (with confirmation?)
  
+
 - [ ] Theory explanation popup
 - [ ] Information popup
 - [ ] File export/import
-- [ ] Reset all stored state button (with confirmation?)
 - [ ] Loading spinner while running model
+- [ ] Ability to add text blobs?
+
 
 - [ ] Escape while editing cell exits and resets default val
 - [ ] Enter while editing cell exits same as tab
