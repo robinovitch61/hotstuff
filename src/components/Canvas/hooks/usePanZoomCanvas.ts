@@ -9,36 +9,23 @@ import {
 } from "../../../utils/pointUtils";
 import config from "../../../config";
 import { calculateCanvasMouse } from "../canvasUtils";
-import useLocalStorageState from "../../../hooks/useLocalStorageState";
+import { CanvasViewState } from "../Canvas";
 
 const { maxZoom, minZoom, zoomSensitivity } = config;
 
 export default function usePanZoomCanvas(
-  canvasRef: React.RefObject<HTMLCanvasElement>
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  canvasViewState: CanvasViewState,
+  setCanvasViewState: (newCanvasViewState: CanvasViewState) => void
 ): [
   CanvasRenderingContext2D | null,
   React.Dispatch<React.SetStateAction<CanvasRenderingContext2D | null>>,
-  (offset: Point, scale: number) => void,
-  Point,
-  number,
   (event: React.MouseEvent | MouseEvent) => void
 ] {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
-  const [scale, setScale] = useLocalStorageState<number>(1, "hotstuffScale");
-  const [offset, setOffset] = useLocalStorageState<Point>(
-    ORIGIN,
-    "hotstuffOffset"
-  );
   const mousePosRef = useRef<Point>(ORIGIN);
   const lastMousePosRef = useRef<Point>(ORIGIN);
-
-  const setView = useCallback(
-    (offset: Point, scale: number) => {
-      setOffset(offset);
-      setScale(scale);
-    },
-    [setOffset, setScale]
-  );
+  const lastCanvasViewState = useRef<CanvasViewState>(canvasViewState);
 
   // functions for panning
   const mouseMove = useCallback(
@@ -51,12 +38,17 @@ export default function usePanZoomCanvas(
 
         const mouseDiff = scalePoint(
           diffPoints(mousePosRef.current, lastMousePosRef.current),
-          scale
+          canvasViewState.scale
         );
-        setOffset((prevOffset) => addPoints(prevOffset, mouseDiff));
+        const newCanvasViewState = {
+          scale: canvasViewState.scale,
+          offset: addPoints(lastCanvasViewState.current.offset, mouseDiff),
+        };
+        setCanvasViewState(newCanvasViewState);
+        lastCanvasViewState.current = newCanvasViewState;
       }
     },
-    [context, scale, setOffset]
+    [context, canvasViewState.scale, setCanvasViewState]
   );
 
   const mouseUp = useCallback(() => {
@@ -87,27 +79,35 @@ export default function usePanZoomCanvas(
 
         // calculate new scale/zoom
         const zoom = 1 - event.deltaY / zoomSensitivity;
-        const newScale = scale * zoom;
+        const newScale = canvasViewState.scale * zoom;
         if (newScale > maxZoom || newScale < minZoom) {
           return;
         }
 
         // offset the canvas such that the point under the mouse doesn't move
-        const lastMouse = scalePoint(mousePosRef.current, scale);
+        const lastMouse = scalePoint(
+          mousePosRef.current,
+          canvasViewState.scale
+        );
         const newMouse = scalePoint(mousePosRef.current, newScale);
         const mouseOffset = diffPoints(lastMouse, newMouse);
 
-        setOffset(diffPoints(offset, mouseOffset));
-        setScale(newScale);
+        const newCanvasViewState = {
+          offset: diffPoints(lastCanvasViewState.current.offset, mouseOffset),
+          scale: newScale,
+        };
+        setCanvasViewState(newCanvasViewState);
+        lastCanvasViewState.current = newCanvasViewState;
       }
     }
 
     const canvasElem = canvasRef.current;
     if (canvasElem) {
+      lastCanvasViewState.current = canvasViewState;
       canvasElem.addEventListener("wheel", handleWheel);
       return () => canvasElem.removeEventListener("wheel", handleWheel);
     }
-  }, [canvasRef, context, offset, scale, setOffset, setScale]);
+  }, [canvasRef, canvasViewState, context, setCanvasViewState]);
 
-  return [context, setContext, setView, offset, scale, startPan];
+  return [context, setContext, startPan];
 }

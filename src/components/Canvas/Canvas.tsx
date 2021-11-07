@@ -17,17 +17,16 @@ const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
   height: ${({ cssHeight }) => `${cssHeight}px`};
 `;
 
-export type CanvasState = {
-  context: CanvasRenderingContext2D | null;
+export type CanvasViewState = {
   offset: Point;
   scale: number;
-  canvasWidth: number;
-  canvasHeight: number;
 };
 
-export type SavedCanvasState = {
-  offset: Point;
-  scale: number;
+export type CanvasState = {
+  context: CanvasRenderingContext2D | null;
+  canvasViewState: CanvasViewState;
+  canvasWidth: number;
+  canvasHeight: number;
 };
 
 export type CanvasProps = {
@@ -44,8 +43,10 @@ export type CanvasProps = {
     event: React.MouseEvent,
     canvasState: CanvasState
   ) => void;
-  savedCanvasState: SavedCanvasState;
-  setSavedCanvasState: (newSavedCanvasState: SavedCanvasState) => void;
+  canvasViewState: CanvasViewState;
+  setCanvasViewState: (newCanvasState: CanvasViewState) => void;
+  savedCanvasViewState: CanvasViewState;
+  setSavedCanvasViewState: (newSavedCanvasState: CanvasViewState) => void;
   setKeyboardActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -57,16 +58,21 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     draw,
     onMouseDown,
     handleDoubleClick,
-    savedCanvasState,
-    setSavedCanvasState,
+    canvasViewState,
+    setCanvasViewState,
+    savedCanvasViewState,
+    setSavedCanvasViewState,
     setKeyboardActive,
   } = props;
 
   // hooks
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useOnClickCanvas(canvasRef, setKeyboardActive);
-  const [context, setContext, setView, offset, scale, startPan] =
-    usePanZoomCanvas(canvasRef);
+  const [context, setContext, startPan] = usePanZoomCanvas(
+    canvasRef,
+    canvasViewState,
+    setCanvasViewState
+  );
 
   // setup canvas and set context
   useLayoutEffect(() => {
@@ -84,8 +90,11 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
       context.canvas.width = canvasWidth * devicePixelRatio;
       context.canvas.height = canvasHeight * devicePixelRatio;
 
-      context.scale(scale * devicePixelRatio, scale * devicePixelRatio);
-      context.translate(offset.x, offset.y);
+      context.scale(
+        canvasViewState.scale * devicePixelRatio,
+        canvasViewState.scale * devicePixelRatio
+      );
+      context.translate(canvasViewState.offset.x, canvasViewState.offset.y);
 
       draw(context);
     }
@@ -95,18 +104,23 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     context,
     devicePixelRatio,
     draw,
-    offset.x,
-    offset.y,
-    scale,
+    canvasViewState.offset.x,
+    canvasViewState.offset.y,
+    canvasViewState.scale,
   ]);
 
   return (
     <StyledCanvasWrapper>
       <Controls
-        setView={setView}
-        canvasState={{ context, offset, scale, canvasWidth, canvasHeight }}
-        savedCanvasState={savedCanvasState}
-        setSavedCanvasState={setSavedCanvasState}
+        setCanvasViewState={setCanvasViewState}
+        canvasState={{
+          context,
+          canvasViewState,
+          canvasWidth,
+          canvasHeight,
+        }}
+        savedCanvasState={savedCanvasViewState}
+        setSavedCanvasState={setSavedCanvasViewState}
       />
       <StyledCanvas
         ref={canvasRef}
@@ -117,15 +131,14 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
         onMouseDown={(event: React.MouseEvent | MouseEvent) =>
           onMouseDown(
             event,
-            { context, offset, scale, canvasWidth, canvasHeight },
+            { context, canvasViewState, canvasWidth, canvasHeight },
             () => startPan(event)
           )
         }
         onDoubleClick={(event: React.MouseEvent) =>
           handleDoubleClick(event, {
             context,
-            offset,
-            scale,
+            canvasViewState,
             canvasWidth,
             canvasHeight,
           })

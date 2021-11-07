@@ -6,14 +6,14 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
 import config from "./config";
 import useWindowSize from "./components/Canvas/hooks/useWindowSize";
-import Canvas, { SavedCanvasState } from "./components/Canvas/Canvas";
+import Canvas, { CanvasViewState } from "./components/Canvas/Canvas";
 import useDraw from "./hooks/useDraw";
 import useDoubleClick from "./hooks/useDoubleClick";
 import useNodeConnectionUtils from "./hooks/useNodeConnectionUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
 import { defaultAppState } from "./default";
-import useLocalStorageState from "./hooks/useLocalStorageState";
+import useSessionStorageState from "./hooks/useSessionStorageState";
 
 const {
   editorWidthPerc,
@@ -48,7 +48,8 @@ export type AppState = {
   timing: Timing;
   nodes: AppNode[];
   connections: AppConnection[];
-  savedCanvasState: SavedCanvasState;
+  canvasViewState: CanvasViewState;
+  savedCanvasState: CanvasViewState;
 };
 
 const StyledApp = styled.div<{ height: number }>`
@@ -71,7 +72,7 @@ const StyledCanvas = styled.div<{ height: number }>`
 `;
 
 export default function App(): React.ReactElement {
-  const [appState, setAppState] = useLocalStorageState<AppState>(
+  const [appState, setAppState] = useSessionStorageState<AppState>(
     defaultAppState,
     "hotstuffAppState"
   );
@@ -96,8 +97,18 @@ export default function App(): React.ReactElement {
     [setAppState]
   );
 
+  const setCanvasState = useCallback(
+    (newCanvasState: CanvasViewState) => {
+      setAppState((prevState) => ({
+        ...prevState,
+        canvasViewState: newCanvasState,
+      }));
+    },
+    [setAppState]
+  );
+
   const setSavedCanvasState = useCallback(
-    (newSavedCanvasState: SavedCanvasState) => {
+    (newSavedCanvasState: CanvasViewState) => {
       setAppState((prevState) => ({
         ...prevState,
         savedCanvasState: newSavedCanvasState,
@@ -185,8 +196,10 @@ export default function App(): React.ReactElement {
             draw={draw}
             onMouseDown={onMouseDown}
             handleDoubleClick={handleDoubleClick}
-            savedCanvasState={appState.savedCanvasState}
-            setSavedCanvasState={setSavedCanvasState}
+            canvasViewState={appState.canvasViewState}
+            setCanvasViewState={setCanvasState}
+            savedCanvasViewState={appState.savedCanvasState}
+            setSavedCanvasViewState={setSavedCanvasState}
             setKeyboardActive={setKeyboardActive}
           />
         </StyledCanvas>

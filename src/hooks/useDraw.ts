@@ -42,10 +42,10 @@ export default function useDraw(
     (canvasState: CanvasState) => {
       if (canvasState.context) {
         canvasState.context.clearRect(
-          -canvasState.offset.x,
-          -canvasState.offset.y,
-          canvasState.canvasWidth / canvasState.scale,
-          canvasState.canvasHeight / canvasState.scale
+          -canvasState.canvasViewState.offset.x,
+          -canvasState.canvasViewState.offset.y,
+          canvasState.canvasWidth / canvasState.canvasViewState.scale,
+          canvasState.canvasHeight / canvasState.canvasViewState.scale
         );
         draw(canvasState.context);
       }

@@ -56,7 +56,7 @@ export const defaultTiming = {
   totalTimeS: config.defaultTotalTimeSeconds,
 };
 
-export const defaultSavedCanvasState = {
+export const defaultCanvasViewState = {
   offset: ORIGIN,
   scale: 1,
 };
@@ -66,5 +66,6 @@ export const defaultAppState = {
   timing: defaultTiming,
   nodes: defaultNodes,
   connections: defaultConnections,
-  savedCanvasState: defaultSavedCanvasState,
+  canvasViewState: defaultCanvasViewState,
+  savedCanvasState: defaultCanvasViewState,
 };

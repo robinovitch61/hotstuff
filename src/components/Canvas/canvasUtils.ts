@@ -369,8 +369,8 @@ export function mouseToNodeCoords(
     const canvasMouse = calculateCanvasMouse(event, canvasState.context.canvas);
     return canvasMouseToNodeCoords(
       canvasMouse,
-      canvasState.offset,
-      canvasState.scale
+      canvasState.canvasViewState.offset,
+      canvasState.canvasViewState.scale
     );
   } else {
     return ORIGIN;
