@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import {
+  determineColor,
   determineRadius,
   drawConnection,
   drawNode,
@@ -21,12 +22,16 @@ export default function useDraw(
           node.capacitanceJPerDegK,
           appNodes.map((node) => node.capacitanceJPerDegK)
         );
+        const nodeColor = determineColor(
+          node.temperatureDegC,
+          appNodes.map((node) => node.temperatureDegC)
+        );
         drawNode(
           context,
           node.name,
           node.center,
           nodeRadius,
-          "red",
+          nodeColor,
           node.isActive,
           node.isBoundary,
           node.textDirection

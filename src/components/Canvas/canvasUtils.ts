@@ -409,3 +409,10 @@ export function determineRadius(
     ((capacitance - min) / (max - min)) * (maxRadius - minRadius) + minRadius
   );
 }
+
+export function determineColor(
+  temperature: number,
+  allTemperatures: number[]
+): string {
+  return "grey";
+}
