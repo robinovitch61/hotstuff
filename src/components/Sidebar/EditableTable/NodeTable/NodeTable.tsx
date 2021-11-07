@@ -13,6 +13,7 @@ import { TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
+import DeleteCell from "../DeleteCell";
 
 type NodeTableColumn = TableColumn<AppNode>;
 
@@ -90,19 +91,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
             </StyledCell>
           );
         })}
-        <StyledDeleteCell
-          tabIndex={0}
-          onKeyUp={(event: React.KeyboardEvent) => {
-            if (event.key === "Enter") {
-              onDeleteRow(row);
-            }
-          }}
-          width={config.tableDeleteCellWidthPerc}
-          minWidth={config.tableDeleteCellMinWidthPx}
-          onClick={() => onDeleteRow(row)}
-        >
-          ❌
-        </StyledDeleteCell>
+        <DeleteCell row={row} onDeleteRow={() => onDeleteRow(row)} />
       </StyledRow>
     );
   });

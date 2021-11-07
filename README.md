@@ -8,7 +8,6 @@ TODO:
 - [ ] Do not clear active nodes if holding down click for pan canvas
 - [ ] Resistance calculator
 - [ ] Ability to swap source/target in connection table
-- [ ] X, Table Tabs, Tab-selectable
 - [ ] Add the ability to change the plot/canvas/table size by dragging the borders
 - [ ] Reset all stored state button (with confirmation?)
  

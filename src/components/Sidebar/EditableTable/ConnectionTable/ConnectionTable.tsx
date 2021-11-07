@@ -14,6 +14,7 @@ import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
 import { ConnectionKind } from "../../../types";
+import DeleteCell from "../DeleteCell";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
@@ -249,13 +250,7 @@ export default function ConnectionTable(
             </StyledCell>
           );
         })}
-        <StyledDeleteCell
-          width={config.tableDeleteCellWidthPerc}
-          minWidth={config.tableDeleteCellMinWidthPx}
-          onClick={() => props.onDeleteRow(row)}
-        >
-          ❌
-        </StyledDeleteCell>
+        <DeleteCell row={row} onDeleteRow={() => props.onDeleteRow(row)} />
       </StyledRow>
     );
   });
