@@ -14,7 +14,7 @@ const { defaultResistanceDegKPerW, defaultConnectionKind } = config;
 export default function useAddConnection(
   appNodes: AppNode[],
   appConnections: AppConnection[],
-  setAppConnections: (newConnections: AppConnection[]) => void,
+  addConnection: (newConnection: AppConnection) => void,
   clearAndRedraw: (canvasState: CanvasState) => void
 ): (
   event: React.MouseEvent | MouseEvent,
@@ -81,7 +81,7 @@ export default function useAddConnection(
             sourceName: clickedNode.name,
             targetName: mouseUpOnNode.name,
           };
-          setAppConnections([...appConnections, newConnection]);
+          addConnection(newConnection);
         } else {
           clearAndRedraw(canvasState);
         }
@@ -90,11 +90,11 @@ export default function useAddConnection(
       document.addEventListener("mouseup", mouseUp);
     },
     [
+      addConnection,
       appConnections,
       appNodes,
       clearAndRedraw,
       drawConnectionBeingMade,
-      setAppConnections,
     ]
   );
 }

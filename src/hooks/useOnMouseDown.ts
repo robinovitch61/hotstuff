@@ -13,7 +13,7 @@ import useMultiSelect from "./useMultiSelect";
 export default function useOnMouseDown(
   appNodes: AppNode[],
   appConnections: AppConnection[],
-  setAppConnections: (newConnections: AppConnection[]) => void,
+  addConnection: (newConnection: AppConnection) => void,
   updateNodes: (nodesToUpdate: AppNode[], clearActiveNodes?: boolean) => void,
   setActiveNodes: (activeNodeIds: string[]) => void,
   clearActiveNodes: () => void,
@@ -26,7 +26,7 @@ export default function useOnMouseDown(
   const makeNewConnection = useAddConnection(
     appNodes,
     appConnections,
-    setAppConnections,
+    addConnection,
     clearAndRedraw
   );
   const moveNode = useMoveNode(updateNodes);

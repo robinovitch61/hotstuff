@@ -129,7 +129,7 @@ export default function App(): React.ReactElement {
   );
 
   const setModelOutput = useCallback(
-    (newModelOutput: ModelOutput) => {
+    (newModelOutput: ModelOutput | undefined) => {
       setAppState((prevState) => ({
         ...prevState,
         output: newModelOutput,
@@ -140,6 +140,7 @@ export default function App(): React.ReactElement {
 
   const [
     addNode,
+    addConnection,
     updateNodes,
     deleteNodes,
     updateConnections,
@@ -150,7 +151,8 @@ export default function App(): React.ReactElement {
     appState.nodes,
     setAppNodes,
     appState.connections,
-    setAppConnections
+    setAppConnections,
+    setModelOutput
   );
 
   const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
@@ -165,7 +167,7 @@ export default function App(): React.ReactElement {
   const onMouseDown = useOnMouseDown(
     appState.nodes,
     appState.connections,
-    setAppConnections,
+    addConnection,
     updateNodes,
     setActiveNodes,
     clearActiveNodes,
@@ -220,9 +222,15 @@ export default function App(): React.ReactElement {
         nodes={appState.nodes}
         connections={appState.connections}
         // addNode={addNode}
-        updateNodes={updateNodes}
+        updateNodes={(nodes: AppNode[]) => {
+          updateNodes(nodes);
+          setModelOutput(undefined);
+        }}
         deleteNodes={deleteNodes}
-        updateConnections={updateConnections}
+        updateConnections={(conns: AppConnection[]) => {
+          updateConnections(conns);
+          setModelOutput(undefined);
+        }}
         deleteConnections={deleteConnections}
         onRunModel={() => {
           const output = run({
