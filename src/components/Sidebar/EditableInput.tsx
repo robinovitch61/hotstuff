@@ -47,6 +47,12 @@ export default function EditableInput<T extends CanBeMadeString>(
       value={value}
       onChange={handleOnChange}
       onBlur={handleOnBlur}
+      // TODO LEO
+      onKeyDown={(event: React.KeyboardEvent) => {
+        if (event.key === "Escape") {
+        } else if (event.key === "Enter") {
+        }
+      }}
     />
   );
 }
