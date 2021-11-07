@@ -57,17 +57,17 @@ export default function useMoveNode(
 
   return useCallback(
     (
-      clickedMouseEvent: React.MouseEvent | MouseEvent,
+      mouseDownEvent: React.MouseEvent | MouseEvent,
       clickedNode: AppNode,
       activeNodes: AppNode[],
       canvasState: CanvasState
     ) => {
-      const shiftKeyPressed = clickedMouseEvent.shiftKey;
+      const shiftKeyPressed = mouseDownEvent.shiftKey;
       const moveNode = (currentMouseEvent: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
           movedRef.current = true;
           const newNodes = getNewAppNodes(
-            clickedMouseEvent,
+            mouseDownEvent,
             currentMouseEvent,
             canvasState,
             clickedNode,
@@ -81,14 +81,14 @@ export default function useMoveNode(
         document.removeEventListener("mousemove", moveNode);
         document.removeEventListener("mouseup", mouseUp);
         const newNodes = getNewAppNodes(
-          clickedMouseEvent,
+          mouseDownEvent,
           mouseUpEvent,
           canvasState,
           clickedNode,
           shiftKeyPressed,
           activeNodes
         );
-        updateNodes(newNodes, !movedRef.current && !shiftKeyPressed);
+        updateNodes(newNodes, !shiftKeyPressed);
         movedRef.current = false;
       };
       document.addEventListener("mousemove", moveNode);
