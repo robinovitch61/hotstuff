@@ -1,4 +1,10 @@
-import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
+import {
+  HSConnection,
+  HSNode,
+  makeConnection,
+  ModelOutput,
+  run,
+} from "hotstuff-network";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./utils/pointUtils";
@@ -15,7 +21,10 @@ import useKeyDown from "./hooks/useKeyDown";
 import { defaultAppState } from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
-import getNewAppNode from "./utils/nodeConnectionUtils";
+import {
+  getNewAppNode,
+  getNewAppConnection,
+} from "./utils/nodeConnectionUtils";
 
 const {
   editorWidthPerc,
@@ -221,6 +230,16 @@ export default function App(): React.ReactElement {
     canvasWidth,
   ]);
 
+  const createNewLogicalConnection = useCallback(() => {
+    const newConnection = getNewAppConnection(
+      appState.nodes,
+      appState.connections
+    );
+    if (newConnection !== undefined) {
+      addConnection(newConnection);
+    }
+  }, [addConnection, appState.connections, appState.nodes]);
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -251,6 +270,7 @@ export default function App(): React.ReactElement {
         appNodes={appState.nodes}
         onAddNode={addNodeInCenterOfCanvas}
         appConnections={appState.connections}
+        onAddConnection={createNewLogicalConnection}
         addConnection={addConnection}
         updateNodes={(nodes: AppNode[]) => {
           updateNodes(nodes);

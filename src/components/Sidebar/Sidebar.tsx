@@ -5,8 +5,6 @@ import NodeTable from "./EditableTable/NodeTable/NodeTable";
 import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
 import ModelControls from "./ModelControls";
-import getNewAppNode from "../../utils/nodeConnectionUtils";
-import { ORIGIN, Point } from "../../utils/pointUtils";
 
 const StyledEditor = styled.div<{ width: number; height: number }>`
   height: ${(props) => props.height}px;
@@ -35,6 +33,7 @@ type SidebarProps = {
   appNodes: AppNode[];
   onAddNode: () => void;
   appConnections: AppConnection[];
+  onAddConnection: () => void;
   addConnection: (connection: AppConnection) => void;
   updateNodes: (nodes: AppNode[], clearActiveNodes: boolean) => void;
   deleteNodes: (nodeIds: string[]) => void;
@@ -63,6 +62,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       onDeleteRow={(connection: AppConnection) =>
         props.deleteConnections([connection.id])
       }
+      onAddButton={props.onAddConnection}
     />
   );
 

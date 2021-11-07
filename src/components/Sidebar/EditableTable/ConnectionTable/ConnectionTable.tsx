@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import config from "../../../../config";
 import { AppConnection, AppNode } from "../../../../App";
 import {
+  StyledAddButton,
   StyledCell,
   StyledDeleteCell,
   StyledRow,
@@ -90,6 +91,7 @@ type ConnectionTableProps = {
   nodes: AppNode[];
   onUpdateRow: (row: AppConnection) => void;
   onDeleteRow: (row: AppConnection) => void;
+  onAddButton: () => void;
 };
 
 export default function ConnectionTable(
@@ -222,24 +224,37 @@ export default function ConnectionTable(
         isActive={row.isActive}
       >
         {connectionColumns.map((col) => {
-          const tableCell = (
-            <TableCell<AppConnectionTable>
-              row={row}
-              col={col}
-              options={filterConnectionOptions(
-                col.key,
-                col.options || [],
-                row.source.id,
-                row.target.id,
-                props.rows
-              )}
-              initiallySetOption={col.options?.find(
-                (option) =>
-                  option.id === row[col.key] || option.text === row[col.key]
-              )}
-              onUpdateRow={props.onUpdateRow}
-            />
+          const setOption = col.options?.find(
+            (option) =>
+              option.id === row[col.key] || option.text === row[col.key]
           );
+
+          const tableCell =
+            !!col.options && !!setOption ? (
+              <TableCell<AppConnectionTable>
+                row={row}
+                col={col}
+                options={[
+                  setOption,
+                  ...filterConnectionOptions(
+                    col.key,
+                    col.options || [],
+                    row.source.id,
+                    row.target.id,
+                    props.rows
+                  ),
+                ]}
+                initiallySetOption={setOption}
+                onUpdateRow={props.onUpdateRow}
+              />
+            ) : (
+              <TableCell<AppConnectionTable>
+                row={row}
+                col={col}
+                onUpdateRow={props.onUpdateRow}
+              />
+            );
+
           return (
             <StyledCell
               key={col.key}
@@ -264,6 +279,7 @@ export default function ConnectionTable(
           setSortState={setSortState}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
+        <StyledAddButton onClick={props.onAddButton}>+</StyledAddButton>
       </StyledTable>
     </StyledTableWrapper>
   );

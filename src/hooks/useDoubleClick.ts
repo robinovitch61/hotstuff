@@ -7,7 +7,7 @@ import {
   rotatedDirection,
 } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
-import getNewAppNode from "../utils/nodeConnectionUtils";
+import { getNewAppNode } from "../utils/nodeConnectionUtils";
 
 export default function useDoubleClick(
   appNodes: AppNode[],
