@@ -14,6 +14,8 @@ import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
 import { defaultAppState } from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
+import { getCanvasCenter } from "./components/Canvas/canvasUtils";
+import getNewAppNode from "./utils/nodeConnectionUtils";
 
 const {
   editorWidthPerc,
@@ -198,6 +200,27 @@ export default function App(): React.ReactElement {
     );
   }, [appState.output, plotHeight, plotWidth]);
 
+  const addNodeInCenterOfCanvas = useCallback(() => {
+    addNode(
+      getNewAppNode(
+        appState.nodes,
+        getCanvasCenter(
+          canvasWidth,
+          canvasHeight,
+          appState.canvasViewState.offset,
+          appState.canvasViewState.scale
+        )
+      )
+    );
+  }, [
+    addNode,
+    appState.canvasViewState.offset,
+    appState.canvasViewState.scale,
+    appState.nodes,
+    canvasHeight,
+    canvasWidth,
+  ]);
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -225,9 +248,10 @@ export default function App(): React.ReactElement {
         width={editorWidth}
         timing={appState.timing}
         setTiming={setTiming}
-        nodes={appState.nodes}
-        connections={appState.connections}
-        // addNode={addNode}
+        appNodes={appState.nodes}
+        onAddNode={addNodeInCenterOfCanvas}
+        appConnections={appState.connections}
+        addConnection={addConnection}
         updateNodes={(nodes: AppNode[]) => {
           updateNodes(nodes);
           setModelOutput(undefined);

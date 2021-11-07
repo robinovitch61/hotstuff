@@ -13,6 +13,8 @@ export const StyledTableBody = styled.div`
   width: 100%;
 `;
 
+export const StyledAddButton = styled.button``;
+
 export const StyledRow = styled.div<{
   heightOffsetPx?: number;
   isActive: boolean;

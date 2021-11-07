@@ -1,4 +1,10 @@
-import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
+import {
+  addPoints,
+  diffPoints,
+  ORIGIN,
+  Point,
+  scalePoint,
+} from "../../utils/pointUtils";
 import config from "../../config";
 import { Direction } from "../../App";
 import * as React from "react";
@@ -390,6 +396,20 @@ export function rotatedDirection(direction: Direction): Direction {
   } else {
     return "D";
   }
+}
+
+export function getCanvasCenter(
+  canvasWidth: number,
+  canvasHeight: number,
+  offset: Point,
+  scale: number
+): Point {
+  const topLeftPoint = offset;
+  const distanceToCenter = scalePoint(
+    { x: canvasWidth, y: canvasHeight },
+    2 * scale
+  );
+  return diffPoints(distanceToCenter, topLeftPoint);
 }
 
 export function determineRadius(

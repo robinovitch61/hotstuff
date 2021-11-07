@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
-import { makeNode } from "hotstuff-network";
 import {
   determineRadius,
   intersectsCircle,
@@ -8,9 +7,7 @@ import {
   rotatedDirection,
 } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
-import config from "../config";
-
-const { newNodeNamePrefix } = config;
+import getNewAppNode from "../utils/nodeConnectionUtils";
 
 export default function useDoubleClick(
   appNodes: AppNode[],
@@ -41,29 +38,10 @@ export default function useDoubleClick(
             textDirection: rotatedDirection(doubleClickedNode.textDirection),
           },
         ]);
-        return;
+      } else {
+        const newAppNode = getNewAppNode(appNodes, nodeCoordsOfMouse);
+        addNode(newAppNode);
       }
-
-      const numNodesWithDefaultPrefix = appNodes.filter((node) =>
-        node.name.startsWith(newNodeNamePrefix)
-      ).length;
-      const newNode = makeNode({
-        name:
-          numNodesWithDefaultPrefix === 0
-            ? `${newNodeNamePrefix}`
-            : `${newNodeNamePrefix} (${numNodesWithDefaultPrefix + 1})`,
-        temperatureDegC: config.defaultTempDegC,
-        capacitanceJPerDegK: config.defaultCapJPerDegK,
-        powerGenW: config.defaultPowerGenW,
-        isBoundary: false,
-      });
-      const newAppNode: AppNode = {
-        ...newNode,
-        center: nodeCoordsOfMouse,
-        isActive: false,
-        textDirection: "D",
-      };
-      addNode(newAppNode);
     },
     [addNode, appNodes, updateNodes]
   );

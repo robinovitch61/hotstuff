@@ -3,11 +3,11 @@ import config from "../../../../config";
 import { AppNode } from "../../../../App";
 import {
   StyledCell,
-  StyledDeleteCell,
   StyledRow,
   StyledTable,
   StyledTableBody,
   StyledTableWrapper,
+  StyledAddButton,
 } from "../style";
 import { TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
@@ -59,14 +59,15 @@ type NodeTableProps = {
   rows: AppNode[];
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
+  onAddButton: () => void;
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
+  const { rows, onUpdateRow, onDeleteRow, onAddButton } = props;
+
   const [sortState, setSortState, sortByState] = useSortableTable<AppNode>({
     default: defaultNodeSortState,
   });
-
-  const { rows, onUpdateRow, onDeleteRow } = props;
 
   const sortedRows = rows.sort(sortByState);
 
@@ -105,6 +106,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
           setSortState={setSortState}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
+        <StyledAddButton onClick={onAddButton}>+</StyledAddButton>
       </StyledTable>
     </StyledTableWrapper>
   );
