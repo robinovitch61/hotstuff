@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import {
+  determineRadius,
   drawArrowWithoutHead,
   intersectsCircle,
   mouseToNodeCoords,
@@ -57,9 +58,13 @@ export default function useAddConnection(
 
         // if arrow released on a node, make new connection
         const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
-        const mouseUpOnNode = appNodes.find(
-          (node) =>
-            intersectsCircle(nodeCoordsOfMouse, node.center, node.radius) &&
+        const mouseUpOnNode = appNodes.find((node) => {
+          const nodeRadius = determineRadius(
+            node.capacitanceJPerDegK,
+            appNodes.map((node) => node.capacitanceJPerDegK)
+          );
+          return (
+            intersectsCircle(nodeCoordsOfMouse, node.center, nodeRadius) &&
             node.id !== clickedNode.id &&
             !appConnections.some(
               (conn) =>
@@ -68,7 +73,8 @@ export default function useAddConnection(
                 (conn.target.id === node.id &&
                   conn.source.id === clickedNode.id)
             )
-        );
+          );
+        });
 
         if (mouseUpOnNode) {
           const newConnection = {

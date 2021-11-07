@@ -27,7 +27,6 @@ export type Direction = "L" | "R" | "U" | "D";
 
 export type AppNode = HSNode & {
   center: Point;
-  radius: number;
   color: string;
   isActive: boolean;
   textDirection: Direction;

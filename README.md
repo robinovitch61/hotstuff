@@ -1,23 +1,23 @@
 # Hot Stuff
 
 TODO:
-- [ ] Put canvas offset/scale in appState
-- [ ] Do not clear active nodes if holding down click for pan canvas?
-- [ ] Clear model output if changing anything in table, adding or deleting node/connection, or maybe just if anything relevant to model has changed if diff comparison is fast enough 
-- [ ] Reset all stored state button
-- [ ] Figure out why lag when lots of points (maybe limit # points?)
-- [ ] Clear model output on any change to appState that isn't `output`
-- [ ] No double-click text rotate when shift held
-- [ ] Loading spinner while running model
-- [ ] More reasonable sig figs in plots
-- [ ] Resistance calculator
-- [ ] Ability to swap source/target in connection
 - [ ] Node color is temp, radius is capacitance
-- [ ] Import/export app state
 - [ ] Default state is tutorial
 - [ ] "+" button for node/connection in table
+- [ ] No double-click text rotate when shift held
+- [ ] More reasonable sig figs in plots
+- [ ] Do not clear active nodes if holding down click for pan canvas
+- [ ] Figure out why lag when lots of points (maybe limit # points?)
+- [ ] Resistance calculator
+- [ ] Ability to swap source/target in connection table
 - [ ] X, Table Tabs, Tab-selectable
 - [ ] Add the ability to change the plot/canvas/table size by dragging the borders
+ 
+- [ ] Theory explanation popup
+- [ ] Information popup
+- [ ] File export/import
+- [ ] Reset all stored state button (with confirmation?)
+- [ ] Loading spinner while running model
 
 - [ ] Escape while editing cell exits and resets default val
 - [ ] Enter while editing cell exits same as tab

@@ -23,7 +23,6 @@ export const defaultNodes: AppNode[] = [
   {
     ...test1,
     center: { x: 200, y: 200 },
-    radius: config.defaultNodeRadius,
     color: "red",
     isActive: false,
     textDirection: "D",
@@ -31,7 +30,6 @@ export const defaultNodes: AppNode[] = [
   {
     ...test2,
     center: { x: 650, y: 450 },
-    radius: config.defaultNodeRadius,
     color: "red",
     isActive: false,
     textDirection: "D",

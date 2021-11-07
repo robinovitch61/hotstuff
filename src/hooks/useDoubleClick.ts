@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import { makeNode } from "hotstuff-network";
 import {
+  determineRadius,
   intersectsCircle,
   mouseToNodeCoords,
   rotatedDirection,
@@ -9,7 +10,7 @@ import {
 import { AppNode } from "../App";
 import config from "../config";
 
-const { newNodeNamePrefix, defaultNodeRadius } = config;
+const { newNodeNamePrefix } = config;
 
 export default function useDoubleClick(
   appNodes: AppNode[],
@@ -22,9 +23,13 @@ export default function useDoubleClick(
 
       const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
 
-      const doubleClickedNode = appNodes.find((node) =>
-        intersectsCircle(nodeCoordsOfMouse, node.center, node.radius)
-      );
+      const doubleClickedNode = appNodes.find((node) => {
+        const nodeRadius = determineRadius(
+          node.capacitanceJPerDegK,
+          appNodes.map((node) => node.capacitanceJPerDegK)
+        );
+        return intersectsCircle(nodeCoordsOfMouse, node.center, nodeRadius);
+      });
       if (doubleClickedNode) {
         updateNodes([
           {
@@ -53,7 +58,6 @@ export default function useDoubleClick(
       const newAppNode: AppNode = {
         ...newNode,
         center: nodeCoordsOfMouse,
-        radius: defaultNodeRadius,
         color: "red",
         isActive: false,
         textDirection: "D",

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useCallback } from "react";
 import {
+  determineRadius,
   intersectsCircle,
   mouseToNodeCoords,
 } from "../components/Canvas/canvasUtils";
@@ -43,9 +44,13 @@ export default function useOnMouseDown(
       const activeNodes = appNodes.filter((node) => node.isActive);
       const activeNodeIds = activeNodes.map((node) => node.id);
 
-      const clickedNode = appNodes.find((node) =>
-        intersectsCircle(nodeCoordsOfMouse, node.center, node.radius)
-      );
+      const clickedNode = appNodes.find((node) => {
+        const nodeRadius = determineRadius(
+          node.capacitanceJPerDegK,
+          appNodes.map((node) => node.capacitanceJPerDegK)
+        );
+        return intersectsCircle(nodeCoordsOfMouse, node.center, nodeRadius);
+      });
 
       if (clickedNode) {
         if (event.altKey) {

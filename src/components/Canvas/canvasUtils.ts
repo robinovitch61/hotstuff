@@ -1,6 +1,6 @@
 import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
 import config from "../../config";
-import { AppNode, Direction } from "../../App";
+import { Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { ConnectionKind } from "../types";
@@ -137,13 +137,12 @@ export function drawNode(
   name: string,
   center: Point,
   radius: number,
+  color: string,
   isActive: boolean,
   isBoundary: boolean,
   textDirection: Direction
-  // temperatureDegC: number, // determines color?
-  // capacitanceJPerDegK: number // determines size?
 ): void {
-  drawCircle(context, center, radius, "red");
+  drawCircle(context, center, radius, color);
   if (isActive) {
     drawCircleOutline(context, center, radius, "black");
   }
@@ -281,27 +280,29 @@ export function drawClearBox(
 
 export function drawConnection(
   context: CanvasRenderingContext2D,
-  source: AppNode,
-  target: AppNode,
+  sourceCenter: Point,
+  sourceRadius: number,
+  targetCenter: Point,
+  targetRadius: number,
   kind: ConnectionKind
 ): void {
   if (kind === "bi") {
     drawBidirectionalArrow(
       context,
-      source.center,
-      target.center,
+      sourceCenter,
+      targetCenter,
       "black",
-      source.radius,
-      target.radius
+      sourceRadius,
+      targetRadius
     );
   } else {
     drawUnidirectionalArrow(
       context,
-      source.center,
-      target.center,
+      sourceCenter,
+      targetCenter,
       "black",
-      source.radius,
-      target.radius
+      sourceRadius,
+      targetRadius
     );
   }
 }
@@ -388,4 +389,11 @@ export function rotatedDirection(direction: Direction): Direction {
   } else {
     return "D";
   }
+}
+
+export function determineRadius(
+  capacitance: number,
+  allCapacitances: number[]
+): number {
+  return 20;
 }

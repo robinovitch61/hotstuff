@@ -1,5 +1,9 @@
 import { useCallback } from "react";
-import { drawConnection, drawNode } from "../components/Canvas/canvasUtils";
+import {
+  determineRadius,
+  drawConnection,
+  drawNode,
+} from "../components/Canvas/canvasUtils";
 import { AppConnection, AppNode } from "../App";
 import { CanvasState } from "../components/Canvas/Canvas";
 
@@ -12,17 +16,20 @@ export default function useDraw(
 ] {
   const draw = useCallback(
     (context: CanvasRenderingContext2D) => {
-      appNodes.map((node) => {
+      appNodes.forEach((node) => {
+        const nodeRadius = determineRadius(
+          node.capacitanceJPerDegK,
+          appNodes.map((node) => node.capacitanceJPerDegK)
+        );
         drawNode(
           context,
           node.name,
           node.center,
-          node.radius,
+          nodeRadius,
+          "red",
           node.isActive,
           node.isBoundary,
           node.textDirection
-          // node.temperatureDegC,
-          // node.capacitanceJPerDegK
         );
       });
 
@@ -31,7 +38,22 @@ export default function useDraw(
         const sourceAppNode = appNodes.find((node) => node.id === source.id);
         const targetAppNode = appNodes.find((node) => node.id === target.id);
         if (sourceAppNode && targetAppNode) {
-          drawConnection(context, sourceAppNode, targetAppNode, kind);
+          const sourceRadius = determineRadius(
+            sourceAppNode.capacitanceJPerDegK,
+            appNodes.map((node) => node.capacitanceJPerDegK)
+          );
+          const targetRadius = determineRadius(
+            targetAppNode.capacitanceJPerDegK,
+            appNodes.map((node) => node.capacitanceJPerDegK)
+          );
+          drawConnection(
+            context,
+            sourceAppNode.center,
+            sourceRadius,
+            targetAppNode.center,
+            targetRadius,
+            kind
+          );
         }
       });
     },
