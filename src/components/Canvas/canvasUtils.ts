@@ -395,5 +395,17 @@ export function determineRadius(
   capacitance: number,
   allCapacitances: number[]
 ): number {
-  return 20;
+  const min = Math.min(...allCapacitances);
+  const max = Math.max(...allCapacitances);
+  const minRadius = 20;
+  const maxRadius = 40;
+  // cap = min -> minRadius
+  // cap = max -> maxRadius
+  // radius = (cap - min) / (max - min) * 20 + 10
+  if (min === max) {
+    return Math.floor((minRadius + maxRadius) / 2);
+  }
+  return (
+    ((capacitance - min) / (max - min)) * (maxRadius - minRadius) + minRadius
+  );
 }
