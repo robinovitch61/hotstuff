@@ -3,9 +3,7 @@
 TODO:
 - [ ] Node color is temp
 - [ ] "+" button for node/connection in table
-- [ ] No double-click text rotate when shift held
 - [ ] More reasonable sig figs in plots
-- [ ] Do not clear active nodes if holding down click for pan canvas
 - [ ] Resistance calculator
 - [ ] Ability to swap source/target in connection table
 - [ ] Add the ability to change the plot/canvas/table size by dragging the borders

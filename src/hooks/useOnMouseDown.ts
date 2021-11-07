@@ -35,11 +35,11 @@ export default function useOnMouseDown(
 
   return useCallback(
     (
-      event: React.MouseEvent | MouseEvent,
+      mouseDownEvent: React.MouseEvent | MouseEvent,
       canvasState: CanvasState,
       defaultBehavior: (event: React.MouseEvent | MouseEvent) => void
     ) => {
-      const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
+      const nodeCoordsOfMouse = mouseToNodeCoords(mouseDownEvent, canvasState);
 
       const activeNodes = appNodes.filter((node) => node.isActive);
       const activeNodeIds = activeNodes.map((node) => node.id);
@@ -53,19 +53,32 @@ export default function useOnMouseDown(
       });
 
       if (clickedNode) {
-        if (event.altKey) {
-          makeNewConnection(event, clickedNode, canvasState);
-        } else if (event.shiftKey && activeNodeIds.includes(clickedNode.id)) {
+        if (mouseDownEvent.altKey) {
+          makeNewConnection(mouseDownEvent, clickedNode, canvasState);
+        } else if (
+          mouseDownEvent.shiftKey &&
+          activeNodeIds.includes(clickedNode.id)
+        ) {
           setActiveNodes(activeNodeIds.filter((id) => id !== clickedNode.id));
         } else {
-          moveNode(event, clickedNode, activeNodes, canvasState);
+          moveNode(mouseDownEvent, clickedNode, activeNodes, canvasState);
         }
       } else {
-        if (event.shiftKey) {
-          multiSelect(event, canvasState);
+        if (mouseDownEvent.shiftKey) {
+          multiSelect(mouseDownEvent, canvasState);
         } else {
-          clearActiveNodes();
-          defaultBehavior(event);
+          // only clear active nodes if click with no pan
+          const onMouseUp = (mouseUpEvent: React.MouseEvent | MouseEvent) => {
+            if (
+              mouseUpEvent.clientX === mouseDownEvent.clientX &&
+              mouseUpEvent.clientY === mouseDownEvent.clientY
+            ) {
+              clearActiveNodes();
+            }
+            document.removeEventListener("mouseup", onMouseUp);
+          };
+          document.addEventListener("mouseup", onMouseUp);
+          defaultBehavior(mouseDownEvent);
         }
       }
     },
