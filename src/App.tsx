@@ -1,5 +1,5 @@
 import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -185,6 +185,19 @@ export default function App(): React.ReactElement {
   const plotWidth = canvasWidth;
   const editorWidth = editorWidthPerc * windowWidth;
 
+  const plot = useMemo(() => {
+    return (
+      <Plot
+        plotDimensions={{
+          height: plotHeight,
+          width: plotWidth,
+          margin: plotMargin,
+        }}
+        modelOutput={appState.output}
+      />
+    );
+  }, [appState.output, plotHeight, plotWidth]);
+
   return (
     <StyledApp height={windowHeight}>
       <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
@@ -203,14 +216,7 @@ export default function App(): React.ReactElement {
             setKeyboardActive={setKeyboardActive}
           />
         </StyledCanvas>
-        <Plot
-          plotDimensions={{
-            height: plotHeight,
-            width: plotWidth,
-            margin: plotMargin,
-          }}
-          modelOutput={appState.output}
-        />
+        {plot}
       </StyledWorkspace>
       <Sidebar
         appState={appState}

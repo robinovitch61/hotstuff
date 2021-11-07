@@ -2,12 +2,10 @@
 
 TODO:
 - [ ] Node color is temp
-- [ ] Default state is tutorial
 - [ ] "+" button for node/connection in table
 - [ ] No double-click text rotate when shift held
 - [ ] More reasonable sig figs in plots
 - [ ] Do not clear active nodes if holding down click for pan canvas
-- [ ] Figure out why lag when lots of points (maybe limit # points?)
 - [ ] Resistance calculator
 - [ ] Ability to swap source/target in connection table
 - [ ] X, Table Tabs, Tab-selectable
