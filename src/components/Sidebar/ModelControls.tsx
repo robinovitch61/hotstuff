@@ -1,7 +1,8 @@
 import * as React from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
-import { Timing } from "../../App";
+import { AppState, Timing } from "../../App";
+import { useState } from "react";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -14,7 +15,12 @@ const StyledModelControlsWrapper = styled.div`
   padding-top: 1em;
 `;
 
-const StyledRunButton = styled.button``;
+const StyledButton = styled.button`
+  margin-top: 5px;
+  margin-bottom: 5px;
+`;
+
+const StyledImport = styled.div``;
 
 const StyledTimeControls = styled.div``;
 
@@ -36,6 +42,8 @@ const StyledLabel = styled.label`
 `;
 
 export type ModelControlsProps = {
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   onRunModel: () => void;
   timing: Timing;
   setTiming: (newTiming: Timing) => void;
@@ -45,6 +53,7 @@ export default function ModelControls(
   props: ModelControlsProps
 ): React.ReactElement {
   const { onRunModel, timing, setTiming } = props;
+  const [stagedAppState, setStagedAppState] = useState<string>("");
 
   return (
     <StyledModelControlsWrapper>
@@ -75,7 +84,29 @@ export default function ModelControls(
           </StyledInputWrapper>
         </StyledTimeControl>
       </StyledTimeControls>
-      <StyledRunButton onClick={onRunModel}>Run Model</StyledRunButton>
+      <StyledButton onClick={onRunModel}>Run Model</StyledButton>
+
+      <StyledButton
+        onClick={() =>
+          navigator.clipboard.writeText(JSON.stringify(props.appState))
+        }
+      >
+        Copy Model to ClipBoard
+      </StyledButton>
+      <StyledImport>
+        <input
+          value={stagedAppState}
+          onChange={(event) => setStagedAppState(event.target.value)}
+        />
+        <StyledButton
+          onClick={() => {
+            props.setAppState(JSON.parse(stagedAppState));
+            setStagedAppState("");
+          }}
+        >
+          Import Model
+        </StyledButton>
+      </StyledImport>
     </StyledModelControlsWrapper>
   );
 }

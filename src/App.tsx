@@ -215,6 +215,8 @@ export default function App(): React.ReactElement {
         />
       </StyledWorkspace>
       <Sidebar
+        appState={appState}
+        setAppState={setAppState}
         height={windowHeight}
         width={editorWidth}
         timing={appState.timing}

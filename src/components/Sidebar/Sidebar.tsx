@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
-import { AppConnection, AppNode, Timing } from "../../App";
+import { AppConnection, AppNode, AppState, Timing } from "../../App";
 import NodeTable from "./EditableTable/NodeTable/NodeTable";
 import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
@@ -24,6 +24,8 @@ const StyledModelControlsWrapper = styled.div`
 `;
 
 type SidebarProps = {
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   width: number;
   height: number;
   timing: Timing;
@@ -72,6 +74,8 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       </StyledTables>
       <StyledModelControlsWrapper>
         <ModelControls
+          appState={props.appState}
+          setAppState={props.setAppState}
           onRunModel={props.onRunModel}
           timing={props.timing}
           setTiming={props.setTiming}
