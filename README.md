@@ -1,25 +1,25 @@
 # Hot Stuff
 
 TODO:
-- [ ] Escape while editing cell exits and resets default val
-- [ ] Enter while editing cell exits same as tab
-- [ ] Node color is temp
-- [ ] "+" button for node/connection in table
-- [ ] More reasonable sig figs in plots
-- [ ] Resistance calculator
-- [ ] Ability to swap source/target in connection table
-- [ ] Add the ability to change the plot/canvas/table size by dragging the borders
-- [ ] Reset all stored state button (with confirmation?)
- 
-
-- [ ] Theory explanation popup
-- [ ] Information popup
-- [ ] File export/import
-- [ ] Loading spinner while running model
-- [ ] Ability to add text blobs?
-
-
-- [ ] Center view on a node button in table
-- [ ] Buttons for aligning selected nodes horizontally/vertically
-- [ ] Copy/paste cells and/or duplicate in table
-- [ ] View/Hide controls
+- [x] Fix bug with dropdowns [5]
+- [ ] Change shift functionality to command/control (multi select, click and drag) [4]
+- [ ] Node color is temp [5]
+- [ ] Add the ability to change the plot/canvas/table size by dragging the borders [5]
+- [ ] More reasonable sig figs in plots (10th of degree) [5]
+- [ ] Theory explanation section/popup [5]
+- [ ] Tutorial popup instead of tutorial model [5]
+- [ ] Make node active when editing in table [4]
+- [ ] Escape while editing cell exits and resets default val [4]
+- [ ] Enter while editing cell exits same as tab [4]
+- [ ] Ability to add text blobs on canvas - would be cool [3]
+  - [ ] Gives you a place to annotate e.g. "natural convection"
+- [ ] Resistance calculator [3]
+    - [ ] Link to engineers edge website
+    - [ ] Calculator pops up while editing
+- [ ] Ability to swap source/target in connection table (depends on keeping unidirectional or not) [3]
+- [ ] Copy/paste all selected [3]
+- [ ] Horizontal/vertical snap functionality for creating grid [2]
+- [ ] Orders of magnitude on convection coefficients [2]
+  - [ ] If you don't have test data to back it up, you start with order of magnitude
+- [ ] File export/import (falsdat doesn't have this) [2]
+- [ ] Reset all stored state button (with confirmation) - not important if not the tutorial [1]

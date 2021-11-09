@@ -1,7 +1,12 @@
+import * as React from "react";
 import { useState } from "react";
 import { TableSortState } from "../types";
 
-export default function useSortableTable<T>(props: {
+interface IDHavingThing {
+  id: string;
+}
+
+export default function useSortableTable<T extends IDHavingThing>(props: {
   default: TableSortState<T>;
 }): [
   TableSortState<T>,
@@ -11,10 +16,22 @@ export default function useSortableTable<T>(props: {
   const [sortState, setSortState] = useState<TableSortState<T>>(props.default);
 
   function sortByState(first: T, second: T): number {
-    if (first[sortState.key] > second[sortState.key]) {
-      return sortState.direction === "ASC" ? 1 : -1;
+    if (sortState.direction === "ASC") {
+      if (first[sortState.key] > second[sortState.key]) {
+        return 1;
+      } else if (first[sortState.key] === second[sortState.key]) {
+        return first.id > second.id ? 1 : -1;
+      } else {
+        return -1;
+      }
     } else {
-      return sortState.direction === "ASC" ? -1 : 1;
+      if (first[sortState.key] > second[sortState.key]) {
+        return -1;
+      } else if (first[sortState.key] === second[sortState.key]) {
+        return first.id > second.id ? 1 : -1;
+      } else {
+        return 1;
+      }
     }
   }
 

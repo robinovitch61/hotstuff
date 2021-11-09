@@ -205,7 +205,7 @@ export default function ConnectionTable(
     .filter((node) => node.isActive)
     .map((node) => node.id);
 
-  const sortedRowsWithIsActive: AppConnectionTable[] = props.rows
+  const sortedRowsWithActiveInfo: AppConnectionTable[] = props.rows
     .map((row) => {
       return {
         ...row,
@@ -216,55 +216,61 @@ export default function ConnectionTable(
     })
     .sort(sortByState);
 
-  const tableRows = sortedRowsWithIsActive.map((row) => {
+  const tableRows = sortedRowsWithActiveInfo.map((row) => {
+    const cols = connectionColumns.map((col) => {
+      function makeStyledCell(tableCell: React.ReactElement) {
+        return (
+          <StyledCell key={col.key} width={col.width} minWidth={col.minWidthPx}>
+            {tableCell}
+          </StyledCell>
+        );
+      }
+
+      if (!!col.options) {
+        const setOption = col.options?.find(
+          (option) => option.id === row[col.key] || option.text === row[col.key]
+        );
+        const options = !!setOption
+          ? [
+              setOption,
+              ...filterConnectionOptions(
+                col.key,
+                col.options || [],
+                row.source.id,
+                row.target.id,
+                props.rows
+              ).filter((opt) => opt.id !== setOption.id),
+            ]
+          : [];
+
+        const tableCell = (
+          <TableCell<AppConnectionTable>
+            row={row}
+            col={col}
+            options={options}
+            initiallySetOption={setOption}
+            onUpdateRow={props.onUpdateRow}
+          />
+        );
+        return makeStyledCell(tableCell);
+      } else {
+        return makeStyledCell(
+          <TableCell<AppConnectionTable>
+            row={row}
+            col={col}
+            onUpdateRow={props.onUpdateRow}
+          />
+        );
+      }
+    });
+
     return (
       <StyledRow
         key={row.id}
         heightOffsetPx={config.tabHeightPx}
         isActive={row.isActive}
       >
-        {connectionColumns.map((col) => {
-          const setOption = col.options?.find(
-            (option) =>
-              option.id === row[col.key] || option.text === row[col.key]
-          );
-
-          const tableCell =
-            !!col.options && !!setOption ? (
-              <TableCell<AppConnectionTable>
-                row={row}
-                col={col}
-                options={[
-                  setOption,
-                  ...filterConnectionOptions(
-                    col.key,
-                    col.options || [],
-                    row.source.id,
-                    row.target.id,
-                    props.rows
-                  ),
-                ]}
-                initiallySetOption={setOption}
-                onUpdateRow={props.onUpdateRow}
-              />
-            ) : (
-              <TableCell<AppConnectionTable>
-                row={row}
-                col={col}
-                onUpdateRow={props.onUpdateRow}
-              />
-            );
-
-          return (
-            <StyledCell
-              key={col.key}
-              width={col.width}
-              minWidth={col.minWidthPx}
-            >
-              {tableCell}
-            </StyledCell>
-          );
-        })}
+        {cols}
         <DeleteCell row={row} onDeleteRow={() => props.onDeleteRow(row)} />
       </StyledRow>
     );
