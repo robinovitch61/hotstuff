@@ -1,5 +1,7 @@
 import { HSConnection } from "hotstuff-network";
 
+type MouseEventKey = "shiftKey" | "altKey" | "metaKey" | "ctrlKey";
+
 const config = {
   defaultTempDegC: 23,
   defaultCapJPerDegK: 10,
@@ -28,6 +30,7 @@ const config = {
     top: 20,
     bottom: 20,
   },
+  multiSelectKey: "metaKey" as MouseEventKey,
 };
 
 export default config;

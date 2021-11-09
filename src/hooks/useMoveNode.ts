@@ -3,13 +3,14 @@ import { CanvasState } from "../components/Canvas/Canvas";
 import { mouseToNodeCoords } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
 import { diffPoints } from "../utils/pointUtils";
+import config from "../config";
 
 function getNewAppNodes(
   clickedMouseEvent: React.MouseEvent | MouseEvent,
   currentMouseEvent: React.MouseEvent | MouseEvent,
   canvasState: CanvasState,
   clickedNode: AppNode,
-  shiftKeyPressed: boolean,
+  multiSelectKeyPressed: boolean,
   activeNodes: AppNode[]
 ): AppNode[] {
   const offsetMouseToCenter = diffPoints(
@@ -29,7 +30,7 @@ function getNewAppNodes(
   };
 
   const newActiveNodes =
-    clickedNode.isActive || shiftKeyPressed
+    clickedNode.isActive || multiSelectKeyPressed
       ? activeNodes.map((node) => {
           const distanceFromClickedCenter = diffPoints(
             clickedNode.center,
@@ -62,7 +63,7 @@ export default function useMoveNode(
       activeNodes: AppNode[],
       canvasState: CanvasState
     ) => {
-      const shiftKeyPressed = mouseDownEvent.shiftKey;
+      const multiSelectKeyPressed = mouseDownEvent[config.multiSelectKey];
       const moveNode = (currentMouseEvent: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
           movedRef.current = true;
@@ -71,10 +72,10 @@ export default function useMoveNode(
             currentMouseEvent,
             canvasState,
             clickedNode,
-            shiftKeyPressed,
+            multiSelectKeyPressed,
             activeNodes
           );
-          updateNodes(newNodes, !currentMouseEvent.shiftKey);
+          updateNodes(newNodes, !currentMouseEvent[config.multiSelectKey]);
         }
       };
       const mouseUp = (mouseUpEvent: React.MouseEvent | MouseEvent) => {
@@ -85,10 +86,10 @@ export default function useMoveNode(
           mouseUpEvent,
           canvasState,
           clickedNode,
-          shiftKeyPressed,
+          multiSelectKeyPressed,
           activeNodes
         );
-        updateNodes(newNodes, !shiftKeyPressed);
+        updateNodes(newNodes, !multiSelectKeyPressed);
         movedRef.current = false;
       };
       document.addEventListener("mousemove", moveNode);

@@ -8,6 +8,7 @@ import {
 } from "../components/Canvas/canvasUtils";
 import { AppNode } from "../App";
 import { getNewAppNode } from "../utils/nodeConnectionUtils";
+import config from "../config";
 
 export default function useDoubleClick(
   appNodes: AppNode[],
@@ -17,7 +18,7 @@ export default function useDoubleClick(
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       event.preventDefault();
-      if (event.shiftKey) {
+      if (event[config.multiSelectKey]) {
         return;
       }
 

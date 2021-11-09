@@ -10,16 +10,14 @@ export default function useKeyDown(
   useEffect(() => {
     const onKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
       if (keyboardActive) {
-        // shift + A makes all nodes active
-        if (event.metaKey) {
-          if (event.keyCode === 65) {
-            event.preventDefault();
-            setAppNodes(
-              appNodes.map((node) => {
-                return { ...node, isActive: true };
-              })
-            );
-          }
+        // meta + A makes all nodes active
+        if (event.metaKey && event.keyCode === 65) {
+          event.preventDefault();
+          setAppNodes(
+            appNodes.map((node) => {
+              return { ...node, isActive: true };
+            })
+          );
         }
 
         // delete active nodes on back/del

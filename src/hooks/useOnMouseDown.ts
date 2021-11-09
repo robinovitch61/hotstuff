@@ -10,6 +10,7 @@ import { CanvasState } from "../components/Canvas/Canvas";
 import useAddConnection from "./useAddConnection";
 import useMoveNode from "./useMoveNode";
 import useMultiSelect from "./useMultiSelect";
+import config from "../config";
 
 export default function useOnMouseDown(
   appNodes: AppNode[],
@@ -56,7 +57,7 @@ export default function useOnMouseDown(
         if (mouseDownEvent.altKey) {
           makeNewConnection(mouseDownEvent, clickedNode, canvasState);
         } else if (
-          mouseDownEvent.shiftKey &&
+          mouseDownEvent[config.multiSelectKey] &&
           activeNodeIds.includes(clickedNode.id)
         ) {
           setActiveNodes(activeNodeIds.filter((id) => id !== clickedNode.id));
@@ -64,7 +65,7 @@ export default function useOnMouseDown(
           moveNode(mouseDownEvent, clickedNode, activeNodes, canvasState);
         }
       } else {
-        if (mouseDownEvent.shiftKey) {
+        if (mouseDownEvent[config.multiSelectKey]) {
           multiSelect(mouseDownEvent, canvasState);
         } else {
           // only clear active nodes if click with no pan
