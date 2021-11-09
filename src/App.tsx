@@ -1,10 +1,4 @@
-import {
-  HSConnection,
-  HSNode,
-  makeConnection,
-  ModelOutput,
-  run,
-} from "hotstuff-network";
+import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./utils/pointUtils";
@@ -22,8 +16,8 @@ import { defaultAppState } from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
 import {
-  getNewAppNode,
   getNewAppConnection,
+  getNewAppNode,
 } from "./utils/nodeConnectionUtils";
 
 const {

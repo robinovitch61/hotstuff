@@ -7,7 +7,9 @@ type DeleteCellProps<T> = {
   onDeleteRow: (row: T) => void;
 };
 
-export default function DeleteCell<T>(props: DeleteCellProps<T>) {
+export default function DeleteCell<T>(
+  props: DeleteCellProps<T>
+): React.ReactElement {
   return (
     <StyledDeleteCell
       tabIndex={0}

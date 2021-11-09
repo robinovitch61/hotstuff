@@ -4,7 +4,6 @@ import { AppConnection, AppNode } from "../../../../App";
 import {
   StyledAddButton,
   StyledCell,
-  StyledDeleteCell,
   StyledRow,
   StyledTable,
   StyledTableBody,

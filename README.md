@@ -3,7 +3,7 @@
 TODO:
 - [x] Fix bug with dropdowns [5]
 - [x] Change shift functionality to command/control (multi select, click and drag) [4]
-- [ ] Node color is temp [5]
+- [x] Node color is temp [5]
 - [ ] Add the ability to change the plot/canvas/table size by dragging the borders [5]
 - [ ] More reasonable sig figs in plots (10th of degree) [5]
 - [ ] Theory explanation section/popup [5]

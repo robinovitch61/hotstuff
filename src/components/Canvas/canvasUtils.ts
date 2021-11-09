@@ -1,15 +1,10 @@
-import {
-  addPoints,
-  diffPoints,
-  ORIGIN,
-  Point,
-  scalePoint,
-} from "../../utils/pointUtils";
+import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
 import config from "../../config";
 import { Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { ConnectionKind } from "../types";
+import { scaleDiverging } from "d3-scale";
 
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
@@ -434,5 +429,11 @@ export function determineColor(
   temperature: number,
   allTemperatures: number[]
 ): string {
-  return "red";
+  const minTemp = Math.min(...allTemperatures);
+  const maxTemp = Math.max(...allTemperatures);
+  const range = maxTemp - minTemp;
+  const test = scaleDiverging<string>()
+    .domain([minTemp - range / 3, (minTemp + maxTemp) / 2, maxTemp + range / 3])
+    .range(["blue", "#ababab", "red"]);
+  return test(temperature);
 }
