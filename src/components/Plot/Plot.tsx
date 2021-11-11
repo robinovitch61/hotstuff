@@ -5,8 +5,10 @@ import styled from "styled-components";
 import { emptyOutput, ModelOutput } from "hotstuff-network";
 import LinePlot from "./LinePlot";
 import Tabs from "../Tabs/Tabs";
+import config from "../../config";
 
-const MAX_PLOT_POINTS_PER_NODE = 400;
+const { maxPlotPoints, plotDomainMargin } = config;
+
 const colors = [
   "#2ecc71",
   "#3498db",
@@ -34,10 +36,6 @@ const StyledCharts = styled.div`
   }
 `;
 
-{
-  /*  */
-}
-
 const StyledPlot = styled.div<{ height: number; width: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
@@ -59,41 +57,73 @@ export type PlotDimensions = {
   margin: Margin;
 };
 
-type PlotDataForTime = {
+type TimeSeriesPlotData = {
   time: number;
   [key: string]: number;
 };
 
-function plotShape(data: ModelOutput): [PlotDataForTime[], PlotDataForTime[]] {
+type PlotDomain = [number, number];
+
+function roundToNearestTenth(input: number): number {
+  return Math.round(input * 10) / 10;
+}
+
+function plotShape(
+  data: ModelOutput
+): [TimeSeriesPlotData[], PlotDomain, TimeSeriesPlotData[], PlotDomain] {
+  // the number of points depends on the order of magnitude
   const lowerMag = Math.floor(Math.log10(data.totalTimeS));
   const divisibleBy = Math.pow(10, lowerMag - 1);
-
   function include(val: number) {
     return Math.abs(val % divisibleBy) === 0;
   }
 
-  const includeAll = data.timeSeriesS.length < MAX_PLOT_POINTS_PER_NODE;
+  const includeAll = data.timeSeriesS.length < maxPlotPoints;
 
-  const tempsAtAllTimes: PlotDataForTime[] = [];
-  const heatTransfersAtAllTimes: PlotDataForTime[] = [];
+  const tempsAtAllTimes: TimeSeriesPlotData[] = [];
+  let minTemp = 1e9;
+  let maxTemp = -1e9;
+  const heatTransfersAtAllTimes: TimeSeriesPlotData[] = [];
+  let minHeatTransfer = 1e9;
+  let maxHeatTransfer = -1e9;
 
   data.timeSeriesS.forEach((t, idx) => {
     if (includeAll || include(t)) {
-      const temp: PlotDataForTime = { time: t };
-      const ht: PlotDataForTime = { time: t };
+      const temp: TimeSeriesPlotData = { time: t };
+      const ht: TimeSeriesPlotData = { time: t };
+
       data.nodeResults.forEach((nodeResult) => {
-        temp[nodeResult.node.name] = nodeResult.tempDegC[idx];
+        const tempVal = nodeResult.tempDegC[idx];
+        if (tempVal < minTemp) {
+          minTemp = tempVal;
+        } else if (tempVal > maxTemp) {
+          maxTemp = tempVal;
+        }
+        temp[nodeResult.node.name] = roundToNearestTenth(tempVal);
       });
+
       data.connectionResults.forEach((connectionResult) => {
+        const heatTransferVal = connectionResult.heatTransferW[idx];
+        if (heatTransferVal < minHeatTransfer) {
+          minHeatTransfer = heatTransferVal;
+        } else if (heatTransferVal > maxHeatTransfer) {
+          maxHeatTransfer = heatTransferVal;
+        }
         ht[
           `${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`
-        ] = connectionResult.heatTransferW[idx];
+        ] = roundToNearestTenth(heatTransferVal);
       });
+
       tempsAtAllTimes.push(temp);
       heatTransfersAtAllTimes.push(ht);
     }
   });
-  return [tempsAtAllTimes, heatTransfersAtAllTimes];
+  return [
+    tempsAtAllTimes,
+    [minTemp, maxTemp],
+    heatTransfersAtAllTimes,
+    [minHeatTransfer, maxHeatTransfer],
+  ];
 }
 
 type PlotProps = {
@@ -102,12 +132,27 @@ type PlotProps = {
 };
 
 export default function Plot(props: PlotProps): React.ReactElement {
+  const modelHasOutput = !!(
+    props.modelOutput && props.modelOutput.nodeResults.length > 0
+  );
   const res =
-    !!props.modelOutput && props.modelOutput.nodeResults.length > 0
-      ? props.modelOutput
-      : emptyOutput;
+    modelHasOutput && props.modelOutput ? props.modelOutput : emptyOutput;
 
-  const [tempPlotData, heatTransferPlotData] = plotShape(res);
+  const [tempPlotData, tempDomain, heatTransferPlotData, heatTransferDomain] =
+    plotShape(res);
+
+  const yTempDomain: [number, number] | undefined = modelHasOutput
+    ? [
+        Math.floor(tempDomain[0]) - plotDomainMargin,
+        Math.ceil(tempDomain[1] + plotDomainMargin),
+      ]
+    : undefined;
+  const yHeatTransferDomain: [number, number] | undefined = modelHasOutput
+    ? [
+        Math.floor(heatTransferDomain[0]) - plotDomainMargin,
+        Math.ceil(heatTransferDomain[1] + plotDomainMargin),
+      ]
+    : undefined;
 
   const heatTransferLines = useMemo(
     () =>
@@ -151,6 +196,8 @@ export default function Plot(props: PlotProps): React.ReactElement {
       xAxisKey={"time"}
       xLabel={"Time [s]"}
       yLabel={"Temperature [degC]"}
+      yDomain={yTempDomain}
+      unit={"degC"}
     />
   );
 
@@ -162,6 +209,8 @@ export default function Plot(props: PlotProps): React.ReactElement {
       xAxisKey={"time"}
       xLabel={"Time [s]"}
       yLabel={"Heat Transfer [Watts]"}
+      yDomain={yHeatTransferDomain}
+      unit={"W"}
     />
   );
 

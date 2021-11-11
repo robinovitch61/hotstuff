@@ -6,7 +6,7 @@ const config = {
   defaultTempDegC: 23,
   defaultCapJPerDegK: 10,
   defaultPowerGenW: 0,
-  defaultTotalTimeSeconds: 60,
+  defaultTotalTimeSeconds: 600,
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
@@ -29,6 +29,8 @@ const config = {
     top: 20,
     bottom: 20,
   },
+  plotDomainMargin: 2,
+  maxPlotPoints: 400,
   multiSelectKey: "metaKey" as MouseEventKey,
 };
 

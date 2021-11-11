@@ -8,7 +8,7 @@ const jerryNode = makeNode({
   name: "Jerry the Cat",
   temperatureDegC: 38.3,
   capacitanceJPerDegK: 16.2e3, // 3.6kJ/kg/degK * 4.5kg
-  powerGenW: 200, // ??
+  powerGenW: 100, // ??
   isBoundary: false,
 });
 const jerryAppNode: AppNode = {
@@ -53,7 +53,7 @@ export const defaultConnections: AppConnection[] = [
     ...makeConnection({
       source: jerryNode,
       target: bedNode,
-      resistanceDegKPerW: 25, // 0.1m / 0.1m^2 / 0.04W/m/degK
+      resistanceDegKPerW: 2.5, // 0.01m / 0.1m^2 / 0.04W/m/degK
       kind: "bi",
     }),
     sourceName: jerryNode.name,
@@ -63,7 +63,7 @@ export const defaultConnections: AppConnection[] = [
     ...makeConnection({
       source: jerryNode,
       target: airNode,
-      resistanceDegKPerW: 0.67, // 1 / 0.3m^2 / 5W/m^2/degK
+      resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 10W/m^2/degK
       kind: "bi",
     }),
     sourceName: jerryNode.name,
@@ -73,7 +73,7 @@ export const defaultConnections: AppConnection[] = [
     ...makeConnection({
       source: bedNode,
       target: airNode,
-      resistanceDegKPerW: 0.67, // 1 / 0.3m^2 / 5W/m^2/degK
+      resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 5W/m^2/degK
       kind: "bi",
     }),
     sourceName: bedNode.name,
