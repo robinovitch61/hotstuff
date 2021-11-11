@@ -1,8 +1,10 @@
 import styled from "styled-components/macro";
 
-export const StyledApp = styled.div<{ height: number }>`
+export const StyledApp = styled.div<{ height: number; modalOpen: boolean }>`
   display: flex;
   height: ${(props) => props.height}px;
+  filter: ${(props) => (props.modalOpen ? "blur(5px)" : "unset")};
+  pointer-events: ${(props) => (props.modalOpen ? "none" : "unset")};
   user-select: none;
   -webkit-user-select: none; /* Chrome/Safari */
   -moz-user-select: none; /* Firefox */
@@ -14,7 +16,7 @@ export const StyledDraggableBorder = styled.div`
   z-index: 1;
 `;
 
-export const StyledCanvasPlotBorder = styled(StyledDraggableBorder)<{
+export const StyledHorizontalBorder = styled(StyledDraggableBorder)<{
   width: number;
   y: number;
   left: number;
@@ -27,7 +29,7 @@ export const StyledCanvasPlotBorder = styled(StyledDraggableBorder)<{
   left: ${(props) => props.left * 100}%;
 `;
 
-export const StyledLeftRightBorder = styled(StyledDraggableBorder)<{
+export const StyledVerticalBorder = styled(StyledDraggableBorder)<{
   x: number;
 }>`
   height: 100%;

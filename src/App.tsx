@@ -11,7 +11,7 @@ import useDoubleClick from "./hooks/useDoubleClick";
 import useNodeConnectionUtils from "./hooks/useNodeConnectionUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
-import { defaultAppState } from "./default";
+import { defaultAppState, defaultModalState } from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
 import {
@@ -23,10 +23,11 @@ import useResizablePanels from "./hooks/useResizablePanels";
 import {
   StyledApp,
   StyledCanvas,
-  StyledCanvasPlotBorder,
-  StyledLeftRightBorder,
+  StyledHorizontalBorder,
+  StyledVerticalBorder,
   StyledWorkspace,
 } from "./style";
+import InfoPanel from "./components/InfoPanel/InfoPanel";
 
 const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
@@ -54,6 +55,11 @@ export type PanelSizes = {
   tableHeightFraction: number;
 };
 
+export type ModalState = {
+  visible: boolean;
+  type: "theory" | "tutorial" | "about";
+};
+
 export type AppState = {
   output?: ModelOutput;
   timing: Timing;
@@ -69,6 +75,8 @@ export default function App(): React.ReactElement {
     defaultAppState,
     "hotstuffAppState"
   );
+
+  const [modalState, setModalState] = useState<ModalState>(defaultModalState);
 
   const [
     setAppNodes,
@@ -185,78 +193,83 @@ export default function App(): React.ReactElement {
   }, [addConnection, appState.connections, appState.nodes]);
 
   return (
-    <StyledApp height={windowHeight}>
-      <StyledCanvasPlotBorder
-        ref={canvasPlotBorderRef}
-        onMouseDown={onMouseDownOnCanvasPlotBorder}
-        y={appState.panelSizes.canvasHeightFraction}
-        width={1 - appState.panelSizes.editorWidthFraction}
-        left={0}
-      />
-      <StyledLeftRightBorder
-        ref={leftRightBorderRef}
-        onMouseDown={onMouseDownOnLeftRightBorder}
-        x={1 - appState.panelSizes.editorWidthFraction}
-      />
-      <StyledCanvasPlotBorder
-        ref={tableControlsBorderRef}
-        onMouseDown={onMouseDownOnTableControlsBorder}
-        y={appState.panelSizes.tableHeightFraction}
-        width={appState.panelSizes.editorWidthFraction}
-        left={1 - appState.panelSizes.editorWidthFraction}
-      />
-      <StyledWorkspace
-        height={workspaceHeight}
-        width={(1 - appState.panelSizes.editorWidthFraction) * workspaceWidth}
-      >
-        <StyledCanvas height={canvasHeight}>
-          <Canvas
-            canvasWidth={canvasWidth}
-            canvasHeight={canvasHeight}
-            devicePixelRatio={ratio}
-            draw={draw}
-            onMouseDown={onMouseDown}
-            handleDoubleClick={handleDoubleClick}
-            canvasViewState={appState.canvasViewState}
-            setCanvasViewState={setCanvasViewState}
-            savedCanvasViewState={appState.savedCanvasState}
-            setSavedCanvasViewState={setSavedCanvasState}
-            setKeyboardActive={setKeyboardActive}
-          />
-        </StyledCanvas>
-        {plot}
-      </StyledWorkspace>
-      <Sidebar
-        appState={appState}
-        setAppState={setAppState}
-        height={windowHeight}
-        width={editorWidth}
-        setTiming={setTiming}
-        onAddNode={addNodeInCenterOfCanvas}
-        onAddConnection={createNewLogicalConnection}
-        updateNodes={(nodes: AppNode[]) => {
-          updateNodes(nodes);
-          setModelOutput(undefined);
-        }}
-        deleteNodes={deleteNodes}
-        updateConnections={(conns: AppConnection[]) => {
-          updateConnections(conns);
-          setModelOutput(undefined);
-        }}
-        deleteConnections={deleteConnections}
-        onRunModel={() => {
-          const output = run({
-            nodes: appState.nodes,
-            connections: appState.connections,
-            timeStepS: appState.timing.timeStepS,
-            totalTimeS: appState.timing.totalTimeS,
-          });
-          if (output.errors?.length) {
-            output.errors.forEach((error) => console.error(error.message));
-          }
-          setModelOutput(output);
-        }}
-      />
-    </StyledApp>
+    <div>
+      <InfoPanel modalState={modalState} setModalState={setModalState} />
+      <StyledApp height={windowHeight} modalOpen={modalState.visible}>
+        <StyledHorizontalBorder
+          ref={canvasPlotBorderRef}
+          onMouseDown={onMouseDownOnCanvasPlotBorder}
+          y={appState.panelSizes.canvasHeightFraction}
+          width={1 - appState.panelSizes.editorWidthFraction}
+          left={0}
+        />
+        <StyledVerticalBorder
+          ref={leftRightBorderRef}
+          onMouseDown={onMouseDownOnLeftRightBorder}
+          x={1 - appState.panelSizes.editorWidthFraction}
+        />
+        <StyledHorizontalBorder
+          ref={tableControlsBorderRef}
+          onMouseDown={onMouseDownOnTableControlsBorder}
+          y={appState.panelSizes.tableHeightFraction}
+          width={appState.panelSizes.editorWidthFraction}
+          left={1 - appState.panelSizes.editorWidthFraction}
+        />
+
+        <StyledWorkspace
+          height={workspaceHeight}
+          width={(1 - appState.panelSizes.editorWidthFraction) * workspaceWidth}
+        >
+          <StyledCanvas height={canvasHeight}>
+            <Canvas
+              canvasWidth={canvasWidth}
+              canvasHeight={canvasHeight}
+              devicePixelRatio={ratio}
+              draw={draw}
+              onMouseDown={onMouseDown}
+              handleDoubleClick={handleDoubleClick}
+              canvasViewState={appState.canvasViewState}
+              setCanvasViewState={setCanvasViewState}
+              savedCanvasViewState={appState.savedCanvasState}
+              setSavedCanvasViewState={setSavedCanvasState}
+              setKeyboardActive={setKeyboardActive}
+              setModalState={setModalState}
+            />
+          </StyledCanvas>
+          {plot}
+        </StyledWorkspace>
+        <Sidebar
+          appState={appState}
+          setAppState={setAppState}
+          height={windowHeight}
+          width={editorWidth}
+          setTiming={setTiming}
+          onAddNode={addNodeInCenterOfCanvas}
+          onAddConnection={createNewLogicalConnection}
+          updateNodes={(nodes: AppNode[]) => {
+            updateNodes(nodes);
+            setModelOutput(undefined);
+          }}
+          deleteNodes={deleteNodes}
+          updateConnections={(conns: AppConnection[]) => {
+            updateConnections(conns);
+            setModelOutput(undefined);
+          }}
+          deleteConnections={deleteConnections}
+          onRunModel={() => {
+            const output = run({
+              nodes: appState.nodes,
+              connections: appState.connections,
+              timeStepS: appState.timing.timeStepS,
+              totalTimeS: appState.timing.totalTimeS,
+            });
+            if (output.errors?.length) {
+              output.errors.forEach((error) => console.error(error.message));
+            }
+            setModelOutput(output);
+          }}
+        />
+      </StyledApp>
+    </div>
   );
 }

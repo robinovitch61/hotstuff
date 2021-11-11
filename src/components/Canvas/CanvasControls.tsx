@@ -15,14 +15,16 @@ const StyledButton = styled.button`
   margin: 0.2em;
 `;
 
-type ControlsProps = {
+type CanvasControlsProps = {
   setCanvasViewState: (canvasViewState: CanvasViewState) => void;
   canvasState: CanvasState;
   savedCanvasState: CanvasViewState;
   setSavedCanvasState: (newSavedCanvasState: CanvasViewState) => void;
 };
 
-export default function Controls(props: ControlsProps): React.ReactElement {
+export default function CanvasControls(
+  props: CanvasControlsProps
+): React.ReactElement {
   return (
     <StyledButtons>
       <StyledButton

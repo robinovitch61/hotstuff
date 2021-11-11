@@ -1,5 +1,5 @@
 import { makeConnection, makeNode } from "hotstuff-network";
-import { AppConnection, AppNode, PanelSizes, Timing } from "./App";
+import { AppConnection, AppNode, ModalState, PanelSizes, Timing } from "./App";
 import config from "./config";
 import { ORIGIN } from "./utils/pointUtils";
 import { CanvasViewState } from "./components/Canvas/Canvas";
@@ -95,6 +95,11 @@ export const defaultPanelSizes: PanelSizes = {
   editorWidthFraction: 1 - 1 / 1.61803398875,
   canvasHeightFraction: 1 / 1.61803398875,
   tableHeightFraction: 0.5,
+};
+
+export const defaultModalState: ModalState = {
+  visible: true,
+  type: "tutorial",
 };
 
 export const defaultAppState = {
