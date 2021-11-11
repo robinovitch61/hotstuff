@@ -61,7 +61,7 @@ export type ModalState = {
   visible: boolean;
   type: ModalType;
   onConfirm?: () => void;
-  confirmText?: string;
+  confirmText?: string[];
 };
 
 export type AppState = {

@@ -11,6 +11,7 @@ const StyledConfirmationModal = styled.div`
 `;
 
 const StyledConfirmationText = styled.p`
+  margin: 0.8em;
   font-size: 1.5em;
   font-weight: bold;
   max-width: 800px;
@@ -40,7 +41,10 @@ export default function ConfirmationModal(
 
   return (
     <StyledConfirmationModal>
-      <StyledConfirmationText>{modalState.confirmText}</StyledConfirmationText>
+      {modalState.confirmText &&
+        modalState.confirmText.map((text) => (
+          <StyledConfirmationText key={text}>{text}</StyledConfirmationText>
+        ))}
       <StyledConfirmationButtons>
         <StyledConfirmationButton
           onClick={() => setModalState((prev) => ({ ...prev, visible: false }))}

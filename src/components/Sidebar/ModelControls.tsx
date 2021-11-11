@@ -115,8 +115,10 @@ export default function ModelControls(
             visible: true,
             type: "confirm",
             onConfirm: () => setAppState(defaultAppState),
-            confirmText:
-              "This will permanently reset the entire model, losing all your current nodes, connections, parameters and output data. Do you want to proceed?",
+            confirmText: [
+              "This will permanently reset the entire model, losing all your current nodes, connections, parameters and output data.",
+              "Do you want to proceed?",
+            ],
           }))
         }
       >

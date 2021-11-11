@@ -4,13 +4,18 @@ import { ModalState } from "../../App";
 import styled from "styled-components/macro";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import ConfirmationModal from "./ConfirmationModal";
+import TheoryModal from "./TheoryModal";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   position: absolute;
-  left: 50px;
-  top: 50px;
-  right: 50px;
-  bottom: 50px;
+  width: 80vw;
+  height: 90vh;
+  max-width: 1400px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
   border: 3px solid black;
   z-index: 10;
   background: white;
@@ -39,6 +44,8 @@ function getModalContent(
         setModalState={setModalState}
       />
     );
+  } else if (type === "theory") {
+    return <TheoryModal />;
   } else {
     return <h1>{type}</h1>;
   }
