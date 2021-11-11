@@ -99,7 +99,7 @@ export const defaultPanelSizes: PanelSizes = {
 
 export const defaultModalState: ModalState = {
   visible: true,
-  type: "tutorial",
+  type: "theory",
 };
 
 export const defaultAppState = {

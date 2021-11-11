@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
+import { MathComponent } from "mathjax-react";
 
 const StyledTheoryModal = styled.div`
   width: 80%;
@@ -38,6 +39,7 @@ export default function TheoryModal(): React.ReactElement {
         The thermal model used by hotstuff.network is a simple, linear,
         &quot;state space&quot; numerical model based off the following
         equation:
+        <MathComponent display={true} tex={String.raw`\int_0^1 x^2\ dx`} />
       </StyledText>
       <StyledText>
         The source code for the entire model can be seen{" "}
