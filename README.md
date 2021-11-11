@@ -9,6 +9,7 @@ TODO:
 - [x] More reasonable sig figs in plots (10th of degree) [5]
 - [ ] Theory explanation section/popup [5]
 - [ ] Logo + favicon [5]
+- [ ] Limits on resizing panels [5]
 - [ ] Fun default model (models?) [5]
 - [ ] Sane validation on editing each editable cell in table [5]
 - [ ] Tutorial popup instead of tutorial model [5]

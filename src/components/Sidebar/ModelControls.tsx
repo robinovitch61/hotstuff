@@ -8,12 +8,11 @@ import { defaultAppState } from "../../default";
 const StyledModelControlsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
   width: 100%;
   justify-content: center;
   align-items: center;
   border-top: 3px solid black;
-  padding-top: 1em;
+  flex-wrap: wrap;
 `;
 
 const StyledButton = styled.button`
@@ -21,12 +20,27 @@ const StyledButton = styled.button`
   margin-bottom: 5px;
 `;
 
-const StyledImport = styled.div``;
+const StyledImport = styled.div`
+  padding: 0.2em;
+  border: 1px solid black;
+`;
+
+const StyledInput = styled.input`
+  margin-right: 0.5em;
+`;
+
+const StyledTopControls = styled.div`
+  display: flex;
+  > * {
+    margin: 1em;
+  }
+`;
 
 const StyledTimeControls = styled.div``;
 
 const StyledTimeControl = styled.div`
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
   align-items: center;
   justify-content: space-between;
@@ -86,15 +100,19 @@ export default function ModelControls(
           </StyledInputWrapper>
         </StyledTimeControl>
       </StyledTimeControls>
-      <StyledButton onClick={onRunModel}>Run Model</StyledButton>
-
-      <StyledButton
-        onClick={() => navigator.clipboard.writeText(JSON.stringify(appState))}
-      >
-        Copy Model to ClipBoard
-      </StyledButton>
+      <StyledTopControls>
+        <StyledButton onClick={onRunModel}>Run Model</StyledButton>
+        <StyledButton
+          onClick={() =>
+            navigator.clipboard.writeText(JSON.stringify(appState))
+          }
+        >
+          Copy Model to ClipBoard
+        </StyledButton>
+      </StyledTopControls>
       <StyledImport>
-        <input
+        <StyledLabel>Model:</StyledLabel>
+        <StyledInput
           value={stagedAppState}
           onChange={(event) => setStagedAppState(event.target.value)}
         />
@@ -116,8 +134,8 @@ export default function ModelControls(
             type: "confirm",
             onConfirm: () => setAppState(defaultAppState),
             confirmText: [
-              "This will permanently reset the entire model, losing all your current nodes, connections, parameters and output data.",
-              "Do you want to proceed?",
+              "This will reset the entire model, discarding all your current nodes, connections, parameters and output data.",
+              "Permanently reset everything?",
             ],
           }))
         }
