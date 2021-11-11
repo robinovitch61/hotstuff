@@ -23,6 +23,7 @@ export default function EditableNumberInput(
 ): React.ReactElement {
   return (
     <EditableInput<number>
+      key={props.initialValue}
       initialValue={props.initialValue}
       onBlur={props.onBlur}
       getNewValue={getFloatVal}

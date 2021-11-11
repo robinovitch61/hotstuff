@@ -11,6 +11,7 @@ export default function EditableStringInput(
 ): React.ReactElement {
   return (
     <EditableInput<string>
+      key={props.initialValue}
       initialValue={props.initialValue}
       onBlur={props.onBlur}
       getNewValue={(event: React.ChangeEvent<HTMLInputElement>) =>

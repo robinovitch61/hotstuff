@@ -5,7 +5,7 @@ TODO:
 - [x] Change shift functionality to command/control (multi select, click and drag) [4]
 - [x] Node color is temp [5]
 - [x] Add the ability to change the plot/canvas/table size by dragging the borders [5]
-- [ ] Fix bug with runtime/timesteps not resetting [5]
+- [x] Fix bug with runtime/timesteps not resetting [5]
 - [ ] Fun default model (models?) [5]
 - [ ] Logo + favicon [5]
 - [ ] More reasonable sig figs in plots (10th of degree) [5]

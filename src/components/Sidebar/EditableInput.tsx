@@ -14,9 +14,9 @@ type EditableInputProps<T> = {
 export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
-  const [value, setValue] = useState<string>(props.initialValue.toString());
-
   const { initialValue, onBlur, getNewValue } = props;
+
+  const [value, setValue] = useState<string>(initialValue.toString());
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     const newVal = event.target.value;

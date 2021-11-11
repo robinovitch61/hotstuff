@@ -26,6 +26,7 @@ export default function TableCell<T extends TableCellType>(
   if (!!options && options.length > 0 && col.onSelectOption) {
     return (
       <DropDownTableCell
+        key={row.id}
         rowId={row.id}
         options={options}
         setOption={initiallySetOption}
@@ -52,6 +53,7 @@ export default function TableCell<T extends TableCellType>(
   } else if (typeof initialVal === "boolean") {
     return (
       <BooleanTableCell
+        key={initialVal.toString()}
         initialIsActive={initialVal}
         onClick={(newVal) => onUpdateRow({ ...row, [col.key]: newVal })}
         showWhenActive={"✅"}
