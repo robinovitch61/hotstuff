@@ -28,4 +28,4 @@ TODO:
 - [ ] Orders of magnitude on convection coefficients [2]
   - [ ] If you don't have test data to back it up, you start with order of magnitude
 - [ ] File export/import (falsdat doesn't have this) [2]
-- [ ] Reset all stored state button (with confirmation) - not important if not the tutorial [1]
+- [x] Reset all stored state button (with confirmation) - not important if not the tutorial [1]

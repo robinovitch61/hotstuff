@@ -27,7 +27,7 @@ import {
   StyledVerticalBorder,
   StyledWorkspace,
 } from "./style";
-import InfoPanel from "./components/InfoPanel/InfoPanel";
+import Modal from "./components/Modal/Modal";
 
 const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
@@ -55,9 +55,13 @@ export type PanelSizes = {
   tableHeightFraction: number;
 };
 
+export type ModalType = "theory" | "tutorial" | "about" | "confirm";
+
 export type ModalState = {
   visible: boolean;
-  type: "theory" | "tutorial" | "about";
+  type: ModalType;
+  onConfirm?: () => void;
+  confirmText?: string;
 };
 
 export type AppState = {
@@ -194,7 +198,7 @@ export default function App(): React.ReactElement {
 
   return (
     <div>
-      <InfoPanel modalState={modalState} setModalState={setModalState} />
+      <Modal modalState={modalState} setModalState={setModalState} />
       <StyledApp height={windowHeight} modalOpen={modalState.visible}>
         <StyledHorizontalBorder
           ref={canvasPlotBorderRef}
@@ -241,6 +245,7 @@ export default function App(): React.ReactElement {
         <Sidebar
           appState={appState}
           setAppState={setAppState}
+          setModalState={setModalState}
           height={windowHeight}
           width={editorWidth}
           setTiming={setTiming}

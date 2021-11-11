@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
-import { AppState, Timing } from "../../App";
+import { AppState, ModalState, Timing } from "../../App";
 import { defaultAppState } from "../../default";
 
 const StyledModelControlsWrapper = styled.div`
@@ -45,6 +45,7 @@ const StyledLabel = styled.label`
 export type ModelControlsProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   onRunModel: () => void;
   setTiming: (newTiming: Timing) => void;
 };
@@ -52,7 +53,8 @@ export type ModelControlsProps = {
 export default function ModelControls(
   props: ModelControlsProps
 ): React.ReactElement {
-  const { appState, setAppState, onRunModel, setTiming } = props;
+  const { appState, setAppState, setModalState, onRunModel, setTiming } = props;
+
   const [stagedAppState, setStagedAppState] = useState<string>("");
 
   return (
@@ -106,8 +108,19 @@ export default function ModelControls(
         </StyledButton>
       </StyledImport>
 
-      <StyledButton onClick={() => setAppState(defaultAppState)}>
-        Reset to Tutorial
+      <StyledButton
+        onClick={() =>
+          setModalState((prev) => ({
+            ...prev,
+            visible: true,
+            type: "confirm",
+            onConfirm: () => setAppState(defaultAppState),
+            confirmText:
+              "This will permanently reset the entire model, losing all your current nodes, connections, parameters and output data. Do you want to proceed?",
+          }))
+        }
+      >
+        Reset
       </StyledButton>
     </StyledModelControlsWrapper>
   );
