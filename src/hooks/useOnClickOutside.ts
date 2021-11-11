@@ -9,7 +9,6 @@ export default function useOnClickOutside(
     const listener = (
       event: React.MouseEvent | MouseEvent | React.TouchEvent | TouchEvent
     ) => {
-      event.preventDefault();
       // Do nothing if clicking ref's element or descendent elements
       if (!ref.current || ref.current.contains(event.target as Node | null)) {
         return;

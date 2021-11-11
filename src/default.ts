@@ -98,7 +98,7 @@ export const defaultPanelSizes: PanelSizes = {
 };
 
 export const defaultModalState: ModalState = {
-  visible: true,
+  visible: false,
   type: "theory",
 };
 
