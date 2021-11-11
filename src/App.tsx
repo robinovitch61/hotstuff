@@ -66,15 +66,29 @@ const StyledApp = styled.div<{ height: number }>`
   -ms-user-select: none; /* IE10+ */
 `;
 
-const StyledCanvasPlotBorder = styled.div<{ width: number; y: number }>`
+const StyledBorder = styled.div`
   position: absolute;
+  border: 1px solid red;
+  z-index: 1;
+`;
+
+const StyledCanvasPlotBorder = styled(StyledBorder)<{
+  width: number;
+  y: number;
+}>`
   width: ${(props) => props.width * 100}%;
   height: 10px;
-  border: 1px solid red;
   top: ${(props) => props.y * 100}%;
   transform: translate(0, -5px);
   cursor: row-resize;
-  z-index: 1;
+`;
+
+const StyledLeftRightBorder = styled(StyledBorder)<{ x: number }>`
+  height: 100%;
+  width: 10px;
+  left: ${(props) => props.x * 100}%;
+  transform: translate(-5px, 0);
+  cursor: col-resize;
 `;
 
 const StyledWorkspace = styled.div<{ height: number; width: number }>`
@@ -160,6 +174,25 @@ export default function App(): React.ReactElement {
     onDragY,
   });
 
+  const leftRightBorderRef = useRef(null);
+  const onDragX = useCallback(
+    (deltaXPx: number) => {
+      setAppState((prevAppState) => ({
+        ...prevAppState,
+        panelSizes: {
+          ...prevAppState.panelSizes,
+          editorWidthFraction:
+            prevAppState.panelSizes.editorWidthFraction -
+            deltaXPx / windowWidth,
+        },
+      }));
+    },
+    [setAppState, windowWidth]
+  );
+  const onMouseDownOnLeftRightBorder = useClickAndDragElement({
+    onDragX,
+  });
+
   // width/heights
   const workspaceWidth = windowWidth;
   const workspaceHeight = windowHeight;
@@ -224,6 +257,11 @@ export default function App(): React.ReactElement {
         onMouseDown={onMouseDownOnCanvasPlotBorder}
         y={appState.panelSizes.canvasHeightFraction}
         width={1 - appState.panelSizes.editorWidthFraction}
+      />
+      <StyledLeftRightBorder
+        ref={leftRightBorderRef}
+        onMouseDown={onMouseDownOnLeftRightBorder}
+        x={1 - appState.panelSizes.editorWidthFraction}
       />
       <StyledWorkspace
         height={workspaceHeight}
