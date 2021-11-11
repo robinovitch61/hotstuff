@@ -1,5 +1,5 @@
 import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -20,6 +20,7 @@ import {
   getNewAppNode,
 } from "./utils/nodeConnectionUtils";
 import useAppStateModifiers from "./hooks/useAppStateModifiers";
+import useClickAndDragElement from "./hooks/useClickAndDragElement";
 
 const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
@@ -65,6 +66,17 @@ const StyledApp = styled.div<{ height: number }>`
   -ms-user-select: none; /* IE10+ */
 `;
 
+const StyledCanvasPlotBorder = styled.div<{ width: number; y: number }>`
+  position: absolute;
+  width: ${(props) => props.width * 100}%;
+  height: 10px;
+  border: 1px solid red;
+  top: ${(props) => props.y * 100}%;
+  transform: translate(0, -5px);
+  cursor: row-resize;
+  z-index: 1;
+`;
+
 const StyledWorkspace = styled.div<{ height: number; width: number }>`
   height: ${(props) => props.height}px;
   width: ${(props) => props.width}px;
@@ -80,6 +92,7 @@ export default function App(): React.ReactElement {
     defaultAppState,
     "hotstuffAppState"
   );
+
   const [
     setAppNodes,
     setAppConnections,
@@ -127,6 +140,25 @@ export default function App(): React.ReactElement {
 
   const [size, ratio] = useWindowSize();
   const [windowWidth, windowHeight] = size;
+
+  const canvasPlotBorderRef = useRef(null);
+  const onDragY = useCallback(
+    (deltaYPx: number) => {
+      setAppState((prevAppState) => ({
+        ...prevAppState,
+        panelSizes: {
+          ...prevAppState.panelSizes,
+          canvasHeightFraction:
+            prevAppState.panelSizes.canvasHeightFraction +
+            deltaYPx / windowHeight,
+        },
+      }));
+    },
+    [setAppState, windowHeight]
+  );
+  const onMouseDownOnCanvasPlotBorder = useClickAndDragElement({
+    onDragY,
+  });
 
   // width/heights
   const workspaceWidth = windowWidth;
@@ -187,6 +219,12 @@ export default function App(): React.ReactElement {
 
   return (
     <StyledApp height={windowHeight}>
+      <StyledCanvasPlotBorder
+        ref={canvasPlotBorderRef}
+        onMouseDown={onMouseDownOnCanvasPlotBorder}
+        y={appState.panelSizes.canvasHeightFraction}
+        width={1 - appState.panelSizes.editorWidthFraction}
+      />
       <StyledWorkspace
         height={workspaceHeight}
         width={(1 - appState.panelSizes.editorWidthFraction) * workspaceWidth}

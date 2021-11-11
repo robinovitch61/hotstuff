@@ -1,28 +1,36 @@
 import * as React from "react";
+import { useRef } from "react";
+import { diffPoints, Point } from "../utils/pointUtils";
 
-export default function useClickAndDragElement(
-  ref: React.RefObject<HTMLElement>,
-  onDragX: () => void,
-  onDragY: () => void
-): void {
-  const elem = ref.current;
+export default function useClickAndDragElement(events: {
+  onDragX?: (deltaXPx: number) => void;
+  onDragY?: (deltaYPx: number) => void;
+}): (mouseDownEvent: React.MouseEvent | MouseEvent) => void {
+  const lastMousePos = useRef<Point | undefined>(undefined);
 
-  if (elem !== null) {
-    const onMouseUp = (mouseUpEvent: React.MouseEvent | MouseEvent) => {
-      elem.removeEventListener("mousemove", onMouseMove);
-      elem.removeEventListener("mouseup", onMouseUp);
-    };
+  const { onDragX, onDragY } = events;
 
-    const onMouseMove = (mouseMoveEvent: React.MouseEvent | MouseEvent) => {
-      onDragX();
-      onDragY();
-    };
+  const onMouseUp = () => {
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
 
-    const onMouseDown = (mouseDownEvent: React.MouseEvent | MouseEvent) => {
-      elem.addEventListener("mousemove", onMouseMove);
-      elem.addEventListener("mouseup", onMouseUp);
-    };
+  const onMouseMove = (mouseMoveEvent: React.MouseEvent | MouseEvent) => {
+    if (lastMousePos.current) {
+      const currentMousePos = {
+        x: mouseMoveEvent.pageX,
+        y: mouseMoveEvent.pageY,
+      };
+      const diff = diffPoints(currentMousePos, lastMousePos.current);
+      onDragX && onDragX(diff.x);
+      onDragY && onDragY(diff.y);
+      lastMousePos.current = currentMousePos;
+    }
+  };
 
-    elem.addEventListener("mousedown", onMouseDown);
-  }
+  return (mouseDownEvent: React.MouseEvent | MouseEvent) => {
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    lastMousePos.current = { x: mouseDownEvent.pageX, y: mouseDownEvent.pageY };
+  };
 }

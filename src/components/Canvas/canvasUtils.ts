@@ -346,12 +346,12 @@ export function isInsideBox(
   );
 }
 
-export function calculateCanvasMouse(
+export function calculateMousePositionOnElement(
   event: React.MouseEvent | MouseEvent,
-  canvas: HTMLCanvasElement
+  element: HTMLElement
 ): Point {
   const viewportMousePos = { x: event.pageX, y: event.pageY };
-  const boundingRect = canvas.getBoundingClientRect();
+  const boundingRect = element.getBoundingClientRect();
   const topLeftCanvasPos = { x: boundingRect.left, y: boundingRect.top };
   return diffPoints(viewportMousePos, topLeftCanvasPos);
 }
@@ -369,7 +369,10 @@ export function mouseToNodeCoords(
   canvasState: CanvasState
 ): Point {
   if (canvasState.context) {
-    const canvasMouse = calculateCanvasMouse(event, canvasState.context.canvas);
+    const canvasMouse = calculateMousePositionOnElement(
+      event,
+      canvasState.context.canvas
+    );
     return canvasMouseToNodeCoords(
       canvasMouse,
       canvasState.canvasViewState.offset,
