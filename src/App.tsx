@@ -19,14 +19,9 @@ import {
   getNewAppConnection,
   getNewAppNode,
 } from "./utils/nodeConnectionUtils";
+import useAppStateModifiers from "./hooks/useAppStateModifiers";
 
-const {
-  editorWidthPerc,
-  canvasHeightPerc,
-  plotMargin,
-  tabHeightPx,
-  plotHeightBufferPx,
-} = config;
+const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -46,6 +41,11 @@ export type Timing = {
   totalTimeS: number;
 };
 
+export type PanelSizes = {
+  editorWidthFraction: number;
+  canvasHeightFraction: number;
+};
+
 export type AppState = {
   output?: ModelOutput;
   timing: Timing;
@@ -53,6 +53,7 @@ export type AppState = {
   connections: AppConnection[];
   canvasViewState: CanvasViewState;
   savedCanvasState: CanvasViewState;
+  panelSizes: PanelSizes;
 };
 
 const StyledApp = styled.div<{ height: number }>`
@@ -66,7 +67,7 @@ const StyledApp = styled.div<{ height: number }>`
 
 const StyledWorkspace = styled.div<{ height: number; width: number }>`
   height: ${(props) => props.height}px;
-  width: ${(props) => (1 - editorWidthPerc) * props.width}px;
+  width: ${(props) => props.width}px;
 `;
 
 const StyledCanvas = styled.div<{ height: number }>`
@@ -79,67 +80,14 @@ export default function App(): React.ReactElement {
     defaultAppState,
     "hotstuffAppState"
   );
-
-  const setAppNodes = useCallback(
-    (newNodes: AppNode[]) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        nodes: newNodes,
-      }));
-    },
-    [setAppState]
-  );
-
-  const setAppConnections = useCallback(
-    (newConnections: AppConnection[]) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        connections: newConnections,
-      }));
-    },
-    [setAppState]
-  );
-
-  const setCanvasState = useCallback(
-    (newCanvasState: CanvasViewState) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        canvasViewState: newCanvasState,
-      }));
-    },
-    [setAppState]
-  );
-
-  const setSavedCanvasState = useCallback(
-    (newSavedCanvasState: CanvasViewState) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        savedCanvasState: newSavedCanvasState,
-      }));
-    },
-    [setAppState]
-  );
-
-  const setTiming = useCallback(
-    (newTiming: Timing) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        timing: newTiming,
-        output: undefined,
-      }));
-    },
-    [setAppState]
-  );
-
-  const setModelOutput = useCallback(
-    (newModelOutput: ModelOutput | undefined) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        output: newModelOutput,
-      }));
-    },
-    [setAppState]
-  );
+  const [
+    setAppNodes,
+    setAppConnections,
+    setCanvasViewState,
+    setSavedCanvasState,
+    setTiming,
+    setModelOutput,
+  ] = useAppStateModifiers(setAppState);
 
   const [
     addNode,
@@ -183,12 +131,15 @@ export default function App(): React.ReactElement {
   // width/heights
   const workspaceWidth = windowWidth;
   const workspaceHeight = windowHeight;
-  const canvasHeight = windowHeight * canvasHeightPerc;
-  const canvasWidth = windowWidth * (1 - editorWidthPerc);
+  const canvasHeight = windowHeight * appState.panelSizes.canvasHeightFraction;
+  const canvasWidth =
+    windowWidth * (1 - appState.panelSizes.editorWidthFraction);
   const plotHeight =
-    (1 - canvasHeightPerc) * windowHeight - tabHeightPx - plotHeightBufferPx;
+    (1 - appState.panelSizes.canvasHeightFraction) * windowHeight -
+    tabHeightPx -
+    plotHeightBufferPx;
   const plotWidth = canvasWidth;
-  const editorWidth = editorWidthPerc * windowWidth;
+  const editorWidth = appState.panelSizes.editorWidthFraction * windowWidth;
 
   const plot = useMemo(() => {
     return (
@@ -236,7 +187,10 @@ export default function App(): React.ReactElement {
 
   return (
     <StyledApp height={windowHeight}>
-      <StyledWorkspace height={workspaceHeight} width={workspaceWidth}>
+      <StyledWorkspace
+        height={workspaceHeight}
+        width={(1 - appState.panelSizes.editorWidthFraction) * workspaceWidth}
+      >
         <StyledCanvas height={canvasHeight}>
           <Canvas
             canvasWidth={canvasWidth}
@@ -246,7 +200,7 @@ export default function App(): React.ReactElement {
             onMouseDown={onMouseDown}
             handleDoubleClick={handleDoubleClick}
             canvasViewState={appState.canvasViewState}
-            setCanvasViewState={setCanvasState}
+            setCanvasViewState={setCanvasViewState}
             savedCanvasViewState={appState.savedCanvasState}
             setSavedCanvasViewState={setSavedCanvasState}
             setKeyboardActive={setKeyboardActive}

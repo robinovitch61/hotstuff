@@ -11,7 +11,7 @@ import config from "../../../config";
 import { calculateCanvasMouse } from "../canvasUtils";
 import { CanvasViewState } from "../Canvas";
 
-const { maxZoom, minZoom, zoomSensitivity } = config;
+const { maxZoom, minZoom, zoomSensitivity, maxZoomDelta } = config;
 
 export default function usePanZoomCanvas(
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -78,7 +78,12 @@ export default function usePanZoomCanvas(
         mousePosRef.current = newMousePos;
 
         // calculate new scale/zoom
-        const zoom = 1 - event.deltaY / zoomSensitivity;
+        const zoomDelta = event.deltaY / zoomSensitivity;
+        const zoom =
+          1 -
+          (Math.abs(zoomDelta) > maxZoomDelta
+            ? (zoomDelta / Math.abs(zoomDelta)) * maxZoomDelta
+            : zoomDelta);
         const newScale = canvasViewState.scale * zoom;
         if (newScale > maxZoom || newScale < minZoom) {
           return;

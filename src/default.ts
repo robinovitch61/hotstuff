@@ -1,7 +1,8 @@
 import { makeConnection, makeNode } from "hotstuff-network";
-import { AppConnection, AppNode } from "./App";
+import { AppConnection, AppNode, PanelSizes, Timing } from "./App";
 import config from "./config";
 import { ORIGIN } from "./utils/pointUtils";
+import { CanvasViewState } from "./components/Canvas/Canvas";
 
 const firstNode = makeNode({
   name: "1: Click to select",
@@ -224,14 +225,19 @@ export const defaultConnections: AppConnection[] = [
   },
 ];
 
-export const defaultTiming = {
+export const defaultTiming: Timing = {
   timeStepS: config.defaultTimeStepSeconds,
   totalTimeS: config.defaultTotalTimeSeconds,
 };
 
-export const defaultCanvasViewState = {
+export const defaultCanvasViewState: CanvasViewState = {
   offset: ORIGIN,
   scale: 1,
+};
+
+export const defaultPanelSizes: PanelSizes = {
+  editorWidthFraction: 0.3,
+  canvasHeightFraction: 0.7,
 };
 
 export const defaultAppState = {
@@ -241,4 +247,5 @@ export const defaultAppState = {
   connections: defaultConnections,
   canvasViewState: defaultCanvasViewState,
   savedCanvasState: defaultCanvasViewState,
+  panelSizes: defaultPanelSizes,
 };
