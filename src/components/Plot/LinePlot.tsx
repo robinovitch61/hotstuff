@@ -2,7 +2,6 @@ import {
   CartesianGrid,
   Legend,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -23,46 +22,40 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
   const { plotDimensions, plotData, lines, xAxisKey, xLabel, yLabel } = props;
 
   return (
-    <ResponsiveContainer
+    <LineChart
       height={plotDimensions.height}
       width={plotDimensions.width}
-      className="chart"
+      margin={plotDimensions.margin}
+      data={plotData}
     >
-      <LineChart
-        height={plotDimensions.height}
-        width={plotDimensions.width}
-        margin={plotDimensions.margin}
-        data={plotData}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey={xAxisKey}
-          label={{
-            value: xLabel,
-            position: "center",
-            dy: 20,
-          }}
-        />
-        <YAxis
-          label={{
-            value: yLabel,
-            position: "center",
-            angle: -90,
-            dx: -20,
-          }}
-        />
-        <Tooltip />
-        <Legend
-          layout="horizontal"
-          verticalAlign="top"
-          align="center"
-          wrapperStyle={{
-            paddingLeft: "10px",
-          }}
-          // fontSize={5}
-        />
-        {lines}
-      </LineChart>
-    </ResponsiveContainer>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey={xAxisKey}
+        label={{
+          value: xLabel,
+          position: "center",
+          dy: 20,
+        }}
+      />
+      <YAxis
+        label={{
+          value: yLabel,
+          position: "center",
+          angle: -90,
+          dx: -20,
+        }}
+      />
+      <Tooltip />
+      <Legend
+        layout="horizontal"
+        verticalAlign="top"
+        align="center"
+        wrapperStyle={{
+          paddingLeft: "10px",
+        }}
+        // fontSize={5}
+      />
+      {lines}
+    </LineChart>
   );
 }
