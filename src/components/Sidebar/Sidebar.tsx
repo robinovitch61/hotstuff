@@ -1,40 +1,23 @@
 import * as React from "react";
-import styled from "styled-components/macro";
 import { AppConnection, AppNode, AppState, Timing } from "../../App";
 import NodeTable from "./EditableTable/NodeTable/NodeTable";
 import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
 import ModelControls from "./ModelControls";
-
-const StyledEditor = styled.div<{ width: number; height: number }>`
-  height: ${(props) => props.height}px;
-  width: ${(props) => props.width}px;
-  border-left: 3px solid black;
-`;
-
-const StyledTables = styled.div`
-  display: inline-flex;
-  width: 100%;
-  height: 50%;
-`;
-
-const StyledModelControlsWrapper = styled.div`
-  display: inline-flex;
-  width: 100%;
-`;
+import {
+  StyledEditor,
+  StyledModelControlsWrapper,
+  StyledTables,
+} from "./style";
 
 type SidebarProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   width: number;
   height: number;
-  timing: Timing;
   setTiming: (newTiming: Timing) => void;
-  appNodes: AppNode[];
   onAddNode: () => void;
-  appConnections: AppConnection[];
   onAddConnection: () => void;
-  addConnection: (connection: AppConnection) => void;
   updateNodes: (nodes: AppNode[], clearActiveNodes: boolean) => void;
   deleteNodes: (nodeIds: string[]) => void;
   updateConnections: (connections: AppConnection[]) => void;
@@ -43,32 +26,47 @@ type SidebarProps = {
 };
 
 export default function Sidebar(props: SidebarProps): React.ReactElement {
+  const {
+    appState,
+    setAppState,
+    width,
+    height,
+    setTiming,
+    onAddNode,
+    onAddConnection,
+    updateNodes,
+    deleteNodes,
+    updateConnections,
+    deleteConnections,
+    onRunModel,
+  } = props;
+
   const nodeTable = (
     <NodeTable
-      rows={props.appNodes}
-      onUpdateRow={(node: AppNode) => props.updateNodes([node], false)}
-      onDeleteRow={(node: AppNode) => props.deleteNodes([node.id])}
-      onAddButton={props.onAddNode}
+      rows={appState.nodes}
+      onUpdateRow={(node: AppNode) => updateNodes([node], false)}
+      onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
+      onAddButton={onAddNode}
     />
   );
 
   const connectionTable = (
     <ConnectionTable
-      rows={props.appConnections}
-      nodes={props.appNodes}
+      rows={appState.connections}
+      nodes={appState.nodes}
       onUpdateRow={(connection: AppConnection) =>
-        props.updateConnections([connection])
+        updateConnections([connection])
       }
       onDeleteRow={(connection: AppConnection) =>
-        props.deleteConnections([connection.id])
+        deleteConnections([connection.id])
       }
-      onAddButton={props.onAddConnection}
+      onAddButton={onAddConnection}
     />
   );
 
   return (
-    <StyledEditor width={props.width} height={props.height}>
-      <StyledTables>
+    <StyledEditor width={width} height={height}>
+      <StyledTables heightFrac={appState.panelSizes.tableHeightFraction}>
         <Tabs
           tabs={[
             { text: "Nodes", component: nodeTable, width: 0.5 },
@@ -76,13 +74,14 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
           ]}
         />
       </StyledTables>
-      <StyledModelControlsWrapper>
+      <StyledModelControlsWrapper
+        heightFrac={1 - appState.panelSizes.tableHeightFraction}
+      >
         <ModelControls
-          appState={props.appState}
-          setAppState={props.setAppState}
-          onRunModel={props.onRunModel}
-          timing={props.timing}
-          setTiming={props.setTiming}
+          appState={appState}
+          setAppState={setAppState}
+          onRunModel={onRunModel}
+          setTiming={setTiming}
         />
       </StyledModelControlsWrapper>
     </StyledEditor>

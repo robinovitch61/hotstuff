@@ -1,8 +1,8 @@
 import * as React from "react";
+import { useState } from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
 import { AppState, Timing } from "../../App";
-import { useState } from "react";
 import { defaultAppState } from "../../default";
 
 const StyledModelControlsWrapper = styled.div`
@@ -46,14 +46,13 @@ export type ModelControlsProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   onRunModel: () => void;
-  timing: Timing;
   setTiming: (newTiming: Timing) => void;
 };
 
 export default function ModelControls(
   props: ModelControlsProps
 ): React.ReactElement {
-  const { onRunModel, timing, setTiming } = props;
+  const { appState, setAppState, onRunModel, setTiming } = props;
   const [stagedAppState, setStagedAppState] = useState<string>("");
 
   return (
@@ -63,9 +62,9 @@ export default function ModelControls(
           <StyledLabel>Run Time [s]:</StyledLabel>
           <StyledInputWrapper>
             <EditableNumberInput
-              initialValue={timing.totalTimeS}
+              initialValue={appState.timing.totalTimeS}
               onBlur={(newTotalTimeS: number) =>
-                setTiming({ ...timing, totalTimeS: newTotalTimeS })
+                setTiming({ ...appState.timing, totalTimeS: newTotalTimeS })
               }
             />
           </StyledInputWrapper>
@@ -74,10 +73,10 @@ export default function ModelControls(
           <StyledLabel>Time Step [s]:</StyledLabel>
           <StyledInputWrapper>
             <EditableNumberInput
-              initialValue={timing.timeStepS}
+              initialValue={appState.timing.timeStepS}
               onBlur={(newTimeStepS: number) =>
                 setTiming({
-                  ...timing,
+                  ...appState.timing,
                   timeStepS: newTimeStepS,
                 })
               }
@@ -88,9 +87,7 @@ export default function ModelControls(
       <StyledButton onClick={onRunModel}>Run Model</StyledButton>
 
       <StyledButton
-        onClick={() =>
-          navigator.clipboard.writeText(JSON.stringify(props.appState))
-        }
+        onClick={() => navigator.clipboard.writeText(JSON.stringify(appState))}
       >
         Copy Model to ClipBoard
       </StyledButton>
@@ -101,7 +98,7 @@ export default function ModelControls(
         />
         <StyledButton
           onClick={() => {
-            props.setAppState(JSON.parse(stagedAppState));
+            setAppState(JSON.parse(stagedAppState));
             setStagedAppState("");
           }}
         >
@@ -109,7 +106,7 @@ export default function ModelControls(
         </StyledButton>
       </StyledImport>
 
-      <StyledButton onClick={() => props.setAppState(defaultAppState)}>
+      <StyledButton onClick={() => setAppState(defaultAppState)}>
         Reset to Tutorial
       </StyledButton>
     </StyledModelControlsWrapper>

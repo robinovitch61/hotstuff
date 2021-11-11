@@ -1,6 +1,5 @@
 import { HSConnection, HSNode, ModelOutput, run } from "hotstuff-network";
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import styled from "styled-components";
+import React, { useCallback, useMemo, useState } from "react";
 import { Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
@@ -20,7 +19,14 @@ import {
   getNewAppNode,
 } from "./utils/nodeConnectionUtils";
 import useAppStateModifiers from "./hooks/useAppStateModifiers";
-import useClickAndDragElement from "./hooks/useClickAndDragElement";
+import useResizablePanels from "./hooks/useResizablePanels";
+import {
+  StyledApp,
+  StyledCanvas,
+  StyledCanvasPlotBorder,
+  StyledLeftRightBorder,
+  StyledWorkspace,
+} from "./style";
 
 const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
@@ -45,6 +51,7 @@ export type Timing = {
 export type PanelSizes = {
   editorWidthFraction: number;
   canvasHeightFraction: number;
+  tableHeightFraction: number;
 };
 
 export type AppState = {
@@ -56,50 +63,6 @@ export type AppState = {
   savedCanvasState: CanvasViewState;
   panelSizes: PanelSizes;
 };
-
-const StyledApp = styled.div<{ height: number }>`
-  display: flex;
-  height: ${(props) => props.height}px;
-  user-select: none;
-  -webkit-user-select: none; /* Chrome/Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+ */
-`;
-
-const StyledBorder = styled.div`
-  position: absolute;
-  border: 1px solid red;
-  z-index: 1;
-`;
-
-const StyledCanvasPlotBorder = styled(StyledBorder)<{
-  width: number;
-  y: number;
-}>`
-  width: ${(props) => props.width * 100}%;
-  height: 10px;
-  top: ${(props) => props.y * 100}%;
-  transform: translate(0, -5px);
-  cursor: row-resize;
-`;
-
-const StyledLeftRightBorder = styled(StyledBorder)<{ x: number }>`
-  height: 100%;
-  width: 10px;
-  left: ${(props) => props.x * 100}%;
-  transform: translate(-5px, 0);
-  cursor: col-resize;
-`;
-
-const StyledWorkspace = styled.div<{ height: number; width: number }>`
-  height: ${(props) => props.height}px;
-  width: ${(props) => props.width}px;
-`;
-
-const StyledCanvas = styled.div<{ height: number }>`
-  width: 100%;
-  height: ${(props) => props.height}px;
-`;
 
 export default function App(): React.ReactElement {
   const [appState, setAppState] = useSessionStorageState<AppState>(
@@ -155,43 +118,14 @@ export default function App(): React.ReactElement {
   const [size, ratio] = useWindowSize();
   const [windowWidth, windowHeight] = size;
 
-  const canvasPlotBorderRef = useRef(null);
-  const onDragY = useCallback(
-    (deltaYPx: number) => {
-      setAppState((prevAppState) => ({
-        ...prevAppState,
-        panelSizes: {
-          ...prevAppState.panelSizes,
-          canvasHeightFraction:
-            prevAppState.panelSizes.canvasHeightFraction +
-            deltaYPx / windowHeight,
-        },
-      }));
-    },
-    [setAppState, windowHeight]
-  );
-  const onMouseDownOnCanvasPlotBorder = useClickAndDragElement({
-    onDragY,
-  });
-
-  const leftRightBorderRef = useRef(null);
-  const onDragX = useCallback(
-    (deltaXPx: number) => {
-      setAppState((prevAppState) => ({
-        ...prevAppState,
-        panelSizes: {
-          ...prevAppState.panelSizes,
-          editorWidthFraction:
-            prevAppState.panelSizes.editorWidthFraction -
-            deltaXPx / windowWidth,
-        },
-      }));
-    },
-    [setAppState, windowWidth]
-  );
-  const onMouseDownOnLeftRightBorder = useClickAndDragElement({
-    onDragX,
-  });
+  const [
+    canvasPlotBorderRef,
+    onMouseDownOnCanvasPlotBorder,
+    leftRightBorderRef,
+    onMouseDownOnLeftRightBorder,
+    tableControlsBorderRef,
+    onMouseDownOnTableControlsBorder,
+  ] = useResizablePanels(setAppState, windowHeight, windowWidth);
 
   // width/heights
   const workspaceWidth = windowWidth;
@@ -257,11 +191,19 @@ export default function App(): React.ReactElement {
         onMouseDown={onMouseDownOnCanvasPlotBorder}
         y={appState.panelSizes.canvasHeightFraction}
         width={1 - appState.panelSizes.editorWidthFraction}
+        left={0}
       />
       <StyledLeftRightBorder
         ref={leftRightBorderRef}
         onMouseDown={onMouseDownOnLeftRightBorder}
         x={1 - appState.panelSizes.editorWidthFraction}
+      />
+      <StyledCanvasPlotBorder
+        ref={tableControlsBorderRef}
+        onMouseDown={onMouseDownOnTableControlsBorder}
+        y={appState.panelSizes.tableHeightFraction}
+        width={appState.panelSizes.editorWidthFraction}
+        left={1 - appState.panelSizes.editorWidthFraction}
       />
       <StyledWorkspace
         height={workspaceHeight}
@@ -289,13 +231,9 @@ export default function App(): React.ReactElement {
         setAppState={setAppState}
         height={windowHeight}
         width={editorWidth}
-        timing={appState.timing}
         setTiming={setTiming}
-        appNodes={appState.nodes}
         onAddNode={addNodeInCenterOfCanvas}
-        appConnections={appState.connections}
         onAddConnection={createNewLogicalConnection}
-        addConnection={addConnection}
         updateNodes={(nodes: AppNode[]) => {
           updateNodes(nodes);
           setModelOutput(undefined);
