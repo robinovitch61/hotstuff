@@ -7,6 +7,8 @@ import ConfirmationModal from "./ConfirmationModal";
 import TheoryModal from "./TheoryModal";
 
 const StyledModal = styled.div<{ visible: boolean }>`
+  font-size: 1.1em;
+  line-height: 1.4em;
   position: absolute;
   width: 80vw;
   height: 90vh;
@@ -47,7 +49,7 @@ function getModalContent(
   } else if (type === "theory") {
     return <TheoryModal />;
   } else {
-    return <h1>{type}</h1>;
+    return <h1>Coming Soon</h1>;
   }
 }
 

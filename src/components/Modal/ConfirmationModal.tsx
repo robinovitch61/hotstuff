@@ -8,6 +8,7 @@ const StyledConfirmationModal = styled.div`
   margin: 2em;
   justify-content: center;
   align-items: center;
+  line-height: 1.8em;
 `;
 
 const StyledConfirmationText = styled.p`

@@ -1,20 +1,21 @@
 {
   "files": {
     "main.css": "/static/css/main.4479afaa.chunk.css",
-    "main.js": "/static/js/main.e98a69fc.chunk.js",
-    "main.js.map": "/static/js/main.e98a69fc.chunk.js.map",
+    "main.js": "/static/js/main.6e4a6532.chunk.js",
+    "main.js.map": "/static/js/main.6e4a6532.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.dd33819d.js",
     "runtime-main.js.map": "/static/js/runtime-main.dd33819d.js.map",
-    "static/js/2.13c82ef1.chunk.js": "/static/js/2.13c82ef1.chunk.js",
-    "static/js/2.13c82ef1.chunk.js.map": "/static/js/2.13c82ef1.chunk.js.map",
+    "static/js/2.4287357f.chunk.js": "/static/js/2.4287357f.chunk.js",
+    "static/js/2.4287357f.chunk.js.map": "/static/js/2.4287357f.chunk.js.map",
     "index.html": "/index.html",
     "static/css/main.4479afaa.chunk.css.map": "/static/css/main.4479afaa.chunk.css.map",
-    "static/js/2.13c82ef1.chunk.js.LICENSE.txt": "/static/js/2.13c82ef1.chunk.js.LICENSE.txt"
+    "static/js/2.4287357f.chunk.js.LICENSE.txt": "/static/js/2.4287357f.chunk.js.LICENSE.txt",
+    "static/media/resistances.6020ab29.png": "/static/media/resistances.6020ab29.png"
   },
   "entrypoints": [
     "static/js/runtime-main.dd33819d.js",
-    "static/js/2.13c82ef1.chunk.js",
+    "static/js/2.4287357f.chunk.js",
     "static/css/main.4479afaa.chunk.css",
-    "static/js/main.e98a69fc.chunk.js"
+    "static/js/main.6e4a6532.chunk.js"
   ]
 }

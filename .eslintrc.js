@@ -14,5 +14,32 @@ module.exports = {
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
+    "react/no-unescaped-entities": [
+      "error",
+      {
+        forbid: [
+          {
+            char: ">",
+            alternatives: ["&gt;"],
+          },
+          {
+            char: ">",
+            alternatives: ["&lt;"],
+          },
+          {
+            char: "}",
+            alternatives: ["&#125;"],
+          },
+          {
+            char: "'",
+            alternatives: ["&apos;"],
+          },
+          {
+            char: '"',
+            alternatives: ["&quot;"],
+          },
+        ],
+      },
+    ],
   },
 };

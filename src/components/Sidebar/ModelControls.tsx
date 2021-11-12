@@ -48,6 +48,8 @@ const StyledTimeControl = styled.div`
 `;
 
 const StyledInputWrapper = styled.div`
+  border: 1px solid black;
+  border-radius: 2px;
   max-width: 3em;
   height: 1.5em;
 `;

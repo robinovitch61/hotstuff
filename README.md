@@ -8,6 +8,7 @@ TODO:
 - [x] Fix bug with runtime/timesteps not resetting [5]
 - [x] More reasonable sig figs in plots (10th of degree) [5]
 - [ ] Theory explanation section/popup [5]
+- [ ] Differentiate between conduction and convection just for user tracking. Remove unidirectional option from app.
 - [ ] Logo + favicon [5]
 - [ ] Limits on resizing panels [5]
 - [ ] Fun default model (models?) [5]
