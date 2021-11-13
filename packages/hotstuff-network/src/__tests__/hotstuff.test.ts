@@ -132,12 +132,6 @@ describe('validateInputs', () => {
     ).toBeGreaterThan(0);
   });
 
-  test('non-zero power generation on boundary node', () => {
-    expect(
-      validateInputs({ ...modelInput, nodes: [firstNode, { ...secondNode, powerGenW: 10, isBoundary: true }] }).length,
-    ).toBeGreaterThan(0);
-  });
-
   test('connections correspond to real node ids', () => {
     expect(
       validateInputs({
