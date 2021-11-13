@@ -11,6 +11,10 @@ const config = {
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
   defaultConnectionKind: "cond" as HSConnectionKind,
+  defaultEditorWidthFraction: 1 - 1 / 1.61803398875,
+  defaultCanvasHeightFraction: 1 / 1.61803398875,
+  defaultTableHeightFraction: 0.5,
+  minPanelFraction: 0.1,
   newNodeNamePrefix: "New Node",
   zoomSensitivity: 1500, // bigger = less zoom per click
   minZoom: 0.5,

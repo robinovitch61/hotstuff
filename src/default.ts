@@ -92,9 +92,9 @@ export const defaultCanvasViewState: CanvasViewState = {
 };
 
 export const defaultPanelSizes: PanelSizes = {
-  editorWidthFraction: 1 - 1 / 1.61803398875,
-  canvasHeightFraction: 1 / 1.61803398875,
-  tableHeightFraction: 0.5,
+  editorWidthFraction: config.defaultEditorWidthFraction,
+  canvasHeightFraction: config.defaultCanvasHeightFraction,
+  tableHeightFraction: config.defaultTableHeightFraction,
 };
 
 export const defaultModalState: ModalState = {

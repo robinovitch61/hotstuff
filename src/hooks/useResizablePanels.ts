@@ -2,6 +2,15 @@ import * as React from "react";
 import { useCallback, useRef } from "react";
 import useClickAndDragElement from "./useClickAndDragElement";
 import { AppState } from "../App";
+import config from "../config";
+
+function constrainPanelSize(newPanelSize: number): number {
+  return newPanelSize < config.minPanelFraction
+    ? config.minPanelFraction
+    : newPanelSize > 1 - config.minPanelFraction
+    ? 1 - config.minPanelFraction
+    : newPanelSize;
+}
 
 export default function useResizablePanels(
   setAppState: React.Dispatch<React.SetStateAction<AppState>>,
@@ -15,6 +24,36 @@ export default function useResizablePanels(
   React.MutableRefObject<null>,
   (mouseDownEvent: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void
 ] {
+  const constrainX = useCallback(
+    (newX: number) => {
+      const minPx = windowWidth * config.minPanelFraction;
+      const maxPx = windowWidth * (1 - config.minPanelFraction);
+      if (newX < minPx) {
+        return minPx;
+      } else if (newX > maxPx) {
+        return maxPx;
+      } else {
+        return newX;
+      }
+    },
+    [windowWidth]
+  );
+
+  const constrainY = useCallback(
+    (newY: number) => {
+      const minPx = windowHeight * config.minPanelFraction;
+      const maxPx = windowHeight * (1 - config.minPanelFraction);
+      if (newY < minPx) {
+        return minPx;
+      } else if (newY > maxPx) {
+        return maxPx;
+      } else {
+        return newY;
+      }
+    },
+    [windowHeight]
+  );
+
   const canvasPlotBorderRef = useRef(null);
   const onDragYCanvasPlot = useCallback(
     (deltaYPx: number) => {
@@ -22,9 +61,10 @@ export default function useResizablePanels(
         ...prevAppState,
         panelSizes: {
           ...prevAppState.panelSizes,
-          canvasHeightFraction:
+          canvasHeightFraction: constrainPanelSize(
             prevAppState.panelSizes.canvasHeightFraction +
-            deltaYPx / windowHeight,
+              deltaYPx / windowHeight
+          ),
         },
       }));
     },
@@ -32,6 +72,7 @@ export default function useResizablePanels(
   );
   const onMouseDownOnCanvasPlotBorder = useClickAndDragElement({
     onDragY: onDragYCanvasPlot,
+    constrainY,
   });
 
   const leftRightBorderRef = useRef(null);
@@ -41,9 +82,9 @@ export default function useResizablePanels(
         ...prevAppState,
         panelSizes: {
           ...prevAppState.panelSizes,
-          editorWidthFraction:
-            prevAppState.panelSizes.editorWidthFraction -
-            deltaXPx / windowWidth,
+          editorWidthFraction: constrainPanelSize(
+            prevAppState.panelSizes.editorWidthFraction - deltaXPx / windowWidth
+          ),
         },
       }));
     },
@@ -51,6 +92,7 @@ export default function useResizablePanels(
   );
   const onMouseDownOnLeftRightBorder = useClickAndDragElement({
     onDragX: onDragXLeftRight,
+    constrainX,
   });
 
   const tableControlsBorderRef = useRef(null);
@@ -60,9 +102,10 @@ export default function useResizablePanels(
         ...prevAppState,
         panelSizes: {
           ...prevAppState.panelSizes,
-          tableHeightFraction:
+          tableHeightFraction: constrainPanelSize(
             prevAppState.panelSizes.tableHeightFraction +
-            deltaYPx / windowHeight,
+              deltaYPx / windowHeight
+          ),
         },
       }));
     },
@@ -70,6 +113,7 @@ export default function useResizablePanels(
   );
   const onMouseDownOnTableControlsBorder = useClickAndDragElement({
     onDragY: onDragYTableControls,
+    constrainY,
   });
 
   return [
