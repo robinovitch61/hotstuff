@@ -49,7 +49,7 @@ const nodeColumns: NodeTableColumn[] = [
   },
   {
     key: "isBoundary",
-    text: "Boundary?",
+    text: "Fixed Temp?",
     width: 0.15,
     minWidthPx: 80,
   },

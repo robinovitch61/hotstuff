@@ -162,7 +162,7 @@ export default function ConnectionTable(
   const connectionColumns: ConnectionTableColumn[] = useMemo(
     () => [
       {
-        text: "Source",
+        text: "First Node",
         key: "sourceName",
         width: 0.3,
         minWidthPx: 100,
@@ -170,7 +170,7 @@ export default function ConnectionTable(
         onSelectOption: onSelectNewSource,
       },
       {
-        text: "Target",
+        text: "Second Node",
         key: "targetName",
         width: 0.3,
         minWidthPx: 100,
