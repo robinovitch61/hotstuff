@@ -1,15 +1,14 @@
 import { matrixUtils } from './matrixUtils';
 import {
   CircularConnectionError,
+  HotStuffError,
   NodeIdValidationError,
   NodeNotFoundError,
-  TotalTimeValidationError,
   TemperatureValidationError,
   ThermalCapacitanceValidationError,
   ThermalResistanceValidationError,
   TimeStepValidationError,
-  HotStuffError,
-  PowerGenerationAtBoundaryError,
+  TotalTimeValidationError,
 } from './errors';
 
 export const KELVIN = 273.15;
@@ -140,10 +139,6 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
       errors.push(
         new ThermalCapacitanceValidationError(`Impossible thermal capacitance of ${node.capacitanceJPerDegK} J/degK`),
       );
-    }
-
-    if (node.isBoundary && node.powerGenW !== 0) {
-      errors.push(new PowerGenerationAtBoundaryError(`Non-zero power generation at boundary condition`));
     }
   });
 
