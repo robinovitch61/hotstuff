@@ -1,4 +1,4 @@
-import { HSConnection } from "hotstuff-network";
+import { HSConnectionKind } from "hotstuff-network";
 
 type MouseEventKey = "shiftKey" | "altKey" | "metaKey" | "ctrlKey";
 
@@ -10,7 +10,7 @@ const config = {
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
-  defaultConnectionKind: "bi" as HSConnection["kind"],
+  defaultConnectionKind: "cond" as HSConnectionKind,
   newNodeNamePrefix: "New Node",
   zoomSensitivity: 1500, // bigger = less zoom per click
   minZoom: 0.5,

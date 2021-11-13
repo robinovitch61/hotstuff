@@ -7,8 +7,9 @@ TODO:
 - [x] Add the ability to change the plot/canvas/table size by dragging the borders [5]
 - [x] Fix bug with runtime/timesteps not resetting [5]
 - [x] More reasonable sig figs in plots (10th of degree) [5]
-- [ ] Theory explanation section/popup [5]
-- [ ] Differentiate between conduction and convection just for user tracking. Remove unidirectional option from app.
+- [x] Theory explanation section/popup [5]
+- [ ] Differentiate between conduction and convection just for user tracking. Remove unidirectional option from app. No source/target terminology? [5]
+- [ ] Deal with math for radiative heat transfer (incomplete/wrong right now?) [5]
 - [ ] Logo + favicon [5]
 - [ ] Limits on resizing panels [5]
 - [ ] Fun default model (models?) [5]
@@ -20,6 +21,7 @@ TODO:
 - [ ] Enter while editing cell exits same as tab [4]
 - [ ] Ability to add text blobs on canvas - would be cool [3]
   - [ ] Gives you a place to annotate e.g. "natural convection"
+- [ ] Decide to allow or not non-zero power generation for boundary nodes. Confirm it shouldn't matter. [3]
 - [ ] Make errors more visible than just in console [3]
 - [ ] Resistance calculator [3]
     - [ ] Link to engineers edge website

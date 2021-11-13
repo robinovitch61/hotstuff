@@ -13,8 +13,8 @@ import { CellOption, TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
-import { ConnectionKind } from "../../../types";
 import DeleteCell from "../DeleteCell";
+import { HSConnectionKind } from "hotstuff-network";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
@@ -26,16 +26,16 @@ const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
 
 const connectionTypes: CellOption[] = [
   {
-    id: "bi",
-    text: "Bidirectional",
+    id: "cond",
+    text: "🔗 Conduction",
   },
   {
-    id: "uni",
-    text: "Unidirectional",
+    id: "conv",
+    text: "♨️ Convection️️",
   },
   {
     id: "rad",
-    text: "Radiative",
+    text: "☀️ Radiation️",
   },
 ];
 
@@ -147,7 +147,7 @@ export default function ConnectionTable(
       if (rowToUpdate) {
         props.onUpdateRow({
           ...rowToUpdate,
-          kind: option.id as ConnectionKind,
+          kind: option.id as HSConnectionKind,
         });
       }
     },

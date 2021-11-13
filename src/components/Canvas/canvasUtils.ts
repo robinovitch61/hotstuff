@@ -3,8 +3,8 @@ import config from "../../config";
 import { Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
-import { ConnectionKind } from "../types";
 import { scaleDiverging } from "d3-scale";
+import { HSConnectionKind } from "hotstuff-network";
 
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
@@ -286,9 +286,9 @@ export function drawConnection(
   sourceRadius: number,
   targetCenter: Point,
   targetRadius: number,
-  kind: ConnectionKind
+  kind: HSConnectionKind
 ): void {
-  if (kind === "bi") {
+  if (["cond", "conv"].includes(kind)) {
     drawBidirectionalArrow(
       context,
       sourceCenter,

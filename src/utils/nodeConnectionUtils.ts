@@ -54,7 +54,7 @@ export function getNewAppConnection(
             source: firstNode,
             target: secondNode,
             resistanceDegKPerW: config.defaultResistanceDegKPerW,
-            kind: "bi",
+            kind: config.defaultConnectionKind,
           });
 
           found = {
