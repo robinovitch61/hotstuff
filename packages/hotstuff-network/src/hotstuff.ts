@@ -26,7 +26,7 @@ export type HSNode = HSNodeParams & {
   id: string;
 };
 
-export type ConnectionKind = 'bi' | 'uni' | 'rad';
+export type ConnectionKind = 'cond' | 'conv' | 'uni' | 'rad';
 
 export type HSConnectionParams = {
   source: HSNode;
@@ -189,6 +189,7 @@ export function createAMatrix(nodes: HSNode[], connections: HSConnection[]): num
         } else {
           // assume target radiates to ambient and not back to source
           if (node.id == conn.source.id) {
+            // TODO LEO: I think this is wrong/incomplete...
             vals4[nodeIdx][sourceIdx] -= term;
             vals4[nodeIdx][targetIdx] += term;
           }
