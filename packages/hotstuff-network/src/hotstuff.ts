@@ -26,13 +26,13 @@ export type HSNode = HSNodeParams & {
   id: string;
 };
 
-export type ConnectionKind = 'cond' | 'conv' | 'uni' | 'rad';
+export type HSConnectionKind = 'cond' | 'conv' | 'uni' | 'rad';
 
 export type HSConnectionParams = {
   source: HSNode;
   target: HSNode;
   resistanceDegKPerW: number;
-  kind: ConnectionKind;
+  kind: HSConnectionKind;
 };
 
 export type HSConnection = HSConnectionParams & {
