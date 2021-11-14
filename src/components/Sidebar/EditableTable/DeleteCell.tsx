@@ -18,7 +18,7 @@ export default function DeleteCell<T>(
           props.onDeleteRow(props.row);
         }
       }}
-      width={config.tableDeleteCellWidthPerc}
+      width={config.tableDeleteCellWidthPercent}
       minWidth={config.tableDeleteCellMinWidthPx}
       onClick={() => props.onDeleteRow(props.row)}
     >

@@ -7,7 +7,7 @@ import LinePlot from "./LinePlot";
 import Tabs from "../Tabs/Tabs";
 import config from "../../config";
 
-const { maxPlotPoints, plotDomainMargin } = config;
+const { maxPlotPoints, plotDomainMarginPercent } = config;
 
 const colors = [
   "#2ecc71",
@@ -141,16 +141,21 @@ export default function Plot(props: PlotProps): React.ReactElement {
   const [tempPlotData, tempDomain, heatTransferPlotData, heatTransferDomain] =
     plotShape(res);
 
+  const yTempDomainMargin =
+    (tempDomain[1] - tempDomain[0]) * plotDomainMarginPercent;
   const yTempDomain: [number, number] | undefined = modelHasOutput
     ? [
-        Math.floor(tempDomain[0]) - plotDomainMargin,
-        Math.ceil(tempDomain[1] + plotDomainMargin),
+        Math.floor(tempDomain[0] - yTempDomainMargin),
+        Math.ceil(tempDomain[1] + yTempDomainMargin),
       ]
     : undefined;
+
+  const yHeatTransferDomainMargin =
+    (heatTransferDomain[1] - heatTransferDomain[0]) * plotDomainMarginPercent;
   const yHeatTransferDomain: [number, number] | undefined = modelHasOutput
     ? [
-        Math.floor(heatTransferDomain[0]) - plotDomainMargin,
-        Math.ceil(heatTransferDomain[1] + plotDomainMargin),
+        Math.floor(heatTransferDomain[0] - yHeatTransferDomainMargin),
+        Math.ceil(heatTransferDomain[1] + yHeatTransferDomainMargin),
       ]
     : undefined;
 

@@ -56,7 +56,7 @@ export default function TableHeader<T>(
         );
       })}
       <StyledColHeader
-        width={config.tableDeleteCellWidthPerc}
+        width={config.tableDeleteCellWidthPercent}
         minWidth={config.tableDeleteCellMinWidthPx}
         style={{ cursor: "unset" }}
       />

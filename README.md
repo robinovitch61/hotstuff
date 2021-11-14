@@ -11,12 +11,19 @@ TODO:
 - [x] Differentiate between conduction and convection just for user tracking. Remove unidirectional option from app. No source/target terminology. [5]
 - [x] Deal with math for radiative heat transfer (incomplete/wrong right now?) [5]
 - [x] Limits on resizing panels [5]
-- [ ] Plot margin a percentage of domain rather than fixed val [5]
+- [x] Plot margin a percentage of domain rather than fixed val [5]
+- [ ] Multiple connection types per A <--> B connection [5]
+- [ ] Clarify radiation resistance formula in theory [5]
+- [ ] Figure out why control-click not working on windows [5]
+- [ ] Limit num points and/or compress appState to not hit limits on localStorage [5]
+- [ ] Optional notes field for nodes/connections in table.
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]
 - [ ] Sane validation on editing each editable cell in table [5]
 - [ ] Tutorial popup instead of tutorial model [5]
-- [ ] Compress appState to not hit limits on localStorage [4]
+- [ ] Resistance calculator [4]
+  - [ ] Link to engineers edge website
+  - [ ] Calculator pops up while editing
 - [ ] Make node active when editing in table [4]
 - [ ] Escape while editing cell exits and resets default val [4]
 - [ ] Enter while editing cell exits same as tab [4]
@@ -28,9 +35,6 @@ TODO:
   - Resistance between nodes?
   - Heat transfer between nodes?
 - [ ] Make errors more visible than just in console [3]
-- [ ] Resistance calculator [3]
-    - [ ] Link to engineers edge website
-    - [ ] Calculator pops up while editing
 - [ ] Ability to swap source/target in connection table (depends on keeping unidirectional or not) [3]
 - [ ] Copy/paste all selected [3]
 - [ ] Horizontal/vertical snap functionality for creating grid [2]

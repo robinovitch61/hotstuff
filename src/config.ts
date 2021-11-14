@@ -25,7 +25,7 @@ const config = {
   activeNodeOutlineWidthPx: 5,
   tabHeightPx: 25,
   plotHeightBufferPx: 10,
-  tableDeleteCellWidthPerc: 0.1,
+  tableDeleteCellWidthPercent: 0.1,
   tableDeleteCellMinWidthPx: 40,
   plotMargin: {
     left: 10,
@@ -33,7 +33,7 @@ const config = {
     top: 20,
     bottom: 20,
   },
-  plotDomainMargin: 2,
+  plotDomainMarginPercent: 0.1,
   maxPlotPoints: 400,
   multiSelectKey: "metaKey" as MouseEventKey,
 };
