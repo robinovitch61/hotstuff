@@ -63,7 +63,9 @@ export default function useMoveNode(
       activeNodes: AppNode[],
       canvasState: CanvasState
     ) => {
-      const multiSelectKeyPressed = mouseDownEvent[config.multiSelectKey];
+      const multiSelectKeyPressed = config.multiSelectKeys.some(
+        (k) => mouseDownEvent[k]
+      );
       const moveNode = (currentMouseEvent: React.MouseEvent | MouseEvent) => {
         if (canvasState.context) {
           movedRef.current = true;
@@ -75,7 +77,10 @@ export default function useMoveNode(
             multiSelectKeyPressed,
             activeNodes
           );
-          updateNodes(newNodes, !currentMouseEvent[config.multiSelectKey]);
+          updateNodes(
+            newNodes,
+            !config.multiSelectKeys.some((k) => currentMouseEvent[k])
+          );
         }
       };
       const mouseUp = (mouseUpEvent: React.MouseEvent | MouseEvent) => {

@@ -18,7 +18,7 @@ export default function useDoubleClick(
   return useCallback(
     (event: React.MouseEvent | MouseEvent, canvasState: CanvasState) => {
       event.preventDefault();
-      if (event[config.multiSelectKey]) {
+      if (config.multiSelectKeys.some((k) => event[k])) {
         return;
       }
 

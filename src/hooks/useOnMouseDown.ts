@@ -57,7 +57,7 @@ export default function useOnMouseDown(
         if (mouseDownEvent.altKey) {
           makeNewConnection(mouseDownEvent, clickedNode, canvasState);
         } else if (
-          mouseDownEvent[config.multiSelectKey] &&
+          config.multiSelectKeys.some((k) => mouseDownEvent[k]) &&
           activeNodeIds.includes(clickedNode.id)
         ) {
           setActiveNodes(activeNodeIds.filter((id) => id !== clickedNode.id));
@@ -65,7 +65,7 @@ export default function useOnMouseDown(
           moveNode(mouseDownEvent, clickedNode, activeNodes, canvasState);
         }
       } else {
-        if (mouseDownEvent[config.multiSelectKey]) {
+        if (config.multiSelectKeys.some((k) => mouseDownEvent[k])) {
           multiSelect(mouseDownEvent, canvasState);
         } else {
           // only clear active nodes if click with no pan

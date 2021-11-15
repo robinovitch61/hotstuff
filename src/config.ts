@@ -35,7 +35,7 @@ const config = {
   },
   plotDomainMarginPercent: 0.1,
   maxPlotPoints: 400,
-  multiSelectKey: "metaKey" as MouseEventKey,
+  multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
 };
 
 export default config;
