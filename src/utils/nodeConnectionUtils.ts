@@ -59,8 +59,8 @@ export function getNewAppConnection(
 
           found = {
             ...newConnection,
-            sourceName: firstNode.name,
-            targetName: secondNode.name,
+            sourceId: firstNode.id,
+            targetId: secondNode.id,
           };
         }
       }

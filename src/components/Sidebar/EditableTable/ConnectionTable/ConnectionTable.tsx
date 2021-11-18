@@ -20,7 +20,7 @@ export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
-  key: "sourceName",
+  key: "sourceId",
   direction: "ASC",
 };
 
@@ -54,7 +54,7 @@ function filterConnectionOptions(
       )
   );
 
-  if (colKey === "sourceName") {
+  if (colKey === "sourceId") {
     // options for source node
     const noSelfConnectionOptions = options.filter(
       (option) => option.id !== selectedTargetId
@@ -67,7 +67,7 @@ function filterConnectionOptions(
           (c.source.id === selectedTargetId && c.target.id === option.id)
       );
     });
-  } else if (colKey === "targetName") {
+  } else if (colKey === "targetId") {
     // options for target node
     const noSelfConnectionOptions = options.filter(
       (option) => option.id !== selectedSourceId
@@ -80,6 +80,11 @@ function filterConnectionOptions(
           (c.source.id === option.id && c.target.id === selectedSourceId)
       );
     });
+  } else if (colKey === "kind") {
+    // if there's another connection between the nodes (either direction) with that same kind:
+    // - no option for the same kind of connection
+    // - no option for both conduction and convection at once as this doesn't make sense physically (solid vs. fluid)
+    return options;
   } else {
     return options;
   }
@@ -115,7 +120,7 @@ export default function ConnectionTable(
       props.onUpdateRow({
         ...connection,
         source: newSourceNode,
-        sourceName: newSourceNode.name,
+        sourceId: newSourceNode.id,
       });
     },
     [props]
@@ -135,7 +140,7 @@ export default function ConnectionTable(
       props.onUpdateRow({
         ...connection,
         target: newTargetNode,
-        targetName: newTargetNode.name,
+        targetId: newTargetNode.id,
       });
     },
     [props]
@@ -163,7 +168,7 @@ export default function ConnectionTable(
     () => [
       {
         text: "First Node",
-        key: "sourceName",
+        key: "sourceId",
         width: 0.3,
         minWidthPx: 100,
         options: nodeOptions,
@@ -171,7 +176,7 @@ export default function ConnectionTable(
       },
       {
         text: "Second Node",
-        key: "targetName",
+        key: "targetId",
         width: 0.3,
         minWidthPx: 100,
         options: nodeOptions,
@@ -217,20 +222,31 @@ export default function ConnectionTable(
 
   const tableRows = sortedRowsWithActiveInfo.map((row) => {
     const cols = connectionColumns.map((col) => {
-      function makeStyledCell(tableCell: React.ReactElement) {
+      function makeStyledCell(
+        options: CellOption[],
+        setOption: CellOption | undefined
+      ) {
         return (
           <StyledCell key={col.key} width={col.width} minWidth={col.minWidthPx}>
-            {tableCell}
+            <TableCell<AppConnectionTable>
+              row={row}
+              col={col}
+              options={options}
+              initiallySetOption={setOption}
+              onUpdateRow={props.onUpdateRow}
+            />
           </StyledCell>
         );
       }
 
       if (!!col.options) {
-        const setOption = col.options?.find(
-          (option) => option.id === row[col.key] || option.text === row[col.key]
+        const setOption = col.options.find(
+          (option) => option.id === row[col.key]
         );
-        const options = !!setOption
-          ? [
+
+        const options = !setOption
+          ? []
+          : [
               setOption,
               ...filterConnectionOptions(
                 col.key,
@@ -239,27 +255,11 @@ export default function ConnectionTable(
                 row.target.id,
                 props.rows
               ).filter((opt) => opt.id !== setOption.id),
-            ]
-          : [];
+            ];
 
-        const tableCell = (
-          <TableCell<AppConnectionTable>
-            row={row}
-            col={col}
-            options={options}
-            initiallySetOption={setOption}
-            onUpdateRow={props.onUpdateRow}
-          />
-        );
-        return makeStyledCell(tableCell);
+        return makeStyledCell(options, setOption);
       } else {
-        return makeStyledCell(
-          <TableCell<AppConnectionTable>
-            row={row}
-            col={col}
-            onUpdateRow={props.onUpdateRow}
-          />
-        );
+        return makeStyledCell([], undefined);
       }
     });
 

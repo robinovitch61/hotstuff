@@ -65,7 +65,7 @@ export default function useNodeConnectionUtils(
           return {
             ...prevConn,
             source: newSourceNode,
-            sourceName: newSourceNode.name,
+            sourceId: newSourceNode.id,
           };
         }
 
@@ -76,7 +76,7 @@ export default function useNodeConnectionUtils(
           return {
             ...prevConn,
             target: newTargetNode,
-            targetName: newTargetNode.name,
+            targetId: newTargetNode.id,
           };
         }
         return prevConn;

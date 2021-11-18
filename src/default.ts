@@ -56,8 +56,8 @@ export const defaultConnections: AppConnection[] = [
       resistanceDegKPerW: 2.5, // 0.01m / 0.1m^2 / 0.04W/m/degK
       kind: "cond",
     }),
-    sourceName: jerryNode.name,
-    targetName: bedNode.name,
+    sourceId: jerryNode.id,
+    targetId: bedNode.id,
   },
   {
     ...makeConnection({
@@ -66,8 +66,8 @@ export const defaultConnections: AppConnection[] = [
       resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 10W/m^2/degK
       kind: "conv",
     }),
-    sourceName: jerryNode.name,
-    targetName: airNode.name,
+    sourceId: jerryNode.id,
+    targetId: airNode.id,
   },
   {
     ...makeConnection({
@@ -76,8 +76,8 @@ export const defaultConnections: AppConnection[] = [
       resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 5W/m^2/degK
       kind: "conv",
     }),
-    sourceName: bedNode.name,
-    targetName: airNode.name,
+    sourceId: bedNode.id,
+    targetId: airNode.id,
   },
 ];
 

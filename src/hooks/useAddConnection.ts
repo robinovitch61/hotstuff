@@ -84,8 +84,8 @@ export default function useAddConnection(
               resistanceDegKPerW: defaultResistanceDegKPerW,
               kind: defaultConnectionKind,
             }),
-            sourceName: clickedNode.name,
-            targetName: mouseUpOnNode.name,
+            sourceId: clickedNode.id,
+            targetId: mouseUpOnNode.id,
           };
           addConnection(newConnection);
         } else {
