@@ -15,8 +15,8 @@ import { defaultAppState, defaultModalState } from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
 import {
-  getNewAppConnection,
   getNewAppNode,
+  getNewPossibleConnection,
 } from "./utils/nodeConnectionUtils";
 import useAppStateModifiers from "./hooks/useAppStateModifiers";
 import useResizablePanels from "./hooks/useResizablePanels";
@@ -187,7 +187,7 @@ export default function App(): React.ReactElement {
   ]);
 
   const createNewLogicalConnection = useCallback(() => {
-    const newConnection = getNewAppConnection(
+    const newConnection = getNewPossibleConnection(
       appState.nodes,
       appState.connections
     );

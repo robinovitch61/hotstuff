@@ -130,9 +130,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 ```
 
 ### TODO
-- [] variable power inputs
-- [] performance testing - realtime or better with 100 nodes, 500 connections, 0.01 timeStep
+- [] Error when a pair of nodes share a conductive and convective connection at the same time (impossible)
+- [] Run-level test for multiple connection types across nodes (e.g. conductive + radiative)
 - [] information about instability
-- [] include error messages in returned errors and make errors unique
-- [] stream results rather than all at once return
-- [] fix round-off floating point errors
+- [] variable power inputs

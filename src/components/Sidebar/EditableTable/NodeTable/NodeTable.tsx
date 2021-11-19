@@ -65,9 +65,11 @@ type NodeTableProps = {
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
   const { rows, onUpdateRow, onDeleteRow, onAddButton } = props;
 
-  const [sortState, setSortState, sortByState] = useSortableTable<AppNode>({
-    default: defaultNodeSortState,
-  });
+  const [sortState, setSortState, sortByState] = useSortableTable<AppNode>(
+    defaultNodeSortState,
+    "temperatureDegC",
+    "capacitanceJPerDegK"
+  );
 
   const sortedRows = rows.sort(sortByState);
 

@@ -1,5 +1,3 @@
-import { HSConnectionKind } from "hotstuff-network";
-
 type MouseEventKey = "shiftKey" | "altKey" | "metaKey" | "ctrlKey";
 
 const config = {
@@ -10,7 +8,6 @@ const config = {
   defaultTimeStepSeconds: 0.1,
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
-  defaultConnectionKind: "cond" as HSConnectionKind,
   defaultEditorWidthFraction: 1 - 1 / 1.61803398875,
   defaultCanvasHeightFraction: 1 / 1.61803398875,
   defaultTableHeightFraction: 0.5,

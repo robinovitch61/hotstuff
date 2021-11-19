@@ -1,8 +1,9 @@
-import { makeConnection, makeNode } from "hotstuff-network";
+import { makeNode } from "hotstuff-network";
 import { AppConnection, AppNode, ModalState, PanelSizes, Timing } from "./App";
 import config from "./config";
 import { ORIGIN } from "./utils/pointUtils";
 import { CanvasViewState } from "./components/Canvas/Canvas";
+import { makeNewConnection } from "./utils/nodeConnectionUtils";
 
 const jerryNode = makeNode({
   name: "Jerry the Cat",
@@ -49,36 +50,9 @@ const airAppNode: AppNode = {
 export const defaultNodes: AppNode[] = [jerryAppNode, bedAppNode, airAppNode];
 
 export const defaultConnections: AppConnection[] = [
-  {
-    ...makeConnection({
-      source: jerryNode,
-      target: bedNode,
-      resistanceDegKPerW: 2.5, // 0.01m / 0.1m^2 / 0.04W/m/degK
-      kind: "cond",
-    }),
-    sourceId: jerryNode.id,
-    targetId: bedNode.id,
-  },
-  {
-    ...makeConnection({
-      source: jerryNode,
-      target: airNode,
-      resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 10W/m^2/degK
-      kind: "conv",
-    }),
-    sourceId: jerryNode.id,
-    targetId: airNode.id,
-  },
-  {
-    ...makeConnection({
-      source: bedNode,
-      target: airNode,
-      resistanceDegKPerW: 0.33, // 1 / 0.3m^2 / 5W/m^2/degK
-      kind: "conv",
-    }),
-    sourceId: bedNode.id,
-    targetId: airNode.id,
-  },
+  makeNewConnection(jerryNode, bedNode, "cond", 2.5), // 0.01m / 0.1m^2 / 0.04W/m/degK
+  makeNewConnection(airNode, jerryNode, "conv", 0.33), // 1 / 0.3m^2 / 10W/m^2/degK
+  makeNewConnection(airNode, bedNode, "conv", 0.67), // 1 / 0.3m^2 / 5W/m^2/degK
 ];
 
 export const defaultTiming: Timing = {

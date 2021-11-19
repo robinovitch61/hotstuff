@@ -6,11 +6,8 @@ import {
   intersectsCircle,
   mouseToNodeCoords,
 } from "../components/Canvas/canvasUtils";
-import { makeConnection } from "hotstuff-network";
 import { AppConnection, AppNode } from "../App";
-import config from "../config";
-
-const { defaultResistanceDegKPerW, defaultConnectionKind } = config;
+import { getNewConnection } from "../utils/nodeConnectionUtils";
 
 export default function useAddConnection(
   appNodes: AppNode[],
@@ -65,29 +62,21 @@ export default function useAddConnection(
           );
           return (
             intersectsCircle(nodeCoordsOfMouse, node.center, nodeRadius) &&
-            node.id !== clickedNode.id &&
-            !appConnections.some(
-              (conn) =>
-                (conn.source.id === node.id &&
-                  conn.target.id === clickedNode.id) ||
-                (conn.target.id === node.id &&
-                  conn.source.id === clickedNode.id)
-            )
+            node.id !== clickedNode.id
           );
         });
 
         if (mouseUpOnNode) {
-          const newConnection = {
-            ...makeConnection({
-              source: clickedNode,
-              target: mouseUpOnNode,
-              resistanceDegKPerW: defaultResistanceDegKPerW,
-              kind: defaultConnectionKind,
-            }),
-            sourceId: clickedNode.id,
-            targetId: mouseUpOnNode.id,
-          };
-          addConnection(newConnection);
+          const newConnection = getNewConnection(
+            clickedNode,
+            mouseUpOnNode,
+            appConnections
+          );
+          if (!!newConnection) {
+            addConnection(newConnection);
+          } else {
+            clearAndRedraw(canvasState);
+          }
         } else {
           clearAndRedraw(canvasState);
         }

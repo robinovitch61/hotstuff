@@ -15,6 +15,7 @@ import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
 import DeleteCell from "../DeleteCell";
 import { HSConnectionKind } from "hotstuff-network";
+import { getNewConnectionKindsPossible } from "../../../../utils/nodeConnectionUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
@@ -42,16 +43,13 @@ const connectionTypes: CellOption[] = [
 function filterConnectionOptions(
   colKey: string,
   options: CellOption[],
+  connectionId: string,
   selectedSourceId: string,
   selectedTargetId: string,
   connections: AppConnection[]
 ): CellOption[] {
   const otherConnections = connections.filter(
-    (conn) =>
-      !(
-        conn.source.id === selectedSourceId &&
-        conn.target.id === selectedTargetId
-      )
+    (conn) => !(conn.id !== connectionId)
   );
 
   if (colKey === "sourceId") {
@@ -81,10 +79,22 @@ function filterConnectionOptions(
       );
     });
   } else if (colKey === "kind") {
-    // if there's another connection between the nodes (either direction) with that same kind:
-    // - no option for the same kind of connection
-    // - no option for both conduction and convection at once as this doesn't make sense physically (solid vs. fluid)
-    return options;
+    const selectedConnection = connections.find(
+      (conn) => conn.id === connectionId
+    );
+    if (!!selectedConnection) {
+      const possibleKinds = getNewConnectionKindsPossible(
+        selectedConnection.kind,
+        selectedConnection.source,
+        selectedConnection.target,
+        connections
+      );
+      return options.filter((opt) =>
+        possibleKinds.includes(opt.id as HSConnectionKind)
+      );
+    } else {
+      return options;
+    }
   } else {
     return options;
   }
@@ -102,9 +112,11 @@ export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
   const [sortState, setSortState, sortByState] =
-    useSortableTable<AppConnectionTable>({
-      default: defaultConnectionSortState,
-    });
+    useSortableTable<AppConnectionTable>(
+      defaultConnectionSortState,
+      "targetId",
+      "kind"
+    );
 
   const onSelectNewSource = useCallback(
     (id: string, option: CellOption) => {
@@ -251,6 +263,7 @@ export default function ConnectionTable(
               ...filterConnectionOptions(
                 col.key,
                 col.options || [],
+                row.id,
                 row.source.id,
                 row.target.id,
                 props.rows
