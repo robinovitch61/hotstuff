@@ -2,6 +2,7 @@ import { matrixUtils } from './matrixUtils';
 import {
   CircularConnectionError,
   HotStuffError,
+  ImpossibleConnectionSetError,
   NodeIdValidationError,
   NodeNotFoundError,
   TemperatureValidationError,
@@ -150,6 +151,25 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
     }
     if (conn.source.id === conn.target.id) {
       errors.push(new CircularConnectionError('Connection source and target are the same'));
+    }
+  });
+
+  const connectedPairs = data.connections.map((conn) => `${conn.source.id}_${conn.target.id}`);
+  connectedPairs.forEach((pair) => {
+    const splitPair = pair.split('_');
+    const kindsInPair = data.connections
+      .filter(
+        (conn) =>
+          (conn.source.id === splitPair[0] && conn.target.id === splitPair[1]) ||
+          (conn.source.id === splitPair[1] && conn.target.id === splitPair[0]),
+      )
+      .map((conn) => conn.kind);
+    if (kindsInPair.includes('cond') && kindsInPair.includes('conv')) {
+      errors.push(
+        new ImpossibleConnectionSetError(
+          `Impossible simultaneous existence of conduction and convection between same node`,
+        ),
+      );
     }
   });
 

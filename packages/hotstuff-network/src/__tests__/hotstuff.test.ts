@@ -193,6 +193,63 @@ describe('validateInputs', () => {
       }).length,
     ).toBeGreaterThan(0);
   });
+
+  test('ok if conduction + radiation or convection + radiation between same nodes', () => {
+    expect(
+      validateInputs({
+        ...modelInput,
+        nodes: [firstNode, secondNode, thirdNode],
+        connections: [
+          makeConnection({
+            source: firstNode,
+            target: secondNode,
+            resistanceDegKPerW: 10,
+            kind: 'cond',
+          }),
+          makeConnection({
+            source: secondNode,
+            target: firstNode,
+            resistanceDegKPerW: 10,
+            kind: 'rad',
+          }),
+          makeConnection({
+            source: firstNode,
+            target: thirdNode,
+            resistanceDegKPerW: 10,
+            kind: 'conv',
+          }),
+          makeConnection({
+            source: thirdNode,
+            target: firstNode,
+            resistanceDegKPerW: 10,
+            kind: 'rad',
+          }),
+        ],
+      }).length,
+    ).toEqual(0);
+  });
+
+  test('no simultaneous conduction and convection between same nodes', () => {
+    expect(
+      validateInputs({
+        ...modelInput,
+        connections: [
+          makeConnection({
+            source: firstNode,
+            target: secondNode,
+            resistanceDegKPerW: 10,
+            kind: 'cond',
+          }),
+          makeConnection({
+            source: secondNode,
+            target: firstNode,
+            resistanceDegKPerW: 10,
+            kind: 'conv',
+          }),
+        ],
+      }).length,
+    ).toBeGreaterThan(0);
+  });
 });
 
 describe('calculateTerm', () => {

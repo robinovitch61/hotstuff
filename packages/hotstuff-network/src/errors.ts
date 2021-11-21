@@ -21,3 +21,5 @@ export class ThermalCapacitanceValidationError extends HotStuffError {}
 export class ThermalResistanceValidationError extends HotStuffError {}
 
 export class CircularConnectionError extends HotStuffError {}
+
+export class ImpossibleConnectionSetError extends HotStuffError {}

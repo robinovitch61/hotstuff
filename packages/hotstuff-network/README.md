@@ -130,7 +130,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 ```
 
 ### TODO
-- [] Error when a pair of nodes share a conductive and convective connection at the same time (impossible)
+- [x] Error when a pair of nodes share a conductive and convective connection at the same time (impossible)
 - [] Run-level test for multiple connection types across nodes (e.g. conductive + radiative)
 - [] information about instability
 - [] variable power inputs
