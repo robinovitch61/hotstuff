@@ -202,11 +202,13 @@ export function createAMatrix(nodes: HSNode[], connections: HSConnection[]): num
             vals[nodeIdx][sourceIdx] += term;
           }
         } else {
-          // assume target radiates to ambient and not back to source
-          if (node.id == conn.source.id) {
-            // TODO LEO: I think this is wrong/incomplete...
+          // radiation
+          if (node.id === conn.source.id) {
             vals4[nodeIdx][sourceIdx] -= term;
             vals4[nodeIdx][targetIdx] += term;
+          } else if (node.id === conn.target.id) {
+            vals4[nodeIdx][targetIdx] -= term;
+            vals4[nodeIdx][sourceIdx] += term;
           }
         }
       }
@@ -338,7 +340,7 @@ export function run(data: ModelInput): ModelOutput {
   const timeStepRange = Array.from(Array(numSteps).keys());
   const timeSeriesS = timeStepRange.map((t) => t * data.timeStepS);
 
-  // account for time 0 being input vals
+  // account for time 0
   timeSeriesS.push(timeSeriesS[timeSeriesS.length - 1] + data.timeStepS);
 
   timeStepRange.forEach((step) => {

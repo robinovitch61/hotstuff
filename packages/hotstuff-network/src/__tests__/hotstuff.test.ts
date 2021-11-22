@@ -331,7 +331,7 @@ describe('createAMatrix', () => {
     expect(aMatrix4).toEqual([
       [0, 0, 0],
       [0, -0.000001, 0.000001],
-      [0, 0, 0],
+      [0, 0.0000005, -0.0000005],
     ]);
   });
 });
@@ -631,6 +631,105 @@ describe('run', () => {
         -0.39999143708632195,
         -0.39999036641975105,
         -0.39998929575317865,
+      ],
+    ];
+
+    output.connectionResults.map((hts, connIdx) => {
+      hts.heatTransferW.map((ht, htIdx) => {
+        expect(ht).toBeCloseTo(expectedHeatTransfers[connIdx][htIdx]);
+      });
+    });
+
+    expect(output.computeTimeS).toBeLessThan(0.01);
+  });
+
+  test('real inputs, 10 timeSteps, conduction and radiation between same node pairs', () => {
+    // 10 + 0.01/10000*((20-10)/1000 + ((20+273.15)^4 - (10+273.15)^4)/3000 + 80)
+    // 20 + 0.01/20000*((10-20)/1000 + ((10+273.15)^4 - (20+273.15)^4)/3000 + 80)
+    const nodes = [firstNode, secondNode];
+    const connections = [
+      makeConnection({
+        source: firstNode,
+        target: secondNode,
+        resistanceDegKPerW: 1000,
+        kind: 'cond',
+      }),
+      makeConnection({
+        source: secondNode,
+        target: firstNode,
+        resistanceDegKPerW: 3000,
+        kind: 'rad',
+      }),
+    ];
+    const input: ModelInput = {
+      nodes,
+      connections,
+      timeStepS: 0.01,
+      totalTimeS: 0.1,
+    };
+    const output = run(input);
+    expect(output.timeSeriesS).toEqual([0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1]);
+    const expectedTemps = [
+      [
+        10,
+        10.319178943244992,
+        10.623325651534174,
+        10.913125821345261,
+        11.189235894837566,
+        11.452284125761366,
+        11.702871623084718,
+        11.941573371177128,
+        12.168939225587451,
+        12.385494883639637,
+        12.591742829238171,
+      ],
+      [
+        20,
+        19.840450528377517,
+        19.68841717423294,
+        19.543557089327408,
+        19.405542052581268,
+        19.27405793711938,
+        19.14880418845769,
+        19.029493314411468,
+        18.91585038720632,
+        18.80761255818021,
+        18.704528585380956,
+      ],
+    ];
+
+    output.nodeResults.map((temps, nodeIdx) => {
+      temps.tempDegC.map((temp, tempIdx) => {
+        expect(temp).toBeCloseTo(expectedTemps[nodeIdx][tempIdx]);
+      });
+    });
+
+    const expectedHeatTransfers = [
+      [
+        -0.01,
+        -0.009521271585132524,
+        -0.009065091522698765,
+        -0.008630431267982146,
+        -0.008216306157743701,
+        -0.007821773811358014,
+        -0.00744593256537297,
+        -0.007087919943234339,
+        -0.006746911161618868,
+        -0.0064221176745405725,
+        -0.006112785756142785,
+      ],
+      [
+        319098.9332449999,
+        304066.698767897,
+        289720.1607460047,
+        276030.06486188824,
+        262968.22270747024,
+        250507.48950159232,
+        238621.7406464777,
+        227285.84732242743,
+        216475.6513052651,
+        206167.9391764059,
+        196340.4160813001,
       ],
     ];
 
