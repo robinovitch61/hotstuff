@@ -1,7 +1,6 @@
 import * as React from "react";
 import styled from "styled-components/macro";
 import { MathComponent } from "mathjax-react";
-import resistances from "./resistances.png";
 
 const StyledTheoryModal = styled.div`
   width: 80%;
@@ -347,7 +346,8 @@ export default function TheoryModal(): React.ReactElement {
             Thermal Resistance
           </StyledLink>{" "}
           between the two thermally connected nodes in degrees Kelvin per Watt
-          [degK/W]
+          [degK/W] if conduction or convection, or degrees Kelvin to the fourth
+          per Watt [degK^4/W] if radiation
         </StyledListItem>
         <StyledListItem>
           <MathComponent
@@ -375,21 +375,91 @@ export default function TheoryModal(): React.ReactElement {
       <StyledText>
         Nodes can be thermally connected through Conduction, Convection, or
         Radiation. The user should calculate thermal resistance differently
-        depending on the type of connection, as illustrated in this chart from{" "}
-        <StyledLink
-          href={
-            "https://en.wikipedia.org/wiki/Lumped-element_model#Thermal_systems"
-          }
-          target={"_blank"}
-        >
-          Wikipedia
-        </StyledLink>
-        :
+        depending on the type of connection, as follows:
       </StyledText>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <StyledImg src={resistances} alt={"Resistance Calculation Table"} />
-      </div>
+      <MathComponent
+        display={true}
+        tex={String.raw`R_{conduction} = \frac{L}{kA}`}
+      />
+
+      <ul>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`L`} /> is the
+          conduction length, in meters [m]
+        </StyledListItem>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`k`} /> is the{" "}
+          <StyledLink
+            href={"https://en.wikipedia.org/wiki/Thermal_conductivity"}
+            target={"_blank"}
+          >
+            Thermal Conductivity
+          </StyledLink>
+          , in Watts per meter per degrees Kelvin [W/m/degK]
+        </StyledListItem>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`A`} /> is the
+          conduction area, in meters squared [m^2]
+        </StyledListItem>
+      </ul>
+
+      <MathComponent
+        display={true}
+        tex={String.raw`R_{convection} = \frac{1}{hA}`}
+      />
+
+      <ul>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`h`} /> is the{" "}
+          <StyledLink
+            href={"https://en.wikipedia.org/wiki/Heat_transfer_coefficient"}
+            target={"_blank"}
+          >
+            Convective Heat Transfer Coefficient
+          </StyledLink>
+          , in Watts per meters squared per degrees Kelvin [W/m^2/degK]
+        </StyledListItem>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`A`} /> is the
+          convection area, in meters squared [m^2]
+        </StyledListItem>
+      </ul>
+
+      <MathComponent
+        display={true}
+        tex={String.raw`R_{convection} = \frac{1}{\epsilon \sigma A}`}
+      />
+
+      <ul>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`\epsilon`} /> is the{" "}
+          <StyledLink
+            href={"https://en.wikipedia.org/wiki/Emissivity"}
+            target={"_blank"}
+          >
+            Emissivity
+          </StyledLink>
+          , a unit-less quantity
+        </StyledListItem>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`\sigma`} /> is the{" "}
+          <StyledLink
+            href={
+              "https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant"
+            }
+            target={"_blank"}
+          >
+            Stefan-Boltzmann constant
+          </StyledLink>
+          , 5.67 * 10^−8 Watts per meters squared per degrees Kelvin to the
+          fourth [W/m^2/degK^4]
+        </StyledListItem>
+        <StyledListItem>
+          <MathComponent display={false} tex={String.raw`A`} /> is the radiation
+          area, in meters squared [m^2]
+        </StyledListItem>
+      </ul>
 
       <StyledText>
         In building your model, you&apos;ll primarily be concerned with
