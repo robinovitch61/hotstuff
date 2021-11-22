@@ -12,15 +12,17 @@ type TableCellType = {
 type TableCellProps<T extends TableCellType> = {
   row: T;
   col: TableColumn<T>;
+  onUpdateRow: (row: T) => void;
   options?: CellOption[];
   initiallySetOption?: CellOption;
-  onUpdateRow: (row: T) => void;
+  afterValue?: string;
 };
 
 export default function TableCell<T extends TableCellType>(
   props: TableCellProps<T>
 ): React.ReactElement {
-  const { row, col, options, initiallySetOption, onUpdateRow } = props;
+  const { row, col, onUpdateRow, options, initiallySetOption, afterValue } =
+    props;
   const initialVal = row[col.key];
 
   if (!!options && options.length > 0 && col.onSelectOption) {
@@ -48,6 +50,7 @@ export default function TableCell<T extends TableCellType>(
       <NumericalTableCell
         initialVal={initialVal}
         onBlur={(newVal) => onUpdateRow({ ...row, [col.key]: newVal })}
+        afterValue={afterValue}
       />
     );
   } else if (typeof initialVal === "boolean") {

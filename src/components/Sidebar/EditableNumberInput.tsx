@@ -16,6 +16,7 @@ function getFloatVal(
 type EditableNumberInputProps = {
   initialValue: number;
   onBlur: (value: number) => void;
+  afterValue?: string;
 };
 
 export default function EditableNumberInput(
@@ -23,10 +24,11 @@ export default function EditableNumberInput(
 ): React.ReactElement {
   return (
     <EditableInput<number>
-      key={props.initialValue}
+      key={props.initialValue + (props.afterValue || "")}
       initialValue={props.initialValue}
       onBlur={props.onBlur}
       getNewValue={getFloatVal}
+      afterValue={props.afterValue}
     />
   );
 }

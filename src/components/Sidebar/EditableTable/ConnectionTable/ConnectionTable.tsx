@@ -195,7 +195,7 @@ export default function ConnectionTable(
         onSelectOption: onSelectNewTarget,
       },
       {
-        text: "Resistance [degK/W]",
+        text: "Resistance",
         key: "resistanceDegKPerW",
         width: 0.2,
         minWidthPx: 100,
@@ -246,6 +246,13 @@ export default function ConnectionTable(
               options={options}
               initiallySetOption={setOption}
               onUpdateRow={props.onUpdateRow}
+              afterValue={
+                col.key !== "resistanceDegKPerW"
+                  ? undefined
+                  : row.kind === "rad"
+                  ? " K^4/W"
+                  : " K/W"
+              }
             />
           </StyledCell>
         );

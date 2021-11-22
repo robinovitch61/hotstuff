@@ -4,6 +4,7 @@ import EditableNumberInput from "../../EditableNumberInput";
 export type NumericalTableCellProps = {
   initialVal: number;
   onBlur: (newValue: number) => void;
+  afterValue?: string;
 };
 
 export default function NumericalTableCell(
@@ -13,6 +14,7 @@ export default function NumericalTableCell(
     <EditableNumberInput
       initialValue={props.initialVal}
       onBlur={props.onBlur}
+      afterValue={props.afterValue}
     />
   );
 }

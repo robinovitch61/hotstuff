@@ -9,14 +9,17 @@ type EditableInputProps<T> = {
   initialValue: T;
   onBlur: (value: T) => void;
   getNewValue: (event: React.ChangeEvent<HTMLInputElement>) => T | undefined;
+  afterValue?: string;
 };
 
 export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
-  const { initialValue, onBlur, getNewValue } = props;
+  const { initialValue, onBlur, getNewValue, afterValue } = props;
 
-  const [value, setValue] = useState<string>(initialValue.toString());
+  const [value, setValue] = useState<string>(
+    initialValue.toString() + (afterValue || "")
+  );
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
     const newVal = event.target.value;
@@ -29,16 +32,17 @@ export default function EditableInput<T extends CanBeMadeString>(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newVal = getNewValue(event);
       if (event.target.value === initialValue.toString()) {
+        setValue((prevVal) => prevVal + (afterValue || ""));
         return;
       } else if (newVal !== undefined) {
-        setValue(newVal.toString());
+        setValue(newVal.toString() + (afterValue || ""));
         onBlur(newVal);
       } else {
-        setValue(initialValue.toString());
+        setValue(initialValue.toString() + (afterValue || ""));
         onBlur(initialValue);
       }
     },
-    [getNewValue, initialValue, onBlur]
+    [afterValue, getNewValue, initialValue, onBlur]
   );
 
   return (
@@ -46,6 +50,9 @@ export default function EditableInput<T extends CanBeMadeString>(
       type="text"
       value={value}
       onChange={handleOnChange}
+      onFocus={() =>
+        setValue((prevVal) => prevVal.replace(afterValue || "", ""))
+      }
       onBlur={handleOnBlur}
       // TODO LEO
       onKeyDown={(event: React.KeyboardEvent) => {
