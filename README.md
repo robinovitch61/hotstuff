@@ -14,12 +14,14 @@ TODO:
 - [x] Plot margin a percentage of domain rather than fixed val [5]
 - [x] Multiple connection types per A <--> B connection (allow all combos except conduction + convection together) [5]
 - [x] Clarify radiation resistance formula in theory [5]
-- [ ] Figure out why control-click not working on windows [5]
-- [ ] Limit num points and/or compress appState to not hit limits on localStorage [5]
+- [x] Figure out why control-click not working on windows [5]
+- [ ] Disallow nodes being named the same thing [5]
+- [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
+- [ ] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]
 - [ ] Optional notes field for nodes/connections in table.
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]
-- [ ] Sane validation on editing each editable cell in table [5]
+- [ ] Visual validation on cell entries with tooltip describing invalid condition [5]
 - [ ] Tutorial popup instead of tutorial model [5]
 - [ ] Resistance calculator [4]
   - [ ] Link to engineers edge website
@@ -27,18 +29,11 @@ TODO:
 - [ ] Make node active when editing in table [4]
 - [ ] Escape while editing cell exits and resets default val [4]
 - [ ] Enter while editing cell exits same as tab [4]
-- [ ] Ability to add text blobs on canvas - would be cool [3]
-  - [ ] Gives you a place to annotate e.g. "natural convection"
-- [ ] Decide to allow or not non-zero power generation for boundary nodes. Confirm it shouldn't matter. [3]
-- [ ] Add info to canvas: [3]
-  - Power gen for each node
-  - Resistance between nodes?
-  - Heat transfer between nodes?
-- [ ] Make errors more visible than just in console [3]
-- [ ] Ability to swap source/target in connection table (depends on keeping unidirectional or not) [3]
-- [ ] Copy/paste all selected [3]
-- [ ] Horizontal/vertical snap functionality for creating grid [2]
-- [ ] Orders of magnitude on convection coefficients [2]
-  - [ ] If you don't have test data to back it up, you start with order of magnitude
-- [ ] File export/import (falsdat doesn't have this) [2]
+- [ ] File export/import (falsdat doesn't have this) [4]
+- [ ] Add info to canvas: [4]
+  - Power gen for each node (number in middle)
+  - Resistance between nodes (thickness changes with resistance)
+- [ ] Make errors more visible than just in console, or just not possible to run if invalid anything [4]
+- [ ] Copy/paste all selected with suffix to avoid nodes being named the same thing [4]
+- [ ] Horizontal/vertical snap functionality for creating grid [1]
 - [x] Reset all stored state button (with confirmation) - not important if not the tutorial [1]
