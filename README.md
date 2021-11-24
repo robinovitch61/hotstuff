@@ -12,8 +12,8 @@ TODO:
 - [x] Deal with math for radiative heat transfer (incomplete/wrong right now?) [5]
 - [x] Limits on resizing panels [5]
 - [x] Plot margin a percentage of domain rather than fixed val [5]
-- [ ] Multiple connection types per A <--> B connection (allow all combos except conduction + convection together) [5]
-- [ ] Clarify radiation resistance formula in theory [5]
+- [x] Multiple connection types per A <--> B connection (allow all combos except conduction + convection together) [5]
+- [x] Clarify radiation resistance formula in theory [5]
 - [ ] Figure out why control-click not working on windows [5]
 - [ ] Limit num points and/or compress appState to not hit limits on localStorage [5]
 - [ ] Optional notes field for nodes/connections in table.

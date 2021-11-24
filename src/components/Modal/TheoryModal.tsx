@@ -428,7 +428,7 @@ export default function TheoryModal(): React.ReactElement {
 
       <MathComponent
         display={true}
-        tex={String.raw`R_{convection} = \frac{1}{\epsilon \sigma A}`}
+        tex={String.raw`R_{radiation} = \frac{1}{\epsilon \sigma A}`}
       />
 
       <ul>
