@@ -130,5 +130,5 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 ```
 
 ### TODO
-- [] information about instability
-- [] variable power inputs
+- [ ] information about instability
+- [ ] variable power inputs
