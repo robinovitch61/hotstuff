@@ -57,7 +57,7 @@ const connSecondThird = makeConnection({
   source: secondNode,
   target: thirdNode,
   resistanceDegKPerW: 100,
-  kind: 'uni',
+  kind: 'conv',
 });
 
 const connRadSecondThird = makeConnection({
@@ -71,7 +71,7 @@ const connFirstThird = makeConnection({
   source: firstNode,
   target: thirdNode,
   resistanceDegKPerW: 75,
-  kind: 'uni',
+  kind: 'conv',
 });
 
 const modelInput: ModelInput = {
@@ -303,13 +303,13 @@ describe('createAMatrix', () => {
     ]);
   });
 
-  test('with uni connection', () => {
+  test('with conductive and convective connections', () => {
     const nodes = [firstNode, secondNode, thirdNode];
     const connections = [connFirstSecond, connSecondThird];
     const [aMatrix, aMatrix4] = createAMatrix(nodes, connections);
     expect(aMatrix).toEqual([
       [-0.000001, 0.000001, 0],
-      [0.0000005, -0.0000005, 0],
+      [0.0000005, -0.000001, 0.0000005],
       [0, 0.00000025, -0.00000025],
     ]);
     expect(aMatrix4).toEqual([
