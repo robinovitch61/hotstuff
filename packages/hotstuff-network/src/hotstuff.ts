@@ -26,7 +26,7 @@ export type HSNode = HSNodeParams & {
   id: string;
 };
 
-export type HSConnectionKind = 'cond' | 'conv' | 'uni' | 'rad';
+export type HSConnectionKind = 'cond' | 'conv' | 'rad';
 
 export type HSConnectionParams = {
   source: HSNode;
@@ -191,25 +191,13 @@ export function createAMatrix(nodes: HSNode[], connections: HSConnection[]): num
         const sourceIdx = nodeIds.indexOf(conn.source.id);
         const targetIdx = nodeIds.indexOf(conn.target.id);
         const term = calculateTerm(node.capacitanceJPerDegK, conn.resistanceDegKPerW);
-
-        if (conn.kind !== 'rad') {
-          // if unidirectional, target does not affect source
-          if (node.id === conn.source.id && conn.kind !== 'uni') {
-            vals[nodeIdx][sourceIdx] -= term;
-            vals[nodeIdx][targetIdx] += term;
-          } else if (node.id === conn.target.id) {
-            vals[nodeIdx][targetIdx] -= term;
-            vals[nodeIdx][sourceIdx] += term;
-          }
-        } else {
-          // radiation
-          if (node.id === conn.source.id) {
-            vals4[nodeIdx][sourceIdx] -= term;
-            vals4[nodeIdx][targetIdx] += term;
-          } else if (node.id === conn.target.id) {
-            vals4[nodeIdx][targetIdx] -= term;
-            vals4[nodeIdx][sourceIdx] += term;
-          }
+        const vals_to_use = conn.kind === 'rad' ? vals4 : vals;
+        if (node.id === conn.source.id) {
+          vals_to_use[nodeIdx][sourceIdx] -= term;
+          vals_to_use[nodeIdx][targetIdx] += term;
+        } else if (node.id === conn.target.id) {
+          vals_to_use[nodeIdx][targetIdx] -= term;
+          vals_to_use[nodeIdx][sourceIdx] += term;
         }
       }
     });
