@@ -47,29 +47,29 @@ const thirdNode = makeNode({
 });
 
 const connFirstSecond = makeConnection({
-  source: firstNode,
-  target: secondNode,
+  firstNode: firstNode,
+  secondNode: secondNode,
   resistanceDegKPerW: 100,
   kind: 'cond',
 });
 
 const connSecondThird = makeConnection({
-  source: secondNode,
-  target: thirdNode,
+  firstNode: secondNode,
+  secondNode: thirdNode,
   resistanceDegKPerW: 100,
   kind: 'conv',
 });
 
 const connRadSecondThird = makeConnection({
-  source: secondNode,
-  target: thirdNode,
+  firstNode: secondNode,
+  secondNode: thirdNode,
   resistanceDegKPerW: 50,
   kind: 'rad',
 });
 
 const connFirstThird = makeConnection({
-  source: firstNode,
-  target: thirdNode,
+  firstNode: firstNode,
+  secondNode: thirdNode,
   resistanceDegKPerW: 75,
   kind: 'conv',
 });
@@ -138,8 +138,8 @@ describe('validateInputs', () => {
         ...modelInput,
         connections: [
           makeConnection({
-            source: firstNode,
-            target: { ...secondNode, id: 'notANode' },
+            firstNode: firstNode,
+            secondNode: { ...secondNode, id: 'notANode' },
             resistanceDegKPerW: 10,
             kind: 'conv',
           }),
@@ -152,8 +152,8 @@ describe('validateInputs', () => {
         ...modelInput,
         connections: [
           makeConnection({
-            source: { ...firstNode, id: 'notANode' },
-            target: secondNode,
+            firstNode: { ...firstNode, id: 'notANode' },
+            secondNode: secondNode,
             resistanceDegKPerW: 10,
             kind: 'cond',
           }),
@@ -168,8 +168,8 @@ describe('validateInputs', () => {
         ...modelInput,
         connections: [
           makeConnection({
-            source: firstNode,
-            target: secondNode,
+            firstNode: firstNode,
+            secondNode: secondNode,
             resistanceDegKPerW: -1,
             kind: 'conv',
           }),
@@ -184,8 +184,8 @@ describe('validateInputs', () => {
         ...modelInput,
         connections: [
           makeConnection({
-            source: firstNode,
-            target: firstNode,
+            firstNode: firstNode,
+            secondNode: firstNode,
             resistanceDegKPerW: 10,
             kind: 'cond',
           }),
@@ -201,26 +201,26 @@ describe('validateInputs', () => {
         nodes: [firstNode, secondNode, thirdNode],
         connections: [
           makeConnection({
-            source: firstNode,
-            target: secondNode,
+            firstNode: firstNode,
+            secondNode: secondNode,
             resistanceDegKPerW: 10,
             kind: 'cond',
           }),
           makeConnection({
-            source: secondNode,
-            target: firstNode,
+            firstNode: secondNode,
+            secondNode: firstNode,
             resistanceDegKPerW: 10,
             kind: 'rad',
           }),
           makeConnection({
-            source: firstNode,
-            target: thirdNode,
+            firstNode: firstNode,
+            secondNode: thirdNode,
             resistanceDegKPerW: 10,
             kind: 'conv',
           }),
           makeConnection({
-            source: thirdNode,
-            target: firstNode,
+            firstNode: thirdNode,
+            secondNode: firstNode,
             resistanceDegKPerW: 10,
             kind: 'rad',
           }),
@@ -235,14 +235,14 @@ describe('validateInputs', () => {
         ...modelInput,
         connections: [
           makeConnection({
-            source: firstNode,
-            target: secondNode,
+            firstNode: firstNode,
+            secondNode: secondNode,
             resistanceDegKPerW: 10,
             kind: 'cond',
           }),
           makeConnection({
-            source: secondNode,
-            target: firstNode,
+            firstNode: secondNode,
+            secondNode: firstNode,
             resistanceDegKPerW: 10,
             kind: 'conv',
           }),
@@ -649,14 +649,14 @@ describe('run', () => {
     const nodes = [firstNode, secondNode];
     const connections = [
       makeConnection({
-        source: firstNode,
-        target: secondNode,
+        firstNode: firstNode,
+        secondNode: secondNode,
         resistanceDegKPerW: 1000,
         kind: 'cond',
       }),
       makeConnection({
-        source: secondNode,
-        target: firstNode,
+        firstNode: secondNode,
+        secondNode: firstNode,
         resistanceDegKPerW: 3000,
         kind: 'rad',
       }),
