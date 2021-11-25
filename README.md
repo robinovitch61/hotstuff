@@ -15,6 +15,8 @@ TODO:
 - [x] Multiple connection types per A <--> B connection (allow all combos except conduction + convection together) [5]
 - [x] Clarify radiation resistance formula in theory [5]
 - [x] Figure out why control-click not working on windows [5]
+- [x] Remove unidirectional from hotstuff-network and standardize away from source/target naming [5]
+- [ ] Migrate to thermalmodel.com [5]
 - [ ] Disallow nodes being named the same thing [5]
 - [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
 - [ ] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]

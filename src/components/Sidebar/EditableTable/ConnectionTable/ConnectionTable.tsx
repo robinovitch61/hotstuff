@@ -21,7 +21,7 @@ export type AppConnectionTable = AppConnection & { isActive: boolean };
 type ConnectionTableColumn = TableColumn<AppConnection>;
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
-  key: "sourceId",
+  key: "firstNodeId",
   direction: "ASC",
 };
 
@@ -44,38 +44,42 @@ function filterConnectionOptions(
   colKey: string,
   options: CellOption[],
   connectionId: string,
-  selectedSourceId: string,
-  selectedTargetId: string,
+  selectedfirstNodeId: string,
+  selectedsecondNodeId: string,
   connections: AppConnection[]
 ): CellOption[] {
   const otherConnections = connections.filter(
     (conn) => !(conn.id !== connectionId)
   );
 
-  if (colKey === "sourceId") {
-    // options for source node
+  if (colKey === "firstNodeId") {
+    // options for firstNode node
     const noSelfConnectionOptions = options.filter(
-      (option) => option.id !== selectedTargetId
+      (option) => option.id !== selectedsecondNodeId
     );
-    // for each source option, there is no other connection that already matches the source -> target or target -> source
+    // for each firstNode option, there is no other connection that already matches the firstNode -> secondNode or secondNode -> firstNode
     return noSelfConnectionOptions.filter((option) => {
       return !otherConnections.some(
         (c) =>
-          (c.source.id === option.id && c.target.id === selectedTargetId) ||
-          (c.source.id === selectedTargetId && c.target.id === option.id)
+          (c.firstNode.id === option.id &&
+            c.secondNode.id === selectedsecondNodeId) ||
+          (c.firstNode.id === selectedsecondNodeId &&
+            c.secondNode.id === option.id)
       );
     });
-  } else if (colKey === "targetId") {
-    // options for target node
+  } else if (colKey === "secondNodeId") {
+    // options for secondNode node
     const noSelfConnectionOptions = options.filter(
-      (option) => option.id !== selectedSourceId
+      (option) => option.id !== selectedfirstNodeId
     );
-    // for each target option, there is no other connection that already matches the source -> target or target -> source
+    // for each secondNode option, there is no other connection that already matches the firstNode -> secondNode or secondNode -> firstNode
     return noSelfConnectionOptions.filter((option) => {
       return !otherConnections.some(
         (c) =>
-          (c.source.id === selectedSourceId && c.target.id === option.id) ||
-          (c.source.id === option.id && c.target.id === selectedSourceId)
+          (c.firstNode.id === selectedfirstNodeId &&
+            c.secondNode.id === option.id) ||
+          (c.firstNode.id === option.id &&
+            c.secondNode.id === selectedfirstNodeId)
       );
     });
   } else if (colKey === "kind") {
@@ -85,8 +89,8 @@ function filterConnectionOptions(
     if (!!selectedConnection) {
       const possibleKinds = getNewConnectionKindsPossible(
         selectedConnection.kind,
-        selectedConnection.source,
-        selectedConnection.target,
+        selectedConnection.firstNode,
+        selectedConnection.secondNode,
         connections
       );
       return options.filter((opt) =>
@@ -114,45 +118,49 @@ export default function ConnectionTable(
   const [sortState, setSortState, sortByState] =
     useSortableTable<AppConnectionTable>(
       defaultConnectionSortState,
-      "targetId",
+      "secondNodeId",
       "kind"
     );
 
-  const onSelectNewSource = useCallback(
+  const onSelectNewfirstNode = useCallback(
     (id: string, option: CellOption) => {
       const connection = props.rows.find((conn) => conn.id === id);
-      const newSourceNode = props.nodes.find((node) => node.id === option.id);
+      const newfirstNodeNode = props.nodes.find(
+        (node) => node.id === option.id
+      );
       if (
         !connection ||
-        !newSourceNode ||
-        newSourceNode.id === connection.target.id
+        !newfirstNodeNode ||
+        newfirstNodeNode.id === connection.secondNode.id
       ) {
         return;
       }
       props.onUpdateRow({
         ...connection,
-        source: newSourceNode,
-        sourceId: newSourceNode.id,
+        firstNode: newfirstNodeNode,
+        firstNodeId: newfirstNodeNode.id,
       });
     },
     [props]
   );
 
-  const onSelectNewTarget = useCallback(
+  const onSelectNewsecondNode = useCallback(
     (id: string, option: CellOption) => {
       const connection = props.rows.find((conn) => conn.id === id);
-      const newTargetNode = props.nodes.find((node) => node.id === option.id);
+      const newsecondNodeNode = props.nodes.find(
+        (node) => node.id === option.id
+      );
       if (
         !connection ||
-        !newTargetNode ||
-        newTargetNode.id === connection.source.id
+        !newsecondNodeNode ||
+        newsecondNodeNode.id === connection.firstNode.id
       ) {
         return;
       }
       props.onUpdateRow({
         ...connection,
-        target: newTargetNode,
-        targetId: newTargetNode.id,
+        secondNode: newsecondNodeNode,
+        secondNodeId: newsecondNodeNode.id,
       });
     },
     [props]
@@ -180,19 +188,19 @@ export default function ConnectionTable(
     () => [
       {
         text: "First Node",
-        key: "sourceId",
+        key: "firstNodeId",
         width: 0.3,
         minWidthPx: 100,
         options: nodeOptions,
-        onSelectOption: onSelectNewSource,
+        onSelectOption: onSelectNewfirstNode,
       },
       {
         text: "Second Node",
-        key: "targetId",
+        key: "secondNodeId",
         width: 0.3,
         minWidthPx: 100,
         options: nodeOptions,
-        onSelectOption: onSelectNewTarget,
+        onSelectOption: onSelectNewsecondNode,
       },
       {
         text: "Resistance",
@@ -212,8 +220,8 @@ export default function ConnectionTable(
     [
       nodeOptions,
       onSelectNewConnectionType,
-      onSelectNewSource,
-      onSelectNewTarget,
+      onSelectNewfirstNode,
+      onSelectNewsecondNode,
     ]
   );
 
@@ -226,8 +234,8 @@ export default function ConnectionTable(
       return {
         ...row,
         isActive:
-          activeNodeIds.includes(row.source.id) ||
-          activeNodeIds.includes(row.target.id),
+          activeNodeIds.includes(row.firstNode.id) ||
+          activeNodeIds.includes(row.secondNode.id),
       };
     })
     .sort(sortByState);
@@ -271,8 +279,8 @@ export default function ConnectionTable(
                 col.key,
                 col.options || [],
                 row.id,
-                row.source.id,
-                row.target.id,
+                row.firstNode.id,
+                row.secondNode.id,
                 props.rows
               ).filter((opt) => opt.id !== setOption.id),
             ];

@@ -40,8 +40,8 @@ export type AppNode = HSNode & {
 };
 
 export type AppConnection = HSConnection & {
-  sourceId: string; // duplicated data here to make working with tables easier
-  targetId: string; // duplicated data here to make working with tables easier
+  firstNodeId: string; // duplicated data here to make working with tables easier
+  secondNodeId: string; // duplicated data here to make working with tables easier
 };
 
 export type Timing = {

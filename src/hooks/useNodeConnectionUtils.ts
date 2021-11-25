@@ -58,25 +58,25 @@ export default function useNodeConnectionUtils(
       setAppNodes(newNodes);
 
       const newConnections = appConnections.map((prevConn) => {
-        const newSourceNode = nodesToUpdate.find(
-          (nodeToUpdate) => prevConn.source.id == nodeToUpdate.id
+        const newfirstNodeNode = nodesToUpdate.find(
+          (nodeToUpdate) => prevConn.firstNode.id == nodeToUpdate.id
         );
-        if (newSourceNode) {
+        if (newfirstNodeNode) {
           return {
             ...prevConn,
-            source: newSourceNode,
-            sourceId: newSourceNode.id,
+            firstNode: newfirstNodeNode,
+            firstNodeId: newfirstNodeNode.id,
           };
         }
 
-        const newTargetNode = nodesToUpdate.find(
-          (nodeToUpdate) => prevConn.target.id == nodeToUpdate.id
+        const newsecondNodeNode = nodesToUpdate.find(
+          (nodeToUpdate) => prevConn.secondNode.id == nodeToUpdate.id
         );
-        if (newTargetNode) {
+        if (newsecondNodeNode) {
           return {
             ...prevConn,
-            target: newTargetNode,
-            targetId: newTargetNode.id,
+            secondNode: newsecondNodeNode,
+            secondNodeId: newsecondNodeNode.id,
           };
         }
         return prevConn;
@@ -90,7 +90,8 @@ export default function useNodeConnectionUtils(
     (nodeIds: string[]) => {
       const newConnections = appConnections.filter(
         (conn) =>
-          !nodeIds.includes(conn.source.id) && !nodeIds.includes(conn.target.id)
+          !nodeIds.includes(conn.firstNode.id) &&
+          !nodeIds.includes(conn.secondNode.id)
       );
       setAppConnections(newConnections);
       setModelOutput(undefined);

@@ -282,29 +282,29 @@ export function drawClearBox(
 
 export function drawConnection(
   context: CanvasRenderingContext2D,
-  sourceCenter: Point,
-  sourceRadius: number,
-  targetCenter: Point,
-  targetRadius: number,
+  firstNodeCenter: Point,
+  firstNodeRadius: number,
+  secondNodeCenter: Point,
+  secondNodeRadius: number,
   kind: HSConnectionKind
 ): void {
   if (["cond", "conv"].includes(kind)) {
     drawBidirectionalArrow(
       context,
-      sourceCenter,
-      targetCenter,
+      firstNodeCenter,
+      secondNodeCenter,
       "black",
-      sourceRadius,
-      targetRadius
+      firstNodeRadius,
+      secondNodeRadius
     );
   } else {
     drawUnidirectionalArrow(
       context,
-      sourceCenter,
-      targetCenter,
+      firstNodeCenter,
+      secondNodeCenter,
       "black",
-      sourceRadius,
-      targetRadius
+      firstNodeRadius,
+      secondNodeRadius
     );
   }
 }

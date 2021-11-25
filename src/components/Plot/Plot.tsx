@@ -110,7 +110,7 @@ function plotShape(
           maxHeatTransfer = heatTransferVal;
         }
         ht[
-          `${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`
+          `${connectionResult.connection.firstNode.name} to ${connectionResult.connection.secondNode.name}`
         ] = roundToNearestTenth(heatTransferVal);
       });
 
@@ -166,7 +166,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
           <Line
             key={connectionResult.connection.id}
             type={"monotone"}
-            dataKey={`${connectionResult.connection.source.name} to ${connectionResult.connection.target.name}`}
+            dataKey={`${connectionResult.connection.firstNode.name} to ${connectionResult.connection.secondNode.name}`}
             stroke={colors[idx]}
             activeDot={{ r: 8 }}
             isAnimationActive={false}

@@ -39,24 +39,28 @@ export default function useDraw(
       });
 
       appConnections.map((conn) => {
-        const { source, target, kind } = conn;
-        const sourceAppNode = appNodes.find((node) => node.id === source.id);
-        const targetAppNode = appNodes.find((node) => node.id === target.id);
-        if (sourceAppNode && targetAppNode) {
-          const sourceRadius = determineRadius(
-            sourceAppNode.capacitanceJPerDegK,
+        const { firstNode, secondNode, kind } = conn;
+        const firstNodeAppNode = appNodes.find(
+          (node) => node.id === firstNode.id
+        );
+        const secondNodeAppNode = appNodes.find(
+          (node) => node.id === secondNode.id
+        );
+        if (firstNodeAppNode && secondNodeAppNode) {
+          const firstNodeRadius = determineRadius(
+            firstNodeAppNode.capacitanceJPerDegK,
             appNodes.map((node) => node.capacitanceJPerDegK)
           );
-          const targetRadius = determineRadius(
-            targetAppNode.capacitanceJPerDegK,
+          const secondNodeRadius = determineRadius(
+            secondNodeAppNode.capacitanceJPerDegK,
             appNodes.map((node) => node.capacitanceJPerDegK)
           );
           drawConnection(
             context,
-            sourceAppNode.center,
-            sourceRadius,
-            targetAppNode.center,
-            targetRadius,
+            firstNodeAppNode.center,
+            firstNodeRadius,
+            secondNodeAppNode.center,
+            secondNodeRadius,
             kind
           );
         }

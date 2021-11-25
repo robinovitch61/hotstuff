@@ -13,11 +13,6 @@ const StyledTitle = styled.h1``;
 
 const StyledText = styled.p``;
 
-const StyledImg = styled.img`
-  width: 90%;
-  max-width: 700px;
-`;
-
 const StyledLink = styled.a``;
 
 const StyledListItem = styled.li`
@@ -468,7 +463,7 @@ export default function TheoryModal(): React.ReactElement {
       </StyledText>
 
       <StyledText>
-        The source code for the entire model can be seen{" "}
+        The firstNode code for the entire model can be seen{" "}
         <StyledLink
           href={
             "https://github.com/robinovitch61/hotstuff.network/tree/main/packages/hotstuff-network"

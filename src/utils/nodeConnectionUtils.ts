@@ -20,8 +20,9 @@ export function getExistingConnections(
 ): HSConnection[] {
   return connections.filter(
     (conn) =>
-      (conn.source.id === firstNodeId && conn.target.id === secondNodeId) ||
-      (conn.source.id === secondNodeId && conn.target.id === firstNodeId)
+      (conn.firstNode.id === firstNodeId &&
+        conn.secondNode.id === secondNodeId) ||
+      (conn.firstNode.id === secondNodeId && conn.secondNode.id === firstNodeId)
   );
 }
 
@@ -34,13 +35,13 @@ export const makeNewConnection = (
   const firstNodeFirst = firstNode.name <= secondNode.name;
   return {
     ...makeConnection({
-      source: firstNodeFirst ? firstNode : secondNode,
-      target: firstNodeFirst ? secondNode : firstNode,
+      firstNode: firstNodeFirst ? firstNode : secondNode,
+      secondNode: firstNodeFirst ? secondNode : firstNode,
       resistanceDegKPerW: resistance || config.defaultResistanceDegKPerW,
       kind,
     }),
-    sourceId: firstNodeFirst ? firstNode.id : secondNode.id,
-    targetId: firstNodeFirst ? secondNode.id : firstNode.id,
+    firstNodeId: firstNodeFirst ? firstNode.id : secondNode.id,
+    secondNodeId: firstNodeFirst ? secondNode.id : firstNode.id,
   };
 };
 
