@@ -22,10 +22,10 @@ const StyledListItem = styled.li`
 export default function TheoryModal(): React.ReactElement {
   return (
     <StyledTheoryModal>
-      <StyledTitle>How Does hotstuff.network Work?</StyledTitle>
+      <StyledTitle>How Does thermalmodel.com Work?</StyledTitle>
 
       <StyledText>
-        The thermal model used by hotstuff.network is a linear{" "}
+        The model used by thermalmodel.com is a linear{" "}
         <StyledLink
           href={"https://en.wikipedia.org/wiki/State-space_representation"}
           target={"_blank"}
@@ -82,7 +82,7 @@ export default function TheoryModal(): React.ReactElement {
 
       <StyledText>
         What follows is the definition and manipulation of fundamental heat
-        transfer equations into the numerical form hotstuff.network uses to
+        transfer equations into the numerical form thermalmodel.com uses to
         calculate node temperatures when it runs a model.
       </StyledText>
 
@@ -310,7 +310,7 @@ export default function TheoryModal(): React.ReactElement {
       <StyledText>
         This partial differential equation can be converted to a numerical
         equation with reasonable results assuming the time step between discrete
-        states is small. In using hotstuff.network, you&apos;ll notice that if
+        states is small. In using thermalmodel.com, you&apos;ll notice that if
         you increase the time step too much and rerun a model, unstable results
         appear - at too high a time step size, errors compound at each step and
         blow up the temperature differences to unreasonable numbers. If you see
@@ -391,7 +391,7 @@ export default function TheoryModal(): React.ReactElement {
       </ul>
 
       <StyledText>
-        Under the hood, hotstuff.network solves the above equation for each node
+        Under the hood, thermalmodel.com solves the above equation for each node
         at each timestep, resulting in a set of temperature values for each node
         at each timestep over the duration of the model.
       </StyledText>
@@ -504,14 +504,14 @@ export default function TheoryModal(): React.ReactElement {
         In building your model, you&apos;re responsible for determining thermal
         resistances between nodes, thermal capacitances of nodes, and power
         generation or consumption in each node in your model. From there,
-        hotstuff.network will do the rest.
+        thermalmodel.com will do the rest.
       </StyledText>
 
       <StyledText>
         The source code for the model can be seen{" "}
         <StyledLink
           href={
-            "https://github.com/robinovitch61/hotstuff.network/tree/main/packages/hotstuff-network"
+            "https://github.com/robinovitch61/thermalmodel.com/tree/main/packages/hotstuff-network"
           }
           target={"_blank"}
         >

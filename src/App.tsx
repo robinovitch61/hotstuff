@@ -77,7 +77,7 @@ export type AppState = {
 export default function App(): React.ReactElement {
   const [appState, setAppState] = useSessionStorageState<AppState>(
     defaultAppState,
-    "hotstuffAppState"
+    "thermalModelAppState"
   );
 
   const [modalState, setModalState] = useState<ModalState>(defaultModalState);

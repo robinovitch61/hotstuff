@@ -17,18 +17,23 @@
   },
   "author": "Leo Robinovitch",
   "keywords": [
+    "engineering",
+    "mechanical engineering",
+    "thermal model",
+    "thermal modeling",
     "thermal simulation",
     "heat transfer",
     "state space",
-    "node network"
+    "node network",
+    "lumped element"
   ],
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/robinovitch61/hotstuff.network",
+    "url": "https://github.com/robinovitch61/thermalmodel",
     "directory": "packages/hotstuff-network"
   },
-  "homepage": "https://github.com/robinovitch61/hotstuff.network/tree/main/packages/hotstuff-network",
+  "homepage": "https://github.com/robinovitch61/thermalmodel/tree/main/packages/hotstuff-network",
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@types/js-quantities": "^1.6.2",

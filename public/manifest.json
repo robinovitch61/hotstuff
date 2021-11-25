@@ -1,6 +1,6 @@
 {
-  "short_name": "hotstuff.network",
-  "name": "Thermal simulation for a nodal network.",
+  "short_name": "thermalmodel.com",
+  "name": "Online thermal modeling tool.",
   "icons": [
     {
       "src": "favicon.ico",
