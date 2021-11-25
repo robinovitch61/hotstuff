@@ -29,8 +29,8 @@ export type HSNode = HSNodeParams & {
 export type HSConnectionKind = 'cond' | 'conv' | 'rad';
 
 export type HSConnectionParams = {
-  source: HSNode;
-  target: HSNode;
+  firstNode: HSNode;
+  secondNode: HSNode;
   resistanceDegKPerW: number;
   kind: HSConnectionKind;
 };
@@ -87,18 +87,18 @@ export function makeNode({ name, temperatureDegC, capacitanceJPerDegK, powerGenW
   };
 }
 
-export function makeConnection({ source, target, resistanceDegKPerW, kind }: HSConnectionParams): HSConnection {
+export function makeConnection({ firstNode, secondNode, resistanceDegKPerW, kind }: HSConnectionParams): HSConnection {
   return {
     id: makeId(),
-    source,
-    target,
+    firstNode: firstNode,
+    secondNode: secondNode,
     resistanceDegKPerW,
     kind,
   };
 }
 
-export function toKey(sourceId: string, targetId: string): string {
-  return `${sourceId}-${targetId}`;
+export function toKey(firstNodeId: string, secondNodeId: string): string {
+  return `${firstNodeId}-${secondNodeId}`;
 }
 
 export function fromKey(key: string): string[] {
@@ -122,12 +122,12 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
   }
 
   Array.from(data.connections).forEach((conn) => {
-    if (!uniqueIds.has(conn.source.id)) {
-      errors.push(new NodeNotFoundError(`Id ${conn.source.id} does not correspond to a node`));
+    if (!uniqueIds.has(conn.firstNode.id)) {
+      errors.push(new NodeNotFoundError(`Id ${conn.firstNode.id} does not correspond to a node`));
     }
 
-    if (!uniqueIds.has(conn.target.id)) {
-      errors.push(new NodeNotFoundError(`Id ${conn.target.id} does not correspond to a node`));
+    if (!uniqueIds.has(conn.secondNode.id)) {
+      errors.push(new NodeNotFoundError(`Id ${conn.secondNode.id} does not correspond to a node`));
     }
   });
 
@@ -149,19 +149,19 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
         new ThermalResistanceValidationError(`Impossible thermal resistance of ${conn.resistanceDegKPerW} degK/W`),
       );
     }
-    if (conn.source.id === conn.target.id) {
-      errors.push(new CircularConnectionError('Connection source and target are the same'));
+    if (conn.firstNode.id === conn.secondNode.id) {
+      errors.push(new CircularConnectionError('Connection firstNode and secondNode are the same'));
     }
   });
 
-  const connectedPairs = data.connections.map((conn) => `${conn.source.id}_${conn.target.id}`);
+  const connectedPairs = data.connections.map((conn) => `${conn.firstNode.id}_${conn.secondNode.id}`);
   connectedPairs.forEach((pair) => {
     const splitPair = pair.split('_');
     const kindsInPair = data.connections
       .filter(
         (conn) =>
-          (conn.source.id === splitPair[0] && conn.target.id === splitPair[1]) ||
-          (conn.source.id === splitPair[1] && conn.target.id === splitPair[0]),
+          (conn.firstNode.id === splitPair[0] && conn.secondNode.id === splitPair[1]) ||
+          (conn.firstNode.id === splitPair[1] && conn.secondNode.id === splitPair[0]),
       )
       .map((conn) => conn.kind);
     if (kindsInPair.includes('cond') && kindsInPair.includes('conv')) {
@@ -187,17 +187,17 @@ export function createAMatrix(nodes: HSNode[], connections: HSConnection[]): num
   const vals4 = matrixUtils.zeros2d(numNodes, numNodes);
   connections.forEach((conn) => {
     nodes.forEach((node, nodeIdx) => {
-      if (node.id === conn.source.id || node.id === conn.target.id) {
-        const sourceIdx = nodeIds.indexOf(conn.source.id);
-        const targetIdx = nodeIds.indexOf(conn.target.id);
+      if (node.id === conn.firstNode.id || node.id === conn.secondNode.id) {
+        const firstNodeIdx = nodeIds.indexOf(conn.firstNode.id);
+        const secondNodeIdx = nodeIds.indexOf(conn.secondNode.id);
         const term = calculateTerm(node.capacitanceJPerDegK, conn.resistanceDegKPerW);
         const vals_to_use = conn.kind === 'rad' ? vals4 : vals;
-        if (node.id === conn.source.id) {
-          vals_to_use[nodeIdx][sourceIdx] -= term;
-          vals_to_use[nodeIdx][targetIdx] += term;
-        } else if (node.id === conn.target.id) {
-          vals_to_use[nodeIdx][targetIdx] -= term;
-          vals_to_use[nodeIdx][sourceIdx] += term;
+        if (node.id === conn.firstNode.id) {
+          vals_to_use[nodeIdx][firstNodeIdx] -= term;
+          vals_to_use[nodeIdx][secondNodeIdx] += term;
+        } else if (node.id === conn.secondNode.id) {
+          vals_to_use[nodeIdx][secondNodeIdx] -= term;
+          vals_to_use[nodeIdx][firstNodeIdx] += term;
         }
       }
     });
@@ -235,15 +235,15 @@ export function getHeatTransfer(temps: number[], nodes: HSNode[], connections: H
   // const flatTemps = matrixUtils.flatten(temps);
   const nodeIds = nodes.map((n) => n.id);
   return connections.map((conn) => {
-    const sourceIdx = nodeIds.indexOf(conn.source.id);
-    const targetIdx = nodeIds.indexOf(conn.target.id);
-    const sourceTemp = temps[sourceIdx];
-    const targetTemp = temps[targetIdx];
+    const firstNodeIdx = nodeIds.indexOf(conn.firstNode.id);
+    const secondNodeIdx = nodeIds.indexOf(conn.secondNode.id);
+    const firstNodeTemp = temps[firstNodeIdx];
+    const secondNodeTemp = temps[secondNodeIdx];
 
     if (conn.kind === 'rad') {
-      return (Math.pow(sourceTemp, 4) - Math.pow(targetTemp, 4)) / conn.resistanceDegKPerW;
+      return (Math.pow(firstNodeTemp, 4) - Math.pow(secondNodeTemp, 4)) / conn.resistanceDegKPerW;
     } else {
-      return (sourceTemp - targetTemp) / conn.resistanceDegKPerW;
+      return (firstNodeTemp - secondNodeTemp) / conn.resistanceDegKPerW;
     }
   });
 }

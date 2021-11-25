@@ -35,8 +35,8 @@ const secondNode = makeNode({
 });
 
 const connection = makeConnection({
-  source: firstNode,
-  target: secondNode,
+  firstNode: firstNode,
+  secondNode: secondNode,
   resistanceDegKPerW: 100,
   kind: "bi",
 });
@@ -98,7 +98,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
     {
       "connection": {
         "id": "KN67LAR1ZSRZK",
-        "source": {
+        "firstNode": {
           "id": "KN67LAR1MXNXS",
           "name": "first",
           "temperatureDegC": 10,
@@ -106,7 +106,7 @@ console.log(JSON.stringify(results, null, 2)); // output below:
           "powerGenW": 80,
           "isBoundary": false
         },
-        "target": {
+        "secondNode": {
           "id": "KN67LAR1ZBD56",
           "name": "second",
           "temperatureDegC": 40,
