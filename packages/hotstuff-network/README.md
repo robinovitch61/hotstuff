@@ -1,5 +1,5 @@
 ## hotstuff-network
-This is the thermal simulation code that powers [hotstuff.network](https://hotstuff.network) [currently WIP].
+This is the thermal model core logic that powers [thermalmodel.com](https://thermalmodel.com).
 
 ### Installation
 ```sh
@@ -10,7 +10,7 @@ npm i hotstuff-network
 
 **Releasing a new version:**
 ```
-npm version patch
+npm version patch/minor/major
 npm publish
 ```
 
@@ -130,7 +130,5 @@ console.log(JSON.stringify(results, null, 2)); // output below:
 ```
 
 ### TODO
-- [x] Error when a pair of nodes share a conductive and convective connection at the same time (impossible)
-- [x] Run-level test for multiple connection types across nodes (e.g. conductive + radiative)
 - [] information about instability
 - [] variable power inputs
