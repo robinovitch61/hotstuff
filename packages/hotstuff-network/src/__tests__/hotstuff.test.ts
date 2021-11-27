@@ -194,6 +194,28 @@ describe('validateInputs', () => {
     ).toBeGreaterThan(0);
   });
 
+  test('duplicate connections error', () => {
+    expect(
+      validateInputs({
+        ...modelInput,
+        connections: [
+          makeConnection({
+            firstNode: firstNode,
+            secondNode: secondNode,
+            resistanceDegKPerW: 1,
+            kind: 'conv',
+          }),
+          makeConnection({
+            firstNode: firstNode,
+            secondNode: secondNode,
+            resistanceDegKPerW: 1,
+            kind: 'conv',
+          }),
+        ],
+      }).length,
+    ).toBeGreaterThan(0);
+  });
+
   test('ok if conduction + radiation or convection + radiation between same nodes', () => {
     expect(
       validateInputs({
