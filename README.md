@@ -21,9 +21,11 @@ TODO:
 - [x] Disallow selecting first/second node in connection table to generate duplicate [5]
 - [x] Test hotstuff-network to error if identical connections passed in (e.g 2x A-B, conduction)
 - [x] Visual validation on cell entries with tooltip describing invalid condition [5]
-- [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
-- [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
+- [x] Escape or Enter while editing cell exits same as tab [5]
 - [ ] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]
+- [ ] File export/import (falsdat doesn't have this) [5]
+- [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
+- [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
 - [ ] Optional notes field for nodes/connections in table.
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]
@@ -32,9 +34,6 @@ TODO:
   - [ ] Link to engineers edge website
   - [ ] Calculator pops up while editing
 - [ ] Make node active when editing in table [4]
-- [ ] Escape while editing cell exits and resets default val [4]
-- [ ] Enter while editing cell exits same as tab [4]
-- [ ] File export/import (falsdat doesn't have this) [4]
 - [ ] Add info to canvas: [4]
   - Power gen for each node (number in middle)
   - Resistance between nodes (thickness changes with resistance)

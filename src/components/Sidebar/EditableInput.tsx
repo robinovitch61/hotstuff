@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { StyledInput } from "./style";
 
 interface CanBeMadeString {
@@ -17,6 +17,8 @@ export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
   const { initialValue, onBlur, getNewValue, afterValue, validator } = props;
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const withAfterValue = useCallback(
     (val: string) => val + (afterValue || ""),
@@ -55,6 +57,7 @@ export default function EditableInput<T extends CanBeMadeString>(
 
   return (
     <StyledInput
+      ref={inputRef}
       type="text"
       value={value}
       onChange={handleOnChange}
@@ -62,10 +65,9 @@ export default function EditableInput<T extends CanBeMadeString>(
         setValue((prevVal) => prevVal.replace(afterValue || "", ""))
       }
       onBlur={handleOnBlur}
-      // TODO LEO
       onKeyDown={(event: React.KeyboardEvent) => {
-        if (event.key === "Escape") {
-        } else if (event.key === "Enter") {
+        if (["Escape", "Enter"].includes(event.key)) {
+          inputRef.current && inputRef.current.blur();
         }
       }}
     />
