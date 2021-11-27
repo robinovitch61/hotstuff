@@ -18,7 +18,7 @@ TODO:
 - [x] Remove unidirectional from hotstuff-network and standardize away from source/target naming [5]
 - [x] Migrate to thermalmodel.com [5]
 - [x] Disallow nodes being named the same thing [5]
-- [ ] Disallow selecting first/second node in connection table to generate duplicate [5]
+- [x] Disallow selecting first/second node in connection table to generate duplicate [5]
 - [ ] Visual validation on cell entries with tooltip describing invalid condition [5]
 - [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
 - [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]

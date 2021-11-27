@@ -54,13 +54,13 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
       },
       {
         key: "temperatureDegC",
-        text: "Temp [degC]",
+        text: "Temp [C]",
         width: 0.15,
         minWidthPx: 100,
       },
       {
         key: "capacitanceJPerDegK",
-        text: "Capacitance [J/degK]",
+        text: "Capacitance [J/K]",
         width: 0.15,
         minWidthPx: 100,
       },

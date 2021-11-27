@@ -104,11 +104,21 @@ export default function useNodeConnectionUtils(
 
   const updateConnections = useCallback(
     (connsToUpdate: AppConnection[]) => {
-      const connIdsToUpdate = connsToUpdate.map((conn) => conn.id);
+      const sortedConnsToUpdate = connsToUpdate.map((conn) => {
+        const firstNodeFirst = conn.firstNode.name < conn.secondNode.name;
+        return {
+          ...conn,
+          firstNode: firstNodeFirst ? conn.firstNode : conn.secondNode,
+          firstNodeId: firstNodeFirst ? conn.firstNode.id : conn.secondNode.id,
+          secondNode: firstNodeFirst ? conn.secondNode : conn.firstNode,
+          secondNodeId: firstNodeFirst ? conn.secondNode.id : conn.firstNode.id,
+        };
+      });
+      const connIdsToUpdate = sortedConnsToUpdate.map((conn) => conn.id);
       const oldConns = appConnections.filter(
         (conn) => !connIdsToUpdate.includes(conn.id)
       );
-      setAppConnections([...connsToUpdate, ...oldConns]);
+      setAppConnections([...sortedConnsToUpdate, ...oldConns]);
       setModelOutput(undefined);
     },
     [appConnections, setAppConnections, setModelOutput]

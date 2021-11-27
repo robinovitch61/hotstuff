@@ -15,10 +15,13 @@ import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
 import DeleteCell from "../DeleteCell";
 import { HSConnectionKind } from "hotstuff-network";
-import { getNewConnectionKindsPossible } from "../../../../utils/nodeConnectionUtils";
+import {
+  filterConnectionOptions,
+  getConnectionAfterValue,
+} from "../../../../utils/nodeConnectionUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
-type ConnectionTableColumn = TableColumn<AppConnectionTable>;
+export type ConnectionTableColumn = TableColumn<AppConnectionTable>;
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
   key: "firstNodeId",
@@ -39,70 +42,6 @@ const connectionTypes: CellOption[] = [
     text: "☀️ Radiation️",
   },
 ];
-
-function filterConnectionOptions(
-  colKey: string,
-  options: CellOption[],
-  connectionId: string,
-  selectedfirstNodeId: string,
-  selectedsecondNodeId: string,
-  connections: AppConnection[]
-): CellOption[] {
-  const otherConnections = connections.filter(
-    (conn) => !(conn.id !== connectionId)
-  );
-
-  if (colKey === "firstNodeId") {
-    // options for firstNode node
-    const noSelfConnectionOptions = options.filter(
-      (option) => option.id !== selectedsecondNodeId
-    );
-    // for each firstNode option, there is no other connection that already matches the firstNode -> secondNode or secondNode -> firstNode
-    return noSelfConnectionOptions.filter((option) => {
-      return !otherConnections.some(
-        (c) =>
-          (c.firstNode.id === option.id &&
-            c.secondNode.id === selectedsecondNodeId) ||
-          (c.firstNode.id === selectedsecondNodeId &&
-            c.secondNode.id === option.id)
-      );
-    });
-  } else if (colKey === "secondNodeId") {
-    // options for secondNode node
-    const noSelfConnectionOptions = options.filter(
-      (option) => option.id !== selectedfirstNodeId
-    );
-    // for each secondNode option, there is no other connection that already matches the firstNode -> secondNode or secondNode -> firstNode
-    return noSelfConnectionOptions.filter((option) => {
-      return !otherConnections.some(
-        (c) =>
-          (c.firstNode.id === selectedfirstNodeId &&
-            c.secondNode.id === option.id) ||
-          (c.firstNode.id === option.id &&
-            c.secondNode.id === selectedfirstNodeId)
-      );
-    });
-  } else if (colKey === "kind") {
-    const selectedConnection = connections.find(
-      (conn) => conn.id === connectionId
-    );
-    if (!!selectedConnection) {
-      const possibleKinds = getNewConnectionKindsPossible(
-        selectedConnection.kind,
-        selectedConnection.firstNode,
-        selectedConnection.secondNode,
-        connections
-      );
-      return options.filter((opt) =>
-        possibleKinds.includes(opt.id as HSConnectionKind)
-      );
-    } else {
-      return options;
-    }
-  } else {
-    return options;
-  }
-}
 
 type ConnectionTableProps = {
   rows: AppConnection[];
@@ -252,13 +191,7 @@ export default function ConnectionTable(
               options={options}
               initiallySetOption={setOption}
               onUpdateRow={onUpdateRow}
-              afterValue={
-                col.key !== "resistanceDegKPerW"
-                  ? undefined
-                  : row.kind === "rad"
-                  ? " K^4/W"
-                  : " K/W"
-              }
+              afterValue={getConnectionAfterValue(col, row)}
             />
           </StyledCell>
         );
@@ -276,9 +209,7 @@ export default function ConnectionTable(
               ...filterConnectionOptions(
                 col.key,
                 col.options || [],
-                row.id,
-                row.firstNode.id,
-                row.secondNode.id,
+                row,
                 rows
               ).filter((opt) => opt.id !== setOption.id),
             ];

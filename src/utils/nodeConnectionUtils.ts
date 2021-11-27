@@ -8,6 +8,11 @@ import {
 import config from "../config";
 import { AppConnection, AppNode } from "../App";
 import { Point } from "./pointUtils";
+import {
+  AppConnectionTable,
+  ConnectionTableColumn,
+} from "../components/Sidebar/EditableTable/ConnectionTable/ConnectionTable";
+import { CellOption } from "../components/Sidebar/EditableTable/types";
 
 const { newNodeNamePrefix } = config;
 
@@ -47,16 +52,16 @@ export const makeNewConnection = (
 
 export function getNewConnectionKindsPossible(
   connectionKind: HSConnectionKind,
-  firstNode: HSNode,
-  secondNode: HSNode,
+  firstNodeId: string,
+  secondNodeId: string,
   otherConnections: HSConnection[]
 ): HSConnectionKind[] {
   // if there's another connection between the nodes (either direction) with that same kind:
   // - no option for the same kind of connection
   // - no option for both conduction and convection at once as this doesn't make sense physically (solid vs. fluid)
   const existingConnections = getExistingConnections(
-    firstNode.id,
-    secondNode.id,
+    firstNodeId,
+    secondNodeId,
     otherConnections
   );
   const existingKinds = existingConnections.map((conn) => conn.kind);
@@ -144,10 +149,7 @@ export function getNewAppNode(appNodes: AppNode[], center: Point): AppNode {
   };
 }
 
-export const validateNodeName = (
-  name: string,
-  otherNames: string[]
-): string => {
+export function validateNodeName(name: string, otherNames: string[]): string {
   const trimName = name.trim();
   const safeName = trimName === "" ? config.defaultNodeName.trim() : trimName;
   const safeAllNames = otherNames.map((n) => n.trim());
@@ -161,4 +163,118 @@ export const validateNodeName = (
   } else {
     return safeName;
   }
-};
+}
+
+export function getConnectionAfterValue(
+  col: ConnectionTableColumn,
+  row: AppConnectionTable
+): string | undefined {
+  return col.key !== "resistanceDegKPerW"
+    ? undefined
+    : row.kind === "rad"
+    ? " [K\u2074/W]"
+    : " [K/W]";
+}
+
+function filterFirstAndSecondNodeOptions(
+  filterKey: "firstNodeId" | "secondNodeId",
+  options: CellOption[],
+  selectedConnection: AppConnection,
+  allOtherConnections: AppConnection[]
+) {
+  const filteringFirstNode = filterKey === "firstNodeId";
+
+  // all the other connections connecting the same nodes as the selected connection
+  const otherConnectionsLikeSelected = allOtherConnections.filter(
+    (c) =>
+      (c.firstNode.id === selectedConnection.firstNode.id &&
+        c.secondNode.id === selectedConnection.secondNode.id) ||
+      (c.firstNode.id === selectedConnection.secondNode.id &&
+        c.secondNode.id === selectedConnection.firstNode.id)
+  );
+
+  // the selected connection should not consider its currently selected value or the ability to connect to itself
+  const noSelfConnectionOptions = options.filter(
+    (option) =>
+      option.id !==
+        (filteringFirstNode
+          ? selectedConnection.firstNode.id
+          : selectedConnection.secondNode.id) &&
+      option.id !==
+        (filteringFirstNode
+          ? selectedConnection.secondNode.id
+          : selectedConnection.firstNode.id)
+  );
+  console.log(
+    `${filterKey}, selected: ${selectedConnection.firstNode.name} -> ${selectedConnection.secondNode.name}, ${selectedConnection.kind}`
+  );
+  // for each of the remaining options
+  return noSelfConnectionOptions.filter((option) => {
+    console.log(`  option: ${option.text}`);
+    // exclude the option if an existing connection would violate the connection kind constraints
+    return !otherConnectionsLikeSelected.some((otherConnection) => {
+      console.log(
+        `    ${otherConnection.firstNode.name} -> ${otherConnection.secondNode.name}, ${otherConnection.kind}`
+      );
+      if (filteringFirstNode) {
+        const otherConnectionKindsPossible = getNewConnectionKindsPossible(
+          otherConnection.kind,
+          option.id,
+          selectedConnection.secondNode.id,
+          allOtherConnections
+        );
+        console.log(`      kinds: ${otherConnectionKindsPossible}`);
+        const wouldViolateConnectionKindConstraints =
+          !otherConnectionKindsPossible.includes(selectedConnection.kind);
+        return wouldViolateConnectionKindConstraints;
+      } else {
+        const otherConnectionKindsPossible = getNewConnectionKindsPossible(
+          otherConnection.kind,
+          selectedConnection.firstNode.id,
+          option.id,
+          allOtherConnections
+        );
+        console.log(`      kinds: ${otherConnectionKindsPossible}`);
+        const wouldViolateConnectionKindConstraints =
+          !otherConnectionKindsPossible.includes(selectedConnection.kind);
+        return wouldViolateConnectionKindConstraints;
+      }
+    });
+  });
+}
+
+export function filterConnectionOptions(
+  colKey: string,
+  options: CellOption[],
+  selectedConnection: AppConnection,
+  connections: AppConnection[]
+): CellOption[] {
+  const otherConnections = connections.filter(
+    (conn) => conn.id !== selectedConnection.id
+  );
+
+  if (["firstNodeId", "secondNodeId"].includes(colKey)) {
+    return filterFirstAndSecondNodeOptions(
+      colKey as "firstNodeId" | "secondNodeId",
+      options,
+      selectedConnection,
+      otherConnections
+    );
+  } else if (colKey === "kind") {
+    if (!!selectedConnection) {
+      const possibleKinds = getNewConnectionKindsPossible(
+        selectedConnection.kind,
+        selectedConnection.firstNode.id,
+        selectedConnection.secondNode.id,
+        connections
+      );
+      return options.filter((opt) =>
+        possibleKinds.includes(opt.id as HSConnectionKind)
+      );
+    } else {
+      return options;
+    }
+  } else {
+    return options;
+  }
+}
