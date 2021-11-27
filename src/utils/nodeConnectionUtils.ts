@@ -17,6 +17,7 @@ import { CellOption } from "../components/Sidebar/EditableTable/types";
 const { newNodeNamePrefix } = config;
 
 const ALL_CONNECTION_KINDS: HSConnectionKind[] = ["cond", "conv", "rad"];
+const DO_NOT_PAIR_KINDS: HSConnectionKind[] = ["cond", "conv"]; // cannot have both of these at once
 
 export function getExistingConnections(
   firstNodeId: string,
@@ -67,7 +68,7 @@ export function getNewConnectionKindsPossible(
   const existingKinds = existingConnections.map((conn) => conn.kind);
   if (
     connectionKind === "rad" &&
-    (existingKinds.includes("cond") || existingKinds.includes("conv"))
+    DO_NOT_PAIR_KINDS.some((k) => existingKinds.includes(k))
   ) {
     return [];
   } else
@@ -94,10 +95,10 @@ export function getNewConnection(
     (kind) => !existingKinds.includes(kind)
   );
 
-  if (!existingKinds.includes("cond") && !existingKinds.includes("conv")) {
+  if (DO_NOT_PAIR_KINDS.every((k) => !existingKinds.includes(k))) {
     return makeNewConnection(firstNode, secondNode, "cond");
   } else if (
-    (remainingKinds.includes("cond") || remainingKinds.includes("conv")) &&
+    DO_NOT_PAIR_KINDS.some((k) => remainingKinds.includes(k)) &&
     !existingKinds.includes("rad")
   ) {
     return makeNewConnection(firstNode, secondNode, "rad");
@@ -205,30 +206,63 @@ function filterFirstAndSecondNodeOptions(
           ? selectedConnection.secondNode.id
           : selectedConnection.firstNode.id)
   );
-  // for each of the remaining options
-  return noSelfConnectionOptions.filter((option) => {
-    // exclude the option if an existing connection would violate the connection kind constraints
-    return !otherConnectionsLikeSelected.some((otherConnection) => {
+
+  // for each of the remaining options, exclude the option if an existing connection would violate the connection kind constraints
+  const noConnectionKindViolationOptions = noSelfConnectionOptions.filter(
+    (option) => {
+      return !otherConnectionsLikeSelected.some((otherConnection) => {
+        if (filteringFirstNode) {
+          const otherConnectionKindsPossible = getNewConnectionKindsPossible(
+            otherConnection.kind,
+            option.id,
+            selectedConnection.secondNode.id,
+            allOtherConnections
+          );
+          return !otherConnectionKindsPossible.includes(
+            selectedConnection.kind
+          );
+        } else {
+          const otherConnectionKindsPossible = getNewConnectionKindsPossible(
+            otherConnection.kind,
+            selectedConnection.firstNode.id,
+            option.id,
+            allOtherConnections
+          );
+          return !otherConnectionKindsPossible.includes(
+            selectedConnection.kind
+          );
+        }
+      });
+    }
+  );
+
+  // finally, exclude the options that would create duplicate or illegal connections
+  return noConnectionKindViolationOptions.filter((option) => {
+    return !allOtherConnections.some((otherConnection) => {
+      const isIllegalConnectionKindCombo =
+        (DO_NOT_PAIR_KINDS.includes(selectedConnection.kind) &&
+          DO_NOT_PAIR_KINDS.includes(otherConnection.kind)) ||
+        selectedConnection.kind === otherConnection.kind;
+
       if (filteringFirstNode) {
-        const otherConnectionKindsPossible = getNewConnectionKindsPossible(
-          otherConnection.kind,
-          option.id,
-          selectedConnection.secondNode.id,
-          allOtherConnections
+        return (
+          (isIllegalConnectionKindCombo &&
+            option.id === otherConnection.firstNode.id &&
+            selectedConnection.secondNode.id ===
+              otherConnection.secondNode.id) ||
+          (isIllegalConnectionKindCombo &&
+            option.id === otherConnection.secondNode.id &&
+            selectedConnection.secondNode.id === otherConnection.firstNode.id)
         );
-        const wouldViolateConnectionKindConstraints =
-          !otherConnectionKindsPossible.includes(selectedConnection.kind);
-        return wouldViolateConnectionKindConstraints;
       } else {
-        const otherConnectionKindsPossible = getNewConnectionKindsPossible(
-          otherConnection.kind,
-          selectedConnection.firstNode.id,
-          option.id,
-          allOtherConnections
+        return (
+          (isIllegalConnectionKindCombo &&
+            option.id === otherConnection.secondNode.id &&
+            selectedConnection.firstNode.id === otherConnection.firstNode.id) ||
+          (isIllegalConnectionKindCombo &&
+            option.id === otherConnection.firstNode.id &&
+            selectedConnection.firstNode.id === otherConnection.secondNode.id)
         );
-        const wouldViolateConnectionKindConstraints =
-          !otherConnectionKindsPossible.includes(selectedConnection.kind);
-        return wouldViolateConnectionKindConstraints;
       }
     });
   });
