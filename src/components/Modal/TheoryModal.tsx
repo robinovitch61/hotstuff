@@ -3,10 +3,12 @@ import styled from "styled-components/macro";
 import { MathComponent } from "mathjax-react";
 
 const StyledTheoryModal = styled.div`
-  width: 80%;
   max-width: 1200px;
-  height: 90%;
+  height: 100%;
   overflow-y: auto;
+  padding: 3em;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
 `;
 
 const StyledTitle = styled.h1``;
@@ -397,10 +399,10 @@ export default function TheoryModal(): React.ReactElement {
       </StyledText>
 
       <StyledText>
-        Boundary condition nodes do not change temperature over time. They
-        influence nodes that are thermally connected to them, but their
-        calculated temperature difference at each time step is discarded rather
-        than added to their previous temperature.
+        Fixed temperature, i.e. boundary condition nodes do not change
+        temperature over time. They influence nodes that are thermally connected
+        to them, but their calculated temperature difference at each time step
+        is discarded rather than added to their previous temperature.
       </StyledText>
 
       <StyledText>
