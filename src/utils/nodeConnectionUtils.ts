@@ -185,15 +185,6 @@ function filterFirstAndSecondNodeOptions(
 ) {
   const filteringFirstNode = filterKey === "firstNodeId";
 
-  // all the other connections connecting the same nodes as the selected connection
-  const otherConnectionsLikeSelected = allOtherConnections.filter(
-    (c) =>
-      (c.firstNode.id === selectedConnection.firstNode.id &&
-        c.secondNode.id === selectedConnection.secondNode.id) ||
-      (c.firstNode.id === selectedConnection.secondNode.id &&
-        c.secondNode.id === selectedConnection.firstNode.id)
-  );
-
   // the selected connection should not consider its currently selected value or the ability to connect to itself
   const noSelfConnectionOptions = options.filter(
     (option) =>
@@ -207,37 +198,8 @@ function filterFirstAndSecondNodeOptions(
           : selectedConnection.firstNode.id)
   );
 
-  // for each of the remaining options, exclude the option if an existing connection would violate the connection kind constraints
-  const noConnectionKindViolationOptions = noSelfConnectionOptions.filter(
-    (option) => {
-      return !otherConnectionsLikeSelected.some((otherConnection) => {
-        if (filteringFirstNode) {
-          const otherConnectionKindsPossible = getNewConnectionKindsPossible(
-            otherConnection.kind,
-            option.id,
-            selectedConnection.secondNode.id,
-            allOtherConnections
-          );
-          return !otherConnectionKindsPossible.includes(
-            selectedConnection.kind
-          );
-        } else {
-          const otherConnectionKindsPossible = getNewConnectionKindsPossible(
-            otherConnection.kind,
-            selectedConnection.firstNode.id,
-            option.id,
-            allOtherConnections
-          );
-          return !otherConnectionKindsPossible.includes(
-            selectedConnection.kind
-          );
-        }
-      });
-    }
-  );
-
-  // finally, exclude the options that would create duplicate or illegal connections
-  return noConnectionKindViolationOptions.filter((option) => {
+  // exclude the options that would create duplicate or illegal connections
+  return noSelfConnectionOptions.filter((option) => {
     return !allOtherConnections.some((otherConnection) => {
       const isIllegalConnectionKindCombo =
         (DO_NOT_PAIR_KINDS.includes(selectedConnection.kind) &&
