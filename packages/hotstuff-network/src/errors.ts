@@ -23,3 +23,5 @@ export class ThermalResistanceValidationError extends HotStuffError {}
 export class CircularConnectionError extends HotStuffError {}
 
 export class ImpossibleConnectionSetError extends HotStuffError {}
+
+export class DuplicateConnectionError extends HotStuffError {}

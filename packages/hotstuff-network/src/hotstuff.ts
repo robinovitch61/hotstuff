@@ -1,6 +1,7 @@
 import { matrixUtils } from './matrixUtils';
 import {
   CircularConnectionError,
+  DuplicateConnectionError,
   HotStuffError,
   ImpossibleConnectionSetError,
   NodeIdValidationError,
@@ -154,9 +155,28 @@ export function validateInputs(data: ModelInput): HotStuffError[] {
     }
   });
 
-  const connectedPairs = data.connections.map((conn) => `${conn.firstNode.id}_${conn.secondNode.id}`);
+  const connections = new Set();
+  data.connections.some((conn) => {
+    const forward = `${conn.firstNode.id}${conn.secondNode.id}${conn.kind}`;
+    const backward = `${conn.secondNode.id}${conn.firstNode.id}${conn.kind}`;
+    if (connections.has(forward) || connections.has(backward)) {
+      errors.push(
+        new DuplicateConnectionError(
+          `Connection ${conn.firstNode.name} to ${conn.secondNode.name} of kind ${conn.kind} is duplicated`,
+        ),
+      );
+      return true;
+    }
+    connections.add(forward);
+    connections.add(backward);
+  });
+
+  const separator = '|$_$|';
+  const connectedPairs = new Set(
+    data.connections.map((conn) => `${conn.firstNode.id}${separator}${conn.secondNode.id}`),
+  );
   connectedPairs.forEach((pair) => {
-    const splitPair = pair.split('_');
+    const splitPair = pair.split(separator);
     const kindsInPair = data.connections
       .filter(
         (conn) =>
