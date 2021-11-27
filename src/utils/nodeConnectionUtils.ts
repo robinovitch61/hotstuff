@@ -205,17 +205,10 @@ function filterFirstAndSecondNodeOptions(
           ? selectedConnection.secondNode.id
           : selectedConnection.firstNode.id)
   );
-  console.log(
-    `${filterKey}, selected: ${selectedConnection.firstNode.name} -> ${selectedConnection.secondNode.name}, ${selectedConnection.kind}`
-  );
   // for each of the remaining options
   return noSelfConnectionOptions.filter((option) => {
-    console.log(`  option: ${option.text}`);
     // exclude the option if an existing connection would violate the connection kind constraints
     return !otherConnectionsLikeSelected.some((otherConnection) => {
-      console.log(
-        `    ${otherConnection.firstNode.name} -> ${otherConnection.secondNode.name}, ${otherConnection.kind}`
-      );
       if (filteringFirstNode) {
         const otherConnectionKindsPossible = getNewConnectionKindsPossible(
           otherConnection.kind,
@@ -223,7 +216,6 @@ function filterFirstAndSecondNodeOptions(
           selectedConnection.secondNode.id,
           allOtherConnections
         );
-        console.log(`      kinds: ${otherConnectionKindsPossible}`);
         const wouldViolateConnectionKindConstraints =
           !otherConnectionKindsPossible.includes(selectedConnection.kind);
         return wouldViolateConnectionKindConstraints;
@@ -234,7 +226,6 @@ function filterFirstAndSecondNodeOptions(
           option.id,
           allOtherConnections
         );
-        console.log(`      kinds: ${otherConnectionKindsPossible}`);
         const wouldViolateConnectionKindConstraints =
           !otherConnectionKindsPossible.includes(selectedConnection.kind);
         return wouldViolateConnectionKindConstraints;
