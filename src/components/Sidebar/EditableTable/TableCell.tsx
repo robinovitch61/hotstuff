@@ -40,6 +40,7 @@ export default function TableCell<T extends TableCellType>(
       <TextTableCell
         initialVal={initialVal}
         onBlur={(newVal) => onUpdateRow({ ...row, [col.key]: newVal })}
+        validator={(val) => (col.validator ? col.validator(row.id, val) : val)}
       />
     );
   } else if (
@@ -48,6 +49,7 @@ export default function TableCell<T extends TableCellType>(
   ) {
     return (
       <NumericalTableCell
+        key={initialVal}
         initialVal={initialVal}
         onBlur={(newVal) => onUpdateRow({ ...row, [col.key]: newVal })}
         afterValue={afterValue}

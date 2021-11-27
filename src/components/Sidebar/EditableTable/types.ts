@@ -12,6 +12,7 @@ export type TableColumn<T> = {
   minWidthPx?: number;
   options?: CellOption[];
   onSelectOption?: (id: string, option: CellOption) => void;
+  validator?: (rowId: string, val: string) => string;
 };
 
 export type TableSortState<T> = {

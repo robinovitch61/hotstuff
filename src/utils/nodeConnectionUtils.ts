@@ -143,3 +143,22 @@ export function getNewAppNode(appNodes: AppNode[], center: Point): AppNode {
     textDirection: "D",
   };
 }
+
+export const validateNodeName = (
+  name: string,
+  otherNames: string[]
+): string => {
+  const trimName = name.trim();
+  const safeName = trimName === "" ? config.defaultNodeName.trim() : trimName;
+  const safeAllNames = otherNames.map((n) => n.trim());
+  if (safeAllNames.includes(safeName)) {
+    let i = 2;
+    const makeNewName = (i: number) => `${safeName} [${i}]`;
+    while (safeAllNames.includes(makeNewName(i))) {
+      i += 1;
+    }
+    return makeNewName(i);
+  } else {
+    return safeName;
+  }
+};

@@ -17,11 +17,17 @@ type EditableNumberInputProps = {
   initialValue: number;
   onBlur: (value: number) => void;
   afterValue?: string;
+  validator?: (val: string) => string;
 };
 
 export default function EditableNumberInput(
   props: EditableNumberInputProps
 ): React.ReactElement {
+  const validator = (val: string) =>
+    props.validator
+      ? parseFloat(props.validator(val.toString()))
+      : parseFloat(val);
+
   return (
     <EditableInput<number>
       key={props.initialValue + (props.afterValue || "")}
@@ -29,6 +35,7 @@ export default function EditableNumberInput(
       onBlur={props.onBlur}
       getNewValue={getFloatVal}
       afterValue={props.afterValue}
+      validator={validator}
     />
   );
 }

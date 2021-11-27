@@ -10,15 +10,21 @@ type EditableInputProps<T> = {
   onBlur: (value: T) => void;
   getNewValue: (event: React.ChangeEvent<HTMLInputElement>) => T | undefined;
   afterValue?: string;
+  validator: (value: string) => T;
 };
 
 export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
-  const { initialValue, onBlur, getNewValue, afterValue } = props;
+  const { initialValue, onBlur, getNewValue, afterValue, validator } = props;
+
+  const withAfterValue = useCallback(
+    (val: string) => val + (afterValue || ""),
+    [afterValue]
+  );
 
   const [value, setValue] = useState<string>(
-    initialValue.toString() + (afterValue || "")
+    withAfterValue(initialValue.toString())
   );
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -32,17 +38,19 @@ export default function EditableInput<T extends CanBeMadeString>(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newVal = getNewValue(event);
       if (event.target.value === initialValue.toString()) {
-        setValue((prevVal) => prevVal + (afterValue || ""));
+        setValue((prevVal) => withAfterValue(prevVal));
         return;
       } else if (newVal !== undefined) {
-        setValue(newVal.toString() + (afterValue || ""));
-        onBlur(newVal);
+        const validated = validator(newVal.toString());
+        setValue(withAfterValue(validated.toString()));
+        onBlur(validated);
       } else {
-        setValue(initialValue.toString() + (afterValue || ""));
-        onBlur(initialValue);
+        const validated = validator(initialValue.toString());
+        setValue(withAfterValue(validated.toString()));
+        onBlur(validated);
       }
     },
-    [afterValue, getNewValue, initialValue, onBlur]
+    [getNewValue, initialValue, onBlur, validator, withAfterValue]
   );
 
   return (

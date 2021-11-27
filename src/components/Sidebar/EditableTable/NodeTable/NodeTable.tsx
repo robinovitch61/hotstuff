@@ -1,19 +1,20 @@
-import React from "react";
+import React, { useMemo } from "react";
 import config from "../../../../config";
 import { AppNode } from "../../../../App";
 import {
+  StyledAddButton,
   StyledCell,
   StyledRow,
   StyledTable,
   StyledTableBody,
   StyledTableWrapper,
-  StyledAddButton,
 } from "../style";
 import { TableColumn, TableSortState } from "../types";
 import TableHeader from "../TableHeader";
 import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
 import DeleteCell from "../DeleteCell";
+import { validateNodeName } from "../../../../utils/nodeConnectionUtils";
 
 type NodeTableColumn = TableColumn<AppNode>;
 
@@ -21,39 +22,6 @@ const defaultNodeSortState: TableSortState<AppNode> = {
   key: "name",
   direction: "ASC",
 };
-
-const nodeColumns: NodeTableColumn[] = [
-  {
-    key: "name",
-    text: "Name",
-    width: 0.3,
-    minWidthPx: 100,
-  },
-  {
-    key: "temperatureDegC",
-    text: "Temp [degC]",
-    width: 0.15,
-    minWidthPx: 100,
-  },
-  {
-    key: "capacitanceJPerDegK",
-    text: "Capacitance [J/degK]",
-    width: 0.15,
-    minWidthPx: 100,
-  },
-  {
-    key: "powerGenW",
-    text: "Power Gen [W]",
-    width: 0.15,
-    minWidthPx: 80,
-  },
-  {
-    key: "isBoundary",
-    text: "Fixed Temp?",
-    width: 0.15,
-    minWidthPx: 80,
-  },
-];
 
 type NodeTableProps = {
   rows: AppNode[];
@@ -69,6 +37,47 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     defaultNodeSortState,
     "temperatureDegC",
     "capacitanceJPerDegK"
+  );
+
+  const nodeColumns: NodeTableColumn[] = useMemo(
+    () => [
+      {
+        key: "name",
+        text: "Name",
+        width: 0.3,
+        minWidthPx: 100,
+        validator: (rowId: string, name: string) =>
+          validateNodeName(
+            name,
+            rows.filter((r) => r.id !== rowId).map((r) => r.name)
+          ),
+      },
+      {
+        key: "temperatureDegC",
+        text: "Temp [degC]",
+        width: 0.15,
+        minWidthPx: 100,
+      },
+      {
+        key: "capacitanceJPerDegK",
+        text: "Capacitance [J/degK]",
+        width: 0.15,
+        minWidthPx: 100,
+      },
+      {
+        key: "powerGenW",
+        text: "Power Gen [W]",
+        width: 0.15,
+        minWidthPx: 80,
+      },
+      {
+        key: "isBoundary",
+        text: "Fixed Temp?",
+        width: 0.15,
+        minWidthPx: 80,
+      },
+    ],
+    [rows]
   );
 
   const sortedRows = rows.sort(sortByState);

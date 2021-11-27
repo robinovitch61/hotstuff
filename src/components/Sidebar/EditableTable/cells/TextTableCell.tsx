@@ -4,6 +4,7 @@ import EditableStringInput from "../../EditableStringInput";
 export type TextTableCellProps = {
   initialVal: string;
   onBlur: (newValue: string) => void;
+  validator?: (val: string) => string;
 };
 
 export default function TextTableCell(
@@ -13,6 +14,7 @@ export default function TextTableCell(
     <EditableStringInput
       initialValue={props.initialVal}
       onBlur={props.onBlur}
+      validator={props.validator}
     />
   );
 }

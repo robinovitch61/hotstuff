@@ -6,6 +6,7 @@ const config = {
   defaultPowerGenW: 0,
   defaultTotalTimeSeconds: 600,
   defaultTimeStepSeconds: 0.1,
+  defaultNodeName: "Unnamed",
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
   defaultEditorWidthFraction: 1 - 1 / 1.61803398875,

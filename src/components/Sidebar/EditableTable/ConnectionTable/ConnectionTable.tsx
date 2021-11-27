@@ -18,7 +18,7 @@ import { HSConnectionKind } from "hotstuff-network";
 import { getNewConnectionKindsPossible } from "../../../../utils/nodeConnectionUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
-type ConnectionTableColumn = TableColumn<AppConnection>;
+type ConnectionTableColumn = TableColumn<AppConnectionTable>;
 
 const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
   key: "firstNodeId",
@@ -115,6 +115,8 @@ type ConnectionTableProps = {
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
+  const { rows, nodes, onUpdateRow, onDeleteRow, onAddButton } = props;
+
   const [sortState, setSortState, sortByState] =
     useSortableTable<AppConnectionTable>(
       defaultConnectionSortState,
@@ -124,10 +126,8 @@ export default function ConnectionTable(
 
   const onSelectNewfirstNode = useCallback(
     (id: string, option: CellOption) => {
-      const connection = props.rows.find((conn) => conn.id === id);
-      const newfirstNodeNode = props.nodes.find(
-        (node) => node.id === option.id
-      );
+      const connection = rows.find((conn) => conn.id === id);
+      const newfirstNodeNode = nodes.find((node) => node.id === option.id);
       if (
         !connection ||
         !newfirstNodeNode ||
@@ -135,21 +135,19 @@ export default function ConnectionTable(
       ) {
         return;
       }
-      props.onUpdateRow({
+      onUpdateRow({
         ...connection,
         firstNode: newfirstNodeNode,
         firstNodeId: newfirstNodeNode.id,
       });
     },
-    [props]
+    [nodes, onUpdateRow, rows]
   );
 
   const onSelectNewsecondNode = useCallback(
     (id: string, option: CellOption) => {
-      const connection = props.rows.find((conn) => conn.id === id);
-      const newsecondNodeNode = props.nodes.find(
-        (node) => node.id === option.id
-      );
+      const connection = rows.find((conn) => conn.id === id);
+      const newsecondNodeNode = nodes.find((node) => node.id === option.id);
       if (
         !connection ||
         !newsecondNodeNode ||
@@ -157,29 +155,29 @@ export default function ConnectionTable(
       ) {
         return;
       }
-      props.onUpdateRow({
+      onUpdateRow({
         ...connection,
         secondNode: newsecondNodeNode,
         secondNodeId: newsecondNodeNode.id,
       });
     },
-    [props]
+    [nodes, onUpdateRow, rows]
   );
 
   const onSelectNewConnectionType = useCallback(
     (id: string, option: CellOption) => {
-      const rowToUpdate = props.rows.find((conn) => conn.id === id);
+      const rowToUpdate = rows.find((conn) => conn.id === id);
       if (rowToUpdate) {
-        props.onUpdateRow({
+        onUpdateRow({
           ...rowToUpdate,
           kind: option.id as HSConnectionKind,
         });
       }
     },
-    [props]
+    [onUpdateRow, rows]
   );
 
-  const nodeOptions: CellOption[] = props.nodes.map((node) => ({
+  const nodeOptions: CellOption[] = nodes.map((node) => ({
     id: node.id,
     text: node.name,
   }));
@@ -225,11 +223,11 @@ export default function ConnectionTable(
     ]
   );
 
-  const activeNodeIds = props.nodes
+  const activeNodeIds = nodes
     .filter((node) => node.isActive)
     .map((node) => node.id);
 
-  const sortedRowsWithActiveInfo: AppConnectionTable[] = props.rows
+  const sortedRowsWithActiveInfo: AppConnectionTable[] = rows
     .map((row) => {
       return {
         ...row,
@@ -253,7 +251,7 @@ export default function ConnectionTable(
               col={col}
               options={options}
               initiallySetOption={setOption}
-              onUpdateRow={props.onUpdateRow}
+              onUpdateRow={onUpdateRow}
               afterValue={
                 col.key !== "resistanceDegKPerW"
                   ? undefined
@@ -281,7 +279,7 @@ export default function ConnectionTable(
                 row.id,
                 row.firstNode.id,
                 row.secondNode.id,
-                props.rows
+                rows
               ).filter((opt) => opt.id !== setOption.id),
             ];
 
@@ -298,7 +296,7 @@ export default function ConnectionTable(
         isActive={row.isActive}
       >
         {cols}
-        <DeleteCell row={row} onDeleteRow={() => props.onDeleteRow(row)} />
+        <DeleteCell row={row} onDeleteRow={() => onDeleteRow(row)} />
       </StyledRow>
     );
   });
@@ -312,7 +310,7 @@ export default function ConnectionTable(
           setSortState={setSortState}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
-        <StyledAddButton onClick={props.onAddButton}>+</StyledAddButton>
+        <StyledAddButton onClick={onAddButton}>+</StyledAddButton>
       </StyledTable>
     </StyledTableWrapper>
   );
