@@ -5,6 +5,7 @@ export type NumericalTableCellProps = {
   initialVal: number;
   onBlur: (newValue: number) => void;
   afterValue?: string;
+  validator?: (val: string) => string;
 };
 
 export default function NumericalTableCell(
@@ -15,6 +16,7 @@ export default function NumericalTableCell(
       initialValue={props.initialVal}
       onBlur={props.onBlur}
       afterValue={props.afterValue}
+      validator={props.validator}
     />
   );
 }

@@ -15,6 +15,7 @@ import TableCell from "../TableCell";
 import useSortableTable from "../hooks/useSortableTable";
 import DeleteCell from "../DeleteCell";
 import { validateNodeName } from "../../../../utils/nodeConnectionUtils";
+import { KELVIN } from "hotstuff-network";
 
 type NodeTableColumn = TableColumn<AppNode>;
 
@@ -28,10 +29,12 @@ type NodeTableProps = {
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
   onAddButton: () => void;
+  setTemporaryError: (error: string) => void;
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
-  const { rows, onUpdateRow, onDeleteRow, onAddButton } = props;
+  const { rows, onUpdateRow, onDeleteRow, onAddButton, setTemporaryError } =
+    props;
 
   const [sortState, setSortState, sortByState] = useSortableTable<AppNode>(
     defaultNodeSortState,
@@ -57,6 +60,15 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         text: "Temp [C]",
         width: 0.15,
         minWidthPx: 100,
+        validator: (rowId, tempVal) => {
+          if (parseFloat(tempVal) < -KELVIN) {
+            setTemporaryError(
+              "Temperature colder than what is physically possible"
+            );
+            return (-KELVIN).toString();
+          }
+          return tempVal;
+        },
       },
       {
         key: "capacitanceJPerDegK",
@@ -77,7 +89,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         minWidthPx: 80,
       },
     ],
-    [rows]
+    [rows, setTemporaryError]
   );
 
   const sortedRows = rows.sort(sortByState);

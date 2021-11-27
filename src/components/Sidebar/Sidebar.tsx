@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import {
   AppConnection,
   AppNode,
@@ -15,6 +16,8 @@ import {
   StyledModelControlsWrapper,
   StyledTables,
 } from "./style";
+import { StyledError } from "./EditableTable/style";
+import config from "../../config";
 
 type SidebarProps = {
   appState: AppState;
@@ -49,12 +52,22 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
     onRunModel,
   } = props;
 
+  const [error, setError] = useState<string | undefined>();
+  const setTemporaryError = (error: string) => {
+    setError(error);
+    setTimeout(
+      () => setError(undefined),
+      config.errorMessageDurationSeconds * 1000
+    );
+  };
+
   const nodeTable = (
     <NodeTable
       rows={appState.nodes}
       onUpdateRow={(node: AppNode) => updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
       onAddButton={onAddNode}
+      setTemporaryError={setTemporaryError}
     />
   );
 
@@ -69,12 +82,18 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         deleteConnections([connection.id])
       }
       onAddButton={onAddConnection}
+      setTemporaryError={setTemporaryError}
     />
   );
 
   return (
     <StyledEditor width={width} height={height}>
       <StyledTables heightFrac={appState.panelSizes.tableHeightFraction}>
+        {!!error && (
+          <StyledError durationSeconds={config.errorMessageDurationSeconds}>
+            {error}
+          </StyledError>
+        )}
         <Tabs
           tabs={[
             { text: "Nodes", component: nodeTable, width: 0.5 },

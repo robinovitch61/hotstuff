@@ -9,6 +9,7 @@ const config = {
   defaultNodeName: "Unnamed",
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
+  defaultSmallResistanceDegKPerW: 0.01,
   defaultEditorWidthFraction: 1 - 1 / 1.61803398875,
   defaultCanvasHeightFraction: 1 / 1.61803398875,
   defaultTableHeightFraction: 0.5,
@@ -34,6 +35,7 @@ const config = {
   plotDomainMarginPercent: 0.1,
   maxPlotPoints: 400,
   multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
+  errorMessageDurationSeconds: 3,
 };
 
 export default config;

@@ -49,12 +49,20 @@ type ConnectionTableProps = {
   onUpdateRow: (row: AppConnection) => void;
   onDeleteRow: (row: AppConnection) => void;
   onAddButton: () => void;
+  setTemporaryError: (error: string) => void;
 };
 
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
-  const { rows, nodes, onUpdateRow, onDeleteRow, onAddButton } = props;
+  const {
+    rows,
+    nodes,
+    onUpdateRow,
+    onDeleteRow,
+    onAddButton,
+    setTemporaryError,
+  } = props;
 
   const [sortState, setSortState, sortByState] =
     useSortableTable<AppConnectionTable>(
@@ -144,6 +152,18 @@ export default function ConnectionTable(
         key: "resistanceDegKPerW",
         width: 0.2,
         minWidthPx: 100,
+        validator: (rowId, resistance) => {
+          const resistanceNumber = parseFloat(resistance);
+          if (resistanceNumber <= 0) {
+            if (resistanceNumber === 0) {
+              setTemporaryError("Resistance cannot be zero");
+            } else {
+              setTemporaryError("Resistance cannot be negative");
+            }
+            return config.defaultSmallResistanceDegKPerW.toString();
+          }
+          return resistance;
+        },
       },
       {
         text: "Kind",
@@ -159,6 +179,7 @@ export default function ConnectionTable(
       onSelectNewConnectionType,
       onSelectNewfirstNode,
       onSelectNewsecondNode,
+      setTemporaryError,
     ]
   );
 

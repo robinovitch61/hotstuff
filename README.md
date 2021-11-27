@@ -20,7 +20,7 @@ TODO:
 - [x] Disallow nodes being named the same thing [5]
 - [x] Disallow selecting first/second node in connection table to generate duplicate [5]
 - [x] Test hotstuff-network to error if identical connections passed in (e.g 2x A-B, conduction)
-- [ ] Visual validation on cell entries with tooltip describing invalid condition [5]
+- [x] Visual validation on cell entries with tooltip describing invalid condition [5]
 - [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
 - [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
 - [ ] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]

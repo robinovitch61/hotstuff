@@ -53,6 +53,7 @@ export default function TableCell<T extends TableCellType>(
         initialVal={initialVal}
         onBlur={(newVal) => onUpdateRow({ ...row, [col.key]: newVal })}
         afterValue={afterValue}
+        validator={(val) => (col.validator ? col.validator(row.id, val) : val)}
       />
     );
   } else if (typeof initialVal === "boolean") {
