@@ -2,9 +2,15 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
-import { AppState, ModalState, Timing } from "../../App";
+import { AppState, ExportedAppState, ModalState, Timing } from "../../App";
 import { defaultAppState } from "../../default";
 import { ModelOutput } from "hotstuff-network";
+import {
+  downloadAppStateFromAnchor,
+  downloadExportedAppStateFromAnchor,
+  importFileFromUser,
+  nicelyFormattedJsonString,
+} from "./ioUtils";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -87,6 +93,7 @@ export default function ModelControls(
 
   const [stagedAppState, setStagedAppState] = useState<string>("");
   const downloadModelRef = useRef<HTMLAnchorElement>(null);
+  const runAndDownloadModelRef = useRef<HTMLAnchorElement>(null);
 
   return (
     <StyledModelControlsWrapper>
@@ -121,7 +128,9 @@ export default function ModelControls(
         <StyledButton onClick={onRunModel}>Run Model</StyledButton>
         <StyledButton
           onClick={() =>
-            navigator.clipboard.writeText(JSON.stringify(appState))
+            navigator.clipboard.writeText(
+              nicelyFormattedJsonString<AppState>(appState)
+            )
           }
         >
           Copy Model
@@ -130,7 +139,10 @@ export default function ModelControls(
           onClick={() => {
             const newOutput = onRunModel();
             navigator.clipboard.writeText(
-              JSON.stringify({ ...appState, newOutput })
+              nicelyFormattedJsonString<ExportedAppState>({
+                ...appState,
+                output: newOutput,
+              })
             );
           }}
         >
@@ -138,25 +150,21 @@ export default function ModelControls(
         </StyledButton>
         <StyledAnchor
           ref={downloadModelRef}
-          onClick={() => {
-            if (downloadModelRef.current) {
-              const blob = new Blob([JSON.stringify(appState)], {
-                type: "text/plain;charset=utf-8",
-              });
-              const url = URL.createObjectURL(blob);
-              downloadModelRef.current.setAttribute("href", url);
-
-              const now = new Date();
-              downloadModelRef.current.setAttribute(
-                "download",
-                `${now.getFullYear()}-${
-                  now.getMonth() + 1
-                }-${now.getDate()}T${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}_thermal_model.json`
-              );
-            }
-          }}
+          onClick={() => downloadAppStateFromAnchor(downloadModelRef, appState)}
         >
           Download Model
+        </StyledAnchor>
+        <StyledAnchor
+          ref={runAndDownloadModelRef}
+          onClick={() => {
+            const newOutput = onRunModel();
+            downloadExportedAppStateFromAnchor(runAndDownloadModelRef, {
+              ...appState,
+              output: newOutput,
+            });
+          }}
+        >
+          Run & Download Results
         </StyledAnchor>
       </StyledTopControls>
       <StyledImport>
@@ -167,12 +175,26 @@ export default function ModelControls(
         />
         <StyledButton
           onClick={() => {
-            setAppState(JSON.parse(stagedAppState));
+            const inputObject = JSON.parse(stagedAppState);
+            setAppState(inputObject);
+            setOutput(inputObject.output);
             setStagedAppState("");
           }}
         >
           Import
         </StyledButton>
+        <div>
+          <input
+            id={"file-importer"}
+            type={"file"}
+            accept={".json"}
+            style={{ display: "none" }}
+            onChange={(event) =>
+              importFileFromUser(event, setAppState, setOutput)
+            }
+          />
+          <label htmlFor={"file-importer"}>Import Model from File</label>
+        </div>
       </StyledImport>
 
       <StyledButton

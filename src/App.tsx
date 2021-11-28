@@ -75,6 +75,8 @@ export type AppState = {
   panelSizes: PanelSizes;
 };
 
+export type ExportedAppState = AppState & { output?: ModelOutput };
+
 export default function App(): React.ReactElement {
   const [appState, setAppState] = useSessionStorageState<AppState>(
     defaultAppState,
