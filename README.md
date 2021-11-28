@@ -24,6 +24,7 @@ TODO:
 - [x] Escape or Enter while editing cell exits same as tab [5]
 - [x] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]
 - [x] Handle app errors like too many timesteps [5]
+- [ ] Make errors more visible than just in console, or just not possible to run if invalid anything [4]
 - [ ] File export/import (falsdat doesn't have this) [5]
 - [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
 - [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
@@ -31,14 +32,14 @@ TODO:
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]
 - [ ] Tutorial popup instead of tutorial model [5]
+- [ ] About section [5]
 - [ ] Resistance calculator [4]
   - [ ] Link to engineers edge website
   - [ ] Calculator pops up while editing
-- [ ] Make node active when editing in table [4]
+- [ ] Make node active in canvas when editing in table [4]
 - [ ] Add info to canvas: [4]
   - Power gen for each node (number in middle)
   - Resistance between nodes (thickness changes with resistance)
-- [ ] Make errors more visible than just in console, or just not possible to run if invalid anything [4]
 - [ ] Copy/paste all selected with suffix to avoid nodes being named the same thing [4]
 - [ ] Horizontal/vertical snap functionality for creating grid [1]
 - [x] Reset all stored state button (with confirmation) - not important if not the tutorial [1]

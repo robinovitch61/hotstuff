@@ -23,6 +23,7 @@ import ErrorModal from "../Modal/ErrorModal";
 type SidebarProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  setOutput: React.Dispatch<React.SetStateAction<ModelOutput | undefined>>;
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   width: number;
   height: number;
@@ -40,6 +41,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
   const {
     appState,
     setAppState,
+    setOutput,
     setModalState,
     width,
     height,
@@ -107,6 +109,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         <ModelControls
           appState={appState}
           setAppState={setAppState}
+          setOutput={setOutput}
           setModalState={setModalState}
           onRunModel={() => {
             if (

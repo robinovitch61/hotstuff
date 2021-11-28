@@ -62,6 +62,7 @@ const StyledLabel = styled.label`
 export type ModelControlsProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  setOutput: React.Dispatch<React.SetStateAction<ModelOutput | undefined>>;
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   onRunModel: () => ModelOutput | undefined;
   setTiming: (newTiming: Timing) => void;
@@ -70,7 +71,14 @@ export type ModelControlsProps = {
 export default function ModelControls(
   props: ModelControlsProps
 ): React.ReactElement {
-  const { appState, setAppState, setModalState, onRunModel, setTiming } = props;
+  const {
+    appState,
+    setAppState,
+    setOutput,
+    setModalState,
+    onRunModel,
+    setTiming,
+  } = props;
 
   const [stagedAppState, setStagedAppState] = useState<string>("");
 
@@ -145,7 +153,10 @@ export default function ModelControls(
             ...prev,
             visible: true,
             type: "confirm",
-            onConfirm: () => setAppState(defaultAppState),
+            onConfirm: () => {
+              setAppState(defaultAppState);
+              setOutput(undefined);
+            },
             confirmText: [
               "This will reset the entire model, discarding all your current nodes, connections, parameters and results.",
               "Permanently reset everything?",

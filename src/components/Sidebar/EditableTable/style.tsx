@@ -1,5 +1,4 @@
 import styled from "styled-components/macro";
-import config from "../../../config";
 
 export const StyledTableWrapper = styled.div`
   width: 100%;

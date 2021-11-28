@@ -1,5 +1,12 @@
 import { makeNode } from "hotstuff-network";
-import { AppConnection, AppNode, ModalState, PanelSizes, Timing } from "./App";
+import {
+  AppConnection,
+  AppNode,
+  AppState,
+  ModalState,
+  PanelSizes,
+  Timing,
+} from "./App";
 import config from "./config";
 import { ORIGIN } from "./utils/pointUtils";
 import { CanvasViewState } from "./components/Canvas/Canvas";
@@ -76,8 +83,7 @@ export const defaultModalState: ModalState = {
   type: "theory",
 };
 
-export const defaultAppState = {
-  output: undefined,
+export const defaultAppState: AppState = {
   timing: defaultTiming,
   nodes: defaultNodes,
   connections: defaultConnections,

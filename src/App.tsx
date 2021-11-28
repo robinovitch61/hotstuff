@@ -243,6 +243,7 @@ export default function App(): React.ReactElement {
         <Sidebar
           appState={appState}
           setAppState={setAppState}
+          setOutput={setOutput}
           setModalState={setModalState}
           height={windowHeight}
           width={editorWidth}
