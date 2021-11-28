@@ -24,7 +24,7 @@ TODO:
 - [x] Escape or Enter while editing cell exits same as tab [5]
 - [x] Limit num points and/or compress appState to not hit limits on localStorage - do not store results in browser, run model before exporting everything [5]
 - [x] Handle app errors like too many timesteps [5]
-- [ ] Make errors more visible than just in console, or just not possible to run if invalid anything [4]
+- [x] Make model runtime errors more visible than just in console [4]
 - [ ] File export/import (falsdat doesn't have this) [5]
 - [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
 - [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]

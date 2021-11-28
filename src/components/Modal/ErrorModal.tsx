@@ -37,14 +37,14 @@ export const StyledError = styled.div<{ isVisible: boolean }>`
 `;
 
 type ErrorModalProps = {
-  error: string | undefined;
-  setError: React.Dispatch<React.SetStateAction<string | undefined>>;
+  errors: string[];
+  setErrors: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export default function ErrorModal(props: ErrorModalProps): React.ReactElement {
-  const { error, setError } = props;
+  const { errors, setErrors } = props;
 
-  if (!error) {
+  if (errors.length === 0) {
     return <></>;
   }
 
@@ -52,12 +52,14 @@ export default function ErrorModal(props: ErrorModalProps): React.ReactElement {
     <StyledError isVisible={true}>
       <StyledExitButton
         onClick={() => {
-          setError(undefined);
+          setErrors([]);
         }}
       >
         ❌
       </StyledExitButton>
-      {error}
+      {errors.map((err) => (
+        <div key={err}>{err}</div>
+      ))}
     </StyledError>
   );
 }

@@ -55,12 +55,12 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
     onRunModel,
   } = props;
 
-  const [tableError, setTableError, setTemporaryTableError] =
+  const [tableErrors, setTableErrors, setTemporaryTableErrors] =
     useTemporaryError();
   const [
-    modelControlsError,
-    setModelControlsError,
-    setTemporaryModelControlsError,
+    modelControlsErrors,
+    setModelControlsErrors,
+    setTemporaryModelControlsErrors,
   ] = useTemporaryError();
 
   const nodeTable = (
@@ -69,7 +69,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       onUpdateRow={(node: AppNode) => updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
       onAddButton={onAddNode}
-      setTemporaryError={setTemporaryTableError}
+      setTemporaryErrors={setTemporaryTableErrors}
     />
   );
 
@@ -84,14 +84,14 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         deleteConnections([connection.id])
       }
       onAddButton={onAddConnection}
-      setTemporaryError={setTemporaryTableError}
+      setTemporaryErrors={setTemporaryTableErrors}
     />
   );
 
   return (
     <StyledEditor width={width} height={height}>
       <StyledTables heightFrac={appState.panelSizes.tableHeightFraction}>
-        <ErrorModal error={tableError} setError={setTableError} />
+        <ErrorModal errors={tableErrors} setErrors={setTableErrors} />
         <Tabs
           tabs={[
             { text: "Nodes", component: nodeTable, width: 0.5 },
@@ -103,8 +103,8 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         heightFrac={1 - appState.panelSizes.tableHeightFraction}
       >
         <ErrorModal
-          error={modelControlsError}
-          setError={setModelControlsError}
+          errors={modelControlsErrors}
+          setErrors={setModelControlsErrors}
         />
         <ModelControls
           appState={appState}
@@ -117,9 +117,9 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
                 appState.timing.totalTimeS / appState.timing.timeStepS
               ) > config.maxTimeSteps
             ) {
-              setTemporaryModelControlsError(
-                `Decrease model run time or increase time step size`
-              );
+              setTemporaryModelControlsErrors([
+                `Decrease model run time or increase time step size`,
+              ]);
               return;
             }
             return onRunModel();

@@ -29,11 +29,11 @@ type NodeTableProps = {
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
   onAddButton: () => void;
-  setTemporaryError: (error: string) => void;
+  setTemporaryErrors: (error: string[]) => void;
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
-  const { rows, onUpdateRow, onDeleteRow, onAddButton, setTemporaryError } =
+  const { rows, onUpdateRow, onDeleteRow, onAddButton, setTemporaryErrors } =
     props;
 
   const [sortState, setSortState, sortByState] = useSortableTable<AppNode>(
@@ -62,9 +62,9 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         minWidthPx: 100,
         validator: (rowId, tempVal) => {
           if (parseFloat(tempVal) < -KELVIN) {
-            setTemporaryError(
-              "Temperature colder than what is physically possible"
-            );
+            setTemporaryErrors([
+              "Temperature colder than what is physically possible",
+            ]);
             return (-KELVIN).toString();
           }
           return tempVal;
@@ -89,7 +89,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         minWidthPx: 80,
       },
     ],
-    [rows, setTemporaryError]
+    [rows, setTemporaryErrors]
   );
 
   const sortedRows = rows.sort(sortByState);

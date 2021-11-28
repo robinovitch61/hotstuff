@@ -49,7 +49,7 @@ type ConnectionTableProps = {
   onUpdateRow: (row: AppConnection) => void;
   onDeleteRow: (row: AppConnection) => void;
   onAddButton: () => void;
-  setTemporaryError: (error: string) => void;
+  setTemporaryErrors: (error: string[]) => void;
 };
 
 export default function ConnectionTable(
@@ -61,7 +61,7 @@ export default function ConnectionTable(
     onUpdateRow,
     onDeleteRow,
     onAddButton,
-    setTemporaryError,
+    setTemporaryErrors,
   } = props;
 
   const [sortState, setSortState, sortByState] =
@@ -156,9 +156,9 @@ export default function ConnectionTable(
           const resistanceNumber = parseFloat(resistance);
           if (resistanceNumber <= 0) {
             if (resistanceNumber === 0) {
-              setTemporaryError("Resistance cannot be zero");
+              setTemporaryErrors(["Resistance cannot be zero"]);
             } else {
-              setTemporaryError("Resistance cannot be negative");
+              setTemporaryErrors(["Resistance cannot be negative"]);
             }
             return config.defaultSmallResistanceDegKPerW.toString();
           }
@@ -179,7 +179,7 @@ export default function ConnectionTable(
       onSelectNewConnectionType,
       onSelectNewfirstNode,
       onSelectNewsecondNode,
-      setTemporaryError,
+      setTemporaryErrors,
     ]
   );
 

@@ -28,6 +28,8 @@ import {
   StyledWorkspace,
 } from "./style";
 import Modal from "./components/Modal/Modal";
+import ErrorModal from "./components/Modal/ErrorModal";
+import useTemporaryError from "./components/Sidebar/hooks/useTemporaryError";
 
 const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
 
@@ -80,6 +82,7 @@ export default function App(): React.ReactElement {
   );
   const [output, setOutput] = useState<ModelOutput | undefined>(undefined);
   const [modalState, setModalState] = useState<ModalState>(defaultModalState);
+  const [appErrors, setAppErrors, setTemporaryAppErrors] = useTemporaryError();
 
   const [
     setAppNodes,
@@ -197,6 +200,7 @@ export default function App(): React.ReactElement {
   return (
     <div>
       <Modal modalState={modalState} setModalState={setModalState} />
+      <ErrorModal errors={appErrors} setErrors={setAppErrors} />
       <StyledApp height={windowHeight} modalOpen={modalState.visible}>
         <StyledHorizontalBorder
           ref={canvasPlotBorderRef}
@@ -268,7 +272,7 @@ export default function App(): React.ReactElement {
               totalTimeS: appState.timing.totalTimeS,
             });
             if (output.errors?.length) {
-              output.errors.forEach((error) => console.error(error.message));
+              setTemporaryAppErrors(output.errors.map((err) => err.message));
             }
             setOutput(output);
             return output;
