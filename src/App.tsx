@@ -260,14 +260,6 @@ export default function App(): React.ReactElement {
           }}
           deleteConnections={deleteConnections}
           onRunModel={() => {
-            if (
-              Math.ceil(
-                appState.timing.totalTimeS / appState.timing.timeStepS
-              ) > config.maxTimeSteps
-            ) {
-              console.log("LEO TODO");
-              return;
-            }
             const output = run({
               nodes: appState.nodes,
               connections: appState.connections,

@@ -5,6 +5,7 @@ import styled from "styled-components/macro";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 import ConfirmationModal from "./ConfirmationModal";
 import TheoryModal from "./TheoryModal";
+import { StyledExitButton } from "./style";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   font-size: 1.1em;
@@ -24,13 +25,6 @@ const StyledModal = styled.div<{ visible: boolean }>`
   display: ${(props) => (props.visible ? "flex" : "none")};
   justify-content: center;
   align-items: center;
-`;
-
-const StyledExitButton = styled.button`
-  position: absolute;
-  right: 1em;
-  top: 1em;
-  font-size: 1.2em;
 `;
 
 function getModalContent(
@@ -78,7 +72,7 @@ export default function Modal(props: ModalProps): React.ReactElement {
           }))
         }
       >
-        X
+        ❌
       </StyledExitButton>
       {modalContent}
     </StyledModal>

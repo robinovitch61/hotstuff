@@ -33,4 +33,5 @@ export const StyledModelControlsWrapper = styled.div<{ heightFrac: number }>`
   display: inline-flex;
   width: 100%;
   height: ${(props) => props.heightFrac * 100}%;
+  position: relative;
 `;

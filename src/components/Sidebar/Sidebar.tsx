@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 import {
   AppConnection,
   AppNode,
@@ -16,9 +15,10 @@ import {
   StyledModelControlsWrapper,
   StyledTables,
 } from "./style";
-import { StyledError } from "./EditableTable/style";
-import config from "../../config";
 import { ModelOutput } from "hotstuff-network";
+import useTemporaryError from "./hooks/useTemporaryError";
+import config from "../../config";
+import ErrorModal from "../Modal/ErrorModal";
 
 type SidebarProps = {
   appState: AppState;
@@ -53,14 +53,13 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
     onRunModel,
   } = props;
 
-  const [error, setError] = useState<string | undefined>();
-  const setTemporaryError = (error: string) => {
-    setError(error);
-    setTimeout(
-      () => setError(undefined),
-      config.errorMessageDurationSeconds * 1000
-    );
-  };
+  const [tableError, setTableError, setTemporaryTableError] =
+    useTemporaryError();
+  const [
+    modelControlsError,
+    setModelControlsError,
+    setTemporaryModelControlsError,
+  ] = useTemporaryError();
 
   const nodeTable = (
     <NodeTable
@@ -68,7 +67,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       onUpdateRow={(node: AppNode) => updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
       onAddButton={onAddNode}
-      setTemporaryError={setTemporaryError}
+      setTemporaryError={setTemporaryTableError}
     />
   );
 
@@ -83,18 +82,14 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         deleteConnections([connection.id])
       }
       onAddButton={onAddConnection}
-      setTemporaryError={setTemporaryError}
+      setTemporaryError={setTemporaryTableError}
     />
   );
 
   return (
     <StyledEditor width={width} height={height}>
       <StyledTables heightFrac={appState.panelSizes.tableHeightFraction}>
-        {!!error && (
-          <StyledError durationSeconds={config.errorMessageDurationSeconds}>
-            {error}
-          </StyledError>
-        )}
+        <ErrorModal error={tableError} setError={setTableError} />
         <Tabs
           tabs={[
             { text: "Nodes", component: nodeTable, width: 0.5 },
@@ -105,11 +100,27 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       <StyledModelControlsWrapper
         heightFrac={1 - appState.panelSizes.tableHeightFraction}
       >
+        <ErrorModal
+          error={modelControlsError}
+          setError={setModelControlsError}
+        />
         <ModelControls
           appState={appState}
           setAppState={setAppState}
           setModalState={setModalState}
-          onRunModel={onRunModel}
+          onRunModel={() => {
+            if (
+              Math.ceil(
+                appState.timing.totalTimeS / appState.timing.timeStepS
+              ) > config.maxTimeSteps
+            ) {
+              setTemporaryModelControlsError(
+                `Decrease model run time or increase time step size`
+              );
+              return;
+            }
+            return onRunModel();
+          }}
           setTiming={setTiming}
         />
       </StyledModelControlsWrapper>

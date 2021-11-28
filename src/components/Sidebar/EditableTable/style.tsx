@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import config from "../../../config";
 
 export const StyledTableWrapper = styled.div`
   width: 100%;
@@ -7,34 +8,6 @@ export const StyledTableWrapper = styled.div`
 export const StyledTable = styled.div`
   width: 100%;
   border-collapse: collapse;
-`;
-
-export const StyledError = styled.div<{ durationSeconds: number }>`
-  color: red;
-  background: white;
-  font-size: 2em;
-  text-align: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  padding: 2em;
-  z-index: 20;
-  width: 80%;
-  border: 1px solid red;
-  animation: ${({ durationSeconds }) =>
-    `FadeAnimation ${durationSeconds}s cubic-bezier(1, -0.04, 0.59, 0.73) forwards`};
-
-  @keyframes FadeAnimation {
-    0% {
-      opacity: 0.9;
-      visibility: visible;
-    }
-    100% {
-      opacity: 0;
-      visibility: hidden;
-    }
-  }
 `;
 
 export const StyledTableBody = styled.div`
