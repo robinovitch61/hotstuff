@@ -14,8 +14,6 @@ import {
 } from "../components/Sidebar/EditableTable/ConnectionTable/ConnectionTable";
 import { CellOption } from "../components/Sidebar/EditableTable/types";
 
-const { newNodeNamePrefix } = config;
-
 const ALL_CONNECTION_KINDS: HSConnectionKind[] = ["cond", "conv", "rad"];
 const DO_NOT_PAIR_KINDS: HSConnectionKind[] = ["cond", "conv"]; // cannot have both of these at once
 
@@ -126,16 +124,22 @@ export function getNewPossibleConnection(
   return undefined;
 }
 
+function newNodeName(i: number): string {
+  if (i === 1) {
+    return config.newNodeNamePrefix;
+  }
+  return `${config.newNodeNamePrefix} [${i}]`;
+}
+
 export function getNewAppNode(appNodes: AppNode[], center: Point): AppNode {
-  const numNodesWithDefaultPrefix = appNodes.filter((node) =>
-    node.name.startsWith(newNodeNamePrefix)
-  ).length;
+  const allNodeNames = appNodes.map((node) => node.name);
+  let i = 1;
+  while (allNodeNames.includes(newNodeName(i))) {
+    i += 1;
+  }
 
   const newNode = makeNode({
-    name:
-      numNodesWithDefaultPrefix === 0
-        ? `${newNodeNamePrefix}`
-        : `${newNodeNamePrefix} (${numNodesWithDefaultPrefix + 1})`,
+    name: newNodeName(i),
     temperatureDegC: config.defaultTempDegC,
     capacitanceJPerDegK: config.defaultCapJPerDegK,
     powerGenW: config.defaultPowerGenW,
