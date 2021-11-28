@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
 import { AppState, ModalState, Timing } from "../../App";
 import { defaultAppState } from "../../default";
+import { ModelOutput } from "hotstuff-network";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -62,7 +63,7 @@ export type ModelControlsProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
-  onRunModel: () => void;
+  onRunModel: () => ModelOutput | undefined;
   setTiming: (newTiming: Timing) => void;
 };
 
@@ -109,7 +110,17 @@ export default function ModelControls(
             navigator.clipboard.writeText(JSON.stringify(appState))
           }
         >
-          Copy Model to ClipBoard
+          Copy Model
+        </StyledButton>
+        <StyledButton
+          onClick={() => {
+            const newOutput = onRunModel();
+            navigator.clipboard.writeText(
+              JSON.stringify({ ...appState, newOutput })
+            );
+          }}
+        >
+          Run & Copy Results
         </StyledButton>
       </StyledTopControls>
       <StyledImport>
@@ -124,7 +135,7 @@ export default function ModelControls(
             setStagedAppState("");
           }}
         >
-          Import Model
+          Import
         </StyledButton>
       </StyledImport>
 
@@ -136,7 +147,7 @@ export default function ModelControls(
             type: "confirm",
             onConfirm: () => setAppState(defaultAppState),
             confirmText: [
-              "This will reset the entire model, discarding all your current nodes, connections, parameters and output data.",
+              "This will reset the entire model, discarding all your current nodes, connections, parameters and results.",
               "Permanently reset everything?",
             ],
           }))

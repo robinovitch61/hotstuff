@@ -65,7 +65,6 @@ export type ModalState = {
 };
 
 export type AppState = {
-  output?: ModelOutput;
   timing: Timing;
   nodes: AppNode[];
   connections: AppConnection[];
@@ -79,7 +78,7 @@ export default function App(): React.ReactElement {
     defaultAppState,
     "thermalModelAppState"
   );
-
+  const [output, setOutput] = useState<ModelOutput | undefined>(undefined);
   const [modalState, setModalState] = useState<ModalState>(defaultModalState);
 
   const [
@@ -88,8 +87,7 @@ export default function App(): React.ReactElement {
     setCanvasViewState,
     setSavedCanvasState,
     setTiming,
-    setModelOutput,
-  ] = useAppStateModifiers(setAppState);
+  ] = useAppStateModifiers(setAppState, setOutput);
 
   const [
     addNode,
@@ -105,7 +103,7 @@ export default function App(): React.ReactElement {
     setAppNodes,
     appState.connections,
     setAppConnections,
-    setModelOutput
+    setOutput
   );
 
   const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
@@ -160,10 +158,10 @@ export default function App(): React.ReactElement {
           width: plotWidth,
           margin: plotMargin,
         }}
-        modelOutput={appState.output}
+        modelOutput={output}
       />
     );
-  }, [appState.output, plotHeight, plotWidth]);
+  }, [output, plotHeight, plotWidth]);
 
   const addNodeInCenterOfCanvas = useCallback(() => {
     addNode(
@@ -253,15 +251,23 @@ export default function App(): React.ReactElement {
           onAddConnection={createNewLogicalConnection}
           updateNodes={(nodes: AppNode[]) => {
             updateNodes(nodes);
-            setModelOutput(undefined);
+            setOutput(undefined);
           }}
           deleteNodes={deleteNodes}
           updateConnections={(conns: AppConnection[]) => {
             updateConnections(conns);
-            setModelOutput(undefined);
+            setOutput(undefined);
           }}
           deleteConnections={deleteConnections}
           onRunModel={() => {
+            if (
+              Math.ceil(
+                appState.timing.totalTimeS / appState.timing.timeStepS
+              ) > config.maxTimeSteps
+            ) {
+              console.log("LEO TODO");
+              return;
+            }
             const output = run({
               nodes: appState.nodes,
               connections: appState.connections,
@@ -271,7 +277,8 @@ export default function App(): React.ReactElement {
             if (output.errors?.length) {
               output.errors.forEach((error) => console.error(error.message));
             }
-            setModelOutput(output);
+            setOutput(output);
+            return output;
           }}
         />
       </StyledApp>

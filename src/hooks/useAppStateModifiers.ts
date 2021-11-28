@@ -5,14 +5,14 @@ import { ModelOutput } from "hotstuff-network";
 import { AppConnection, AppNode, AppState, Timing } from "../App";
 
 export default function useAppStateModifiers(
-  setAppState: React.Dispatch<React.SetStateAction<AppState>>
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>,
+  setOutput: React.Dispatch<React.SetStateAction<ModelOutput | undefined>>
 ): [
   (newNodes: AppNode[]) => void,
   (newConnections: AppConnection[]) => void,
   (newCanvasState: CanvasViewState) => void,
   (newCanvasState: CanvasViewState) => void,
-  (newTiming: Timing) => void,
-  (newModelOutput: ModelOutput | undefined) => void
+  (newTiming: Timing) => void
 ] {
   const setAppNodes = useCallback(
     (newNodes: AppNode[]) => {
@@ -59,20 +59,10 @@ export default function useAppStateModifiers(
       setAppState((prevState) => ({
         ...prevState,
         timing: newTiming,
-        output: undefined,
       }));
+      setOutput(undefined);
     },
-    [setAppState]
-  );
-
-  const setModelOutput = useCallback(
-    (newModelOutput: ModelOutput | undefined) => {
-      setAppState((prevState) => ({
-        ...prevState,
-        output: newModelOutput,
-      }));
-    },
-    [setAppState]
+    [setAppState, setOutput]
   );
 
   return [
@@ -81,6 +71,5 @@ export default function useAppStateModifiers(
     setCanvasViewState,
     setSavedCanvasState,
     setTiming,
-    setModelOutput,
   ];
 }

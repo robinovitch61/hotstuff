@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useCallback } from "react";
 import { AppConnection, AppNode } from "../App";
 import { ModelOutput } from "hotstuff-network";
@@ -7,7 +8,7 @@ export default function useNodeConnectionUtils(
   setAppNodes: (newNodes: AppNode[]) => void,
   appConnections: AppConnection[],
   setAppConnections: (newConnections: AppConnection[]) => void,
-  setModelOutput: (newModelOutput: ModelOutput | undefined) => void
+  setOutput: React.Dispatch<React.SetStateAction<ModelOutput | undefined>>
 ): [
   (node: AppNode) => void,
   (connection: AppConnection) => void,
@@ -26,17 +27,17 @@ export default function useNodeConnectionUtils(
       }));
       newNodes.push({ ...node, isActive: true });
       setAppNodes(newNodes);
-      setModelOutput(undefined);
+      setOutput(undefined);
     },
-    [appNodes, setAppNodes, setModelOutput]
+    [appNodes, setAppNodes, setOutput]
   );
 
   const addConnection = useCallback(
     (connection: AppConnection) => {
       setAppConnections([...appConnections, connection]);
-      setModelOutput(undefined);
+      setOutput(undefined);
     },
-    [appConnections, setAppConnections, setModelOutput]
+    [appConnections, setAppConnections, setOutput]
   );
 
   const updateNodes = useCallback(
@@ -94,12 +95,12 @@ export default function useNodeConnectionUtils(
           !nodeIds.includes(conn.secondNode.id)
       );
       setAppConnections(newConnections);
-      setModelOutput(undefined);
+      setOutput(undefined);
 
       const newNodes = appNodes.filter((node) => !nodeIds.includes(node.id));
       setAppNodes(newNodes);
     },
-    [appConnections, appNodes, setAppConnections, setAppNodes, setModelOutput]
+    [appConnections, appNodes, setAppConnections, setAppNodes, setOutput]
   );
 
   const updateConnections = useCallback(
@@ -119,9 +120,9 @@ export default function useNodeConnectionUtils(
         (conn) => !connIdsToUpdate.includes(conn.id)
       );
       setAppConnections([...sortedConnsToUpdate, ...oldConns]);
-      setModelOutput(undefined);
+      setOutput(undefined);
     },
-    [appConnections, setAppConnections, setModelOutput]
+    [appConnections, setAppConnections, setOutput]
   );
 
   const deleteConnections = useCallback(
@@ -129,9 +130,9 @@ export default function useNodeConnectionUtils(
       setAppConnections(
         appConnections.filter((conn) => !connIds.includes(conn.id))
       );
-      setModelOutput(undefined);
+      setOutput(undefined);
     },
-    [appConnections, setAppConnections, setModelOutput]
+    [appConnections, setAppConnections, setOutput]
   );
 
   const setActiveNodes = useCallback(

@@ -18,6 +18,7 @@ import {
 } from "./style";
 import { StyledError } from "./EditableTable/style";
 import config from "../../config";
+import { ModelOutput } from "hotstuff-network";
 
 type SidebarProps = {
   appState: AppState;
@@ -32,7 +33,7 @@ type SidebarProps = {
   deleteNodes: (nodeIds: string[]) => void;
   updateConnections: (connections: AppConnection[]) => void;
   deleteConnections: (connectionIds: string[]) => void;
-  onRunModel: () => void;
+  onRunModel: () => ModelOutput | undefined;
 };
 
 export default function Sidebar(props: SidebarProps): React.ReactElement {
