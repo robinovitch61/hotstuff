@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
 import { AppState, ModalState, Timing } from "../../App";
@@ -17,6 +17,11 @@ const StyledModelControlsWrapper = styled.div`
 `;
 
 const StyledButton = styled.button`
+  margin-top: 5px;
+  margin-bottom: 5px;
+`;
+
+const StyledAnchor = styled.a`
   margin-top: 5px;
   margin-bottom: 5px;
 `;
@@ -81,6 +86,7 @@ export default function ModelControls(
   } = props;
 
   const [stagedAppState, setStagedAppState] = useState<string>("");
+  const downloadModelRef = useRef<HTMLAnchorElement>(null);
 
   return (
     <StyledModelControlsWrapper>
@@ -130,6 +136,28 @@ export default function ModelControls(
         >
           Run & Copy Results
         </StyledButton>
+        <StyledAnchor
+          ref={downloadModelRef}
+          onClick={() => {
+            if (downloadModelRef.current) {
+              const blob = new Blob([JSON.stringify(appState)], {
+                type: "text/plain;charset=utf-8",
+              });
+              const url = URL.createObjectURL(blob);
+              downloadModelRef.current.setAttribute("href", url);
+
+              const now = new Date();
+              downloadModelRef.current.setAttribute(
+                "download",
+                `${now.getFullYear()}-${
+                  now.getMonth() + 1
+                }-${now.getDate()}T${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}_thermal_model.json`
+              );
+            }
+          }}
+        >
+          Download Model
+        </StyledAnchor>
       </StyledTopControls>
       <StyledImport>
         <StyledLabel>Model:</StyledLabel>
