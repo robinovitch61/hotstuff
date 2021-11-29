@@ -434,19 +434,18 @@ describe('getHeatTransfer', () => {
   });
 
   test('simple input', () => {
-    expect(getHeatTransfer([1, 2], [firstNode, secondNode], [connFirstSecond])).toEqual([-0.01]);
+    expect(getHeatTransfer([1, 2], [firstNode.id, secondNode.id], [connFirstSecond])).toEqual([-0.01]);
   });
 
   test('three node input without rad', () => {
-    expect(getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connSecondThird])).toEqual([
-      -0.01,
-      -0.01,
-    ]);
+    expect(
+      getHeatTransfer([1, 2, 3], [firstNode.id, secondNode.id, thirdNode.id], [connFirstSecond, connSecondThird]),
+    ).toEqual([-0.01, -0.01]);
   });
 
   test('three node input with rad', () => {
     expect(
-      getHeatTransfer([1, 2, 3], [firstNode, secondNode, thirdNode], [connFirstSecond, connRadSecondThird]),
+      getHeatTransfer([1, 2, 3], [firstNode.id, secondNode.id, thirdNode.id], [connFirstSecond, connRadSecondThird]),
     ).toEqual([-0.01, -1.3]);
   });
 });
