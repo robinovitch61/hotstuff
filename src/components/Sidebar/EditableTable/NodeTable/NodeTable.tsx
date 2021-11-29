@@ -16,6 +16,7 @@ import useSortableTable from "../hooks/useSortableTable";
 import DeleteCell from "../DeleteCell";
 import { validateNodeName } from "../../../../utils/nodeConnectionUtils";
 import { KELVIN } from "hotstuff-network";
+import noteValidator from "../tableUtils";
 
 type NodeTableColumn = TableColumn<AppNode>;
 
@@ -88,6 +89,8 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         text: "Notes",
         widthPercent: 1,
         minWidthPx: 100,
+        validator: (rowId, value) =>
+          noteValidator(rowId, value, setTemporaryErrors),
       },
     ],
     [rows, setTemporaryErrors]

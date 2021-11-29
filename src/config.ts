@@ -37,6 +37,7 @@ const config = {
   maxPlotPoints: 400,
   multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
   errorMessageDurationSeconds: 4,
+  maxNoteLengthChars: 500,
 };
 
 export default config;

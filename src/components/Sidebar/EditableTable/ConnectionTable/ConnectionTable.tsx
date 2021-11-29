@@ -19,6 +19,7 @@ import {
   filterConnectionOptions,
   getConnectionAfterValue,
 } from "../../../../utils/nodeConnectionUtils";
+import noteValidator from "../tableUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 export type ConnectionTableColumn = TableColumn<AppConnectionTable>;
@@ -174,6 +175,8 @@ export default function ConnectionTable(
         text: "Notes",
         widthPercent: 1,
         minWidthPx: 100,
+        validator: (rowId, value) =>
+          noteValidator(rowId, value, setTemporaryErrors),
       },
     ],
     [
