@@ -1,7 +1,9 @@
 import {
   CartesianGrid,
+  Label,
   Legend,
   LineChart,
+  ReferenceLine,
   Tooltip,
   TooltipPayload,
   TooltipProps,
@@ -11,6 +13,8 @@ import {
 import * as React from "react";
 import { PlotDimensions } from "./Plot";
 import styled from "styled-components/macro";
+import config from "../../config";
+// import { generateYTicks } from "./plotUtils";
 
 const StyledToolTip = styled.div`
   background: rgba(255, 255, 255, 0.7);
@@ -85,21 +89,12 @@ type LinePlotProps = {
   xAxisKey: string;
   xLabel: string;
   yLabel: string;
-  yDomain?: [number, number];
   unit: string;
 };
 
 export default function LinePlot(props: LinePlotProps): React.ReactElement {
-  const {
-    plotDimensions,
-    plotData,
-    lines,
-    xAxisKey,
-    xLabel,
-    yLabel,
-    yDomain,
-    unit,
-  } = props;
+  const { plotDimensions, plotData, lines, xAxisKey, xLabel, yLabel, unit } =
+    props;
 
   return (
     <LineChart
@@ -118,7 +113,10 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
         }}
       />
       <YAxis
-        domain={yDomain}
+        padding={{
+          top: config.plotYDomainPaddingPx,
+          bottom: config.plotYDomainPaddingPx,
+        }}
         label={{
           value: yLabel,
           position: "center",
@@ -126,6 +124,7 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
           dx: -20,
         }}
       />
+      <ReferenceLine y={0} stroke="black" strokeWidth={2} />
       <Tooltip content={<CustomTooltip after={unit} />} />
       <Legend
         layout="horizontal"

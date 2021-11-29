@@ -33,7 +33,7 @@ const config = {
     top: 20,
     bottom: 20,
   },
-  plotDomainMarginPercent: 0.1,
+  plotYDomainPaddingPx: 15,
   maxPlotPoints: 400,
   multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
   errorMessageDurationSeconds: 4,

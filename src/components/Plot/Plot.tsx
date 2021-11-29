@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { emptyOutput, ModelOutput } from "hotstuff-network";
 import LinePlot from "./LinePlot";
 import Tabs from "../Tabs/Tabs";
-import config from "../../config";
 import { getDataForPlots, getDataKeyForConnection } from "./plotUtils";
 
 const colors = [
@@ -68,27 +67,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
   const res =
     modelHasOutput && props.modelOutput ? props.modelOutput : emptyOutput;
 
-  const [tempPlotData, tempDomain, heatTransferPlotData, heatTransferDomain] =
-    getDataForPlots(res);
-
-  const yTempDomainMargin =
-    (tempDomain[1] - tempDomain[0]) * config.plotDomainMarginPercent;
-  const yTempDomain: [number, number] | undefined = modelHasOutput
-    ? [
-        Math.floor(tempDomain[0] - yTempDomainMargin),
-        Math.ceil(tempDomain[1] + yTempDomainMargin),
-      ]
-    : undefined;
-
-  const yHeatTransferDomainMargin =
-    (heatTransferDomain[1] - heatTransferDomain[0]) *
-    config.plotDomainMarginPercent;
-  const yHeatTransferDomain: [number, number] | undefined = modelHasOutput
-    ? [
-        Math.floor(heatTransferDomain[0] - yHeatTransferDomainMargin),
-        Math.ceil(heatTransferDomain[1] + yHeatTransferDomainMargin),
-      ]
-    : undefined;
+  const [tempPlotData, heatTransferPlotData] = getDataForPlots(res);
 
   const heatTransferLines = useMemo(
     () =>
@@ -132,7 +111,6 @@ export default function Plot(props: PlotProps): React.ReactElement {
       xAxisKey={"time"}
       xLabel={"Time [s]"}
       yLabel={"Temperature [degC]"}
-      yDomain={yTempDomain}
       unit={"degC"}
     />
   );
@@ -145,7 +123,6 @@ export default function Plot(props: PlotProps): React.ReactElement {
       xAxisKey={"time"}
       xLabel={"Time [s]"}
       yLabel={"Heat Transfer [Watts]"}
-      yDomain={yHeatTransferDomain}
       unit={"W"}
     />
   );

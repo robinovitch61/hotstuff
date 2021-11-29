@@ -28,11 +28,9 @@ type TimeSeriesPlotData = {
   [key: string]: number;
 };
 
-type PlotDomain = [number, number];
-
 export function getDataForPlots(
   data: ModelOutput
-): [TimeSeriesPlotData[], PlotDomain, TimeSeriesPlotData[], PlotDomain] {
+): [TimeSeriesPlotData[], TimeSeriesPlotData[]] {
   // the number of points depends on the order of magnitude
   const lowerMag = Math.floor(Math.log10(data.totalTimeS));
   const divisibleBy = Math.pow(10, lowerMag - 1);
@@ -43,11 +41,7 @@ export function getDataForPlots(
   const includeAll = data.timeSeriesS.length < config.maxPlotPoints;
 
   const tempsAtAllTimes: TimeSeriesPlotData[] = [];
-  let minTemp = 1e9;
-  let maxTemp = -1e9;
   const heatTransfersAtAllTimes: TimeSeriesPlotData[] = [];
-  let minHeatTransfer = 1e9;
-  let maxHeatTransfer = -1e9;
 
   data.timeSeriesS.forEach((t, idx) => {
     if (includeAll || include(t)) {
@@ -56,11 +50,6 @@ export function getDataForPlots(
 
       data.nodeResults.forEach((nodeResult) => {
         const tempVal = nodeResult.tempDegC[idx];
-        if (tempVal < minTemp) {
-          minTemp = tempVal;
-        } else if (tempVal > maxTemp) {
-          maxTemp = tempVal;
-        }
         temp[nodeResult.node.name] = roundToNearestTenth(tempVal);
       });
 
@@ -71,11 +60,6 @@ export function getDataForPlots(
         )
           ? heatTransferVal
           : -heatTransferVal;
-        if (signedHeatTransferVal < minHeatTransfer) {
-          minHeatTransfer = signedHeatTransferVal;
-        } else if (signedHeatTransferVal > maxHeatTransfer) {
-          maxHeatTransfer = signedHeatTransferVal;
-        }
         ht[getDataKeyForConnection(connectionResult.connection)] =
           roundToNearestTenth(signedHeatTransferVal);
       });
@@ -84,10 +68,5 @@ export function getDataForPlots(
       heatTransfersAtAllTimes.push(ht);
     }
   });
-  return [
-    tempsAtAllTimes,
-    [minTemp, maxTemp],
-    heatTransfersAtAllTimes,
-    [minHeatTransfer, maxHeatTransfer],
-  ];
+  return [tempsAtAllTimes, heatTransfersAtAllTimes];
 }
