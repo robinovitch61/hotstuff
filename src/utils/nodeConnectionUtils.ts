@@ -46,6 +46,7 @@ export const makeNewConnection = (
     }),
     firstNodeId: firstNodeFirst ? firstNode.id : secondNode.id,
     secondNodeId: firstNodeFirst ? secondNode.id : firstNode.id,
+    connectionNotes: "",
   };
 };
 
@@ -151,6 +152,7 @@ export function getNewAppNode(appNodes: AppNode[], center: Point): AppNode {
     center: center,
     isActive: false,
     textDirection: "D",
+    nodeNotes: "",
   };
 }
 

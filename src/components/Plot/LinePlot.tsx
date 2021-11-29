@@ -1,6 +1,5 @@
 import {
   CartesianGrid,
-  Label,
   Legend,
   LineChart,
   ReferenceLine,

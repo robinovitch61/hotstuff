@@ -132,26 +132,23 @@ export default function ConnectionTable(
   const connectionColumns: ConnectionTableColumn[] = useMemo(
     () => [
       {
-        text: "First Node",
         key: "firstNodeId",
-        width: 0.3,
-        minWidthPx: 100,
+        text: "First Node",
+        minWidthPx: 120,
         options: nodeOptions,
         onSelectOption: onSelectNewfirstNode,
       },
       {
-        text: "Second Node",
         key: "secondNodeId",
-        width: 0.3,
-        minWidthPx: 100,
+        text: "Second Node",
+        minWidthPx: 120,
         options: nodeOptions,
         onSelectOption: onSelectNewsecondNode,
       },
       {
-        text: "Resistance",
         key: "resistanceDegKPerW",
-        width: 0.2,
-        minWidthPx: 100,
+        text: "Resistance",
+        minWidthPx: 120,
         validator: (rowId, resistance) => {
           const resistanceNumber = parseFloat(resistance);
           if (resistanceNumber <= 0) {
@@ -166,12 +163,17 @@ export default function ConnectionTable(
         },
       },
       {
-        text: "Kind",
         key: "kind",
-        width: 0.2,
-        minWidthPx: 100,
+        text: "Kind",
+        minWidthPx: 120,
         options: connectionTypes,
         onSelectOption: onSelectNewConnectionType,
+      },
+      {
+        key: "connectionNotes",
+        text: "Notes",
+        widthPercent: 1,
+        minWidthPx: 100,
       },
     ],
     [
@@ -205,7 +207,11 @@ export default function ConnectionTable(
         setOption: CellOption | undefined
       ) {
         return (
-          <StyledCell key={col.key} width={col.width} minWidth={col.minWidthPx}>
+          <StyledCell
+            key={col.key}
+            width={col.widthPercent}
+            minWidth={col.minWidthPx}
+          >
             <TableCell<AppConnectionTable>
               row={row}
               col={col}

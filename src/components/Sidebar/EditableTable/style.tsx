@@ -29,13 +29,16 @@ export const StyledRow = styled.div<{
     isActive ? "rgba(112, 165, 255, 0.2)" : "none"};
 `;
 
-export const StyledCell = styled.div<{ width: number; minWidth?: number }>`
+export const StyledCell = styled.div<{
+  width?: number;
+  minWidth?: number;
+}>`
   display: inline-flex;
   justify-content: center;
   align-items: center;
   border: 1px solid #ddd;
   height: 2em;
-  width: ${({ width }) => `${width * 100}%`};
+  width: ${({ width }) => (!!width ? `${width * 100}%` : "none")};
   min-width: ${({ minWidth }) => (!!minWidth ? `${minWidth}px` : "none")};
 `;
 
@@ -59,10 +62,14 @@ export const StyledHeaderWrapper = styled.div<{ heightOffsetPx?: number }>`
   z-index: 1;
 `;
 
-export const StyledColHeader = styled.div<{ width: number; minWidth?: number }>`
+export const StyledColHeader = styled.div<{
+  widthPercent?: number;
+  minWidthPx?: number;
+}>`
   display: inline-flex;
-  width: ${({ width }) => `${width * 100}%`};
-  min-width: ${({ minWidth }) => (!!minWidth ? `${minWidth}px` : "none")};
+  width: ${({ widthPercent }) =>
+    !!widthPercent ? `${widthPercent * 100}%` : "none"};
+  min-width: ${({ minWidthPx }) => (!!minWidthPx ? `${minWidthPx}px` : "none")};
   justify-content: center;
   align-items: center;
   font-weight: bold;

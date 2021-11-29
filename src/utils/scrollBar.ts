@@ -3,7 +3,7 @@ export function forceShowScrollbars(): void {
   // This is false on Macs when the "General > Show scroll bars" setting is
   // not set to "Always" (the default is "When scrolling"). The approach
   // taken here is to create an element that will scroll and then compare
-  // its outer width (including scrollbars) to its inner width (excluding
+  // its outer widthPercent (including scrollbars) to its inner widthPercent (excluding
   // scrollbars).
   function areScrollbarsVisible() {
     const scrollableElem = document.createElement("div"),
@@ -15,7 +15,7 @@ export function forceShowScrollbars(): void {
     innerElem.style.width = "30px";
     innerElem.style.height = "60px";
     scrollableElem.appendChild(innerElem);
-    document.body.appendChild(scrollableElem); // Elements only have width if they're in the layout
+    document.body.appendChild(scrollableElem); // Elements only have widthPercent if they're in the layout
     const diff = scrollableElem.offsetWidth - scrollableElem.clientWidth;
     document.body.removeChild(scrollableElem);
     return diff > 0;

@@ -1,5 +1,5 @@
 #canvas {
-  /*set fixed width and height for what you actually want in css!*/
+  /*set fixed widthPercent and height for what you actually want in css!*/
   /*should be the same as what's passed into canvas element*/
   width: 600px;
   height: 400px;

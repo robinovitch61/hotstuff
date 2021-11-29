@@ -47,8 +47,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
       {
         key: "name",
         text: "Name",
-        width: 0.3,
-        minWidthPx: 100,
+        minWidthPx: 150,
         validator: (rowId: string, name: string) =>
           validateNodeName(
             name,
@@ -58,8 +57,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
       {
         key: "temperatureDegC",
         text: "Temp [C]",
-        width: 0.15,
-        minWidthPx: 100,
+        minWidthPx: 120,
         validator: (rowId, tempVal) => {
           if (parseFloat(tempVal) < -KELVIN) {
             setTemporaryErrors([
@@ -73,20 +71,23 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
       {
         key: "capacitanceJPerDegK",
         text: "Capacitance [J/K]",
-        width: 0.15,
-        minWidthPx: 100,
+        minWidthPx: 120,
       },
       {
         key: "powerGenW",
         text: "Power Gen [W]",
-        width: 0.15,
-        minWidthPx: 80,
+        minWidthPx: 120,
       },
       {
         key: "isBoundary",
         text: "Fixed Temp?",
-        width: 0.15,
-        minWidthPx: 80,
+        minWidthPx: 100,
+      },
+      {
+        key: "nodeNotes",
+        text: "Notes",
+        widthPercent: 1,
+        minWidthPx: 100,
       },
     ],
     [rows, setTemporaryErrors]
@@ -108,7 +109,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
           return (
             <StyledCell
               key={col.key}
-              width={col.width}
+              width={col.widthPercent}
               minWidth={col.minWidthPx}
             >
               {tableCell}

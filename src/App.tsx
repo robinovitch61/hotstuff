@@ -39,11 +39,13 @@ export type AppNode = HSNode & {
   center: Point;
   isActive: boolean;
   textDirection: Direction;
+  nodeNotes: string;
 };
 
 export type AppConnection = HSConnection & {
   firstNodeId: string; // duplicated data here to make working with tables easier
   secondNodeId: string; // duplicated data here to make working with tables easier
+  connectionNotes: string;
 };
 
 export type Timing = {
@@ -142,7 +144,7 @@ export default function App(): React.ReactElement {
     onMouseDownOnTableControlsBorder,
   ] = useResizablePanels(setAppState, windowHeight, windowWidth);
 
-  // width/heights
+  // widthPercent/heights
   const workspaceWidth = windowWidth;
   const workspaceHeight = windowHeight;
   const canvasHeight = windowHeight * appState.panelSizes.canvasHeightFraction;

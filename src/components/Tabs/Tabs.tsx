@@ -17,6 +17,7 @@ const StyledTabs = styled.div`
   justify-content: space-evenly;
   position: sticky;
   top: 0;
+  left: 0;
   background: white;
   box-sizing: border-box;
   z-index: 1;

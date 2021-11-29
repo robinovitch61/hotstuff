@@ -24,6 +24,7 @@ const jerryAppNode: AppNode = {
   center: { x: 200, y: 150 },
   isActive: false,
   textDirection: "L",
+  nodeNotes: "Jerry is the best cat.",
 };
 
 const bedNode = makeNode({
@@ -38,6 +39,7 @@ const bedAppNode: AppNode = {
   center: { x: 500, y: 150 },
   isActive: false,
   textDirection: "R",
+  nodeNotes: "",
 };
 
 const airNode = makeNode({
@@ -52,6 +54,7 @@ const airAppNode: AppNode = {
   center: { x: 350, y: 300 },
   isActive: false,
   textDirection: "D",
+  nodeNotes: "",
 };
 
 export const defaultNodes: AppNode[] = [jerryAppNode, bedAppNode, airAppNode];

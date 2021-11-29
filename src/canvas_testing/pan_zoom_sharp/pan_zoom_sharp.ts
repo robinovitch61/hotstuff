@@ -47,7 +47,7 @@ let lastMousePos = ORIGIN;
 let offset = initialOffset;
 let scale = initialScale;
 
-// when setting up canvas, set width/height to devicePixelRation times normal
+// when setting up canvas, set widthPercent/height to devicePixelRation times normal
 const { devicePixelRatio = 1 } = window;
 context.canvas.width = context.canvas.width * devicePixelRatio;
 context.canvas.height = context.canvas.height * devicePixelRatio;

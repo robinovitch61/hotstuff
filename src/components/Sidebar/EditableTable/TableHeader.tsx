@@ -47,8 +47,8 @@ export default function TableHeader<T>(
           <StyledColHeader
             key={col.key.toString()}
             onClick={onClick}
-            width={col.width}
-            minWidth={col.minWidthPx}
+            widthPercent={col.widthPercent}
+            minWidthPx={col.minWidthPx}
           >
             <StyledColText>{col.text}</StyledColText>
             <StyledSortIcon>{isSortedCol ? sortIcon : ""}</StyledSortIcon>
@@ -56,8 +56,8 @@ export default function TableHeader<T>(
         );
       })}
       <StyledColHeader
-        width={config.tableDeleteCellWidthPercent}
-        minWidth={config.tableDeleteCellMinWidthPx}
+        widthPercent={config.tableDeleteCellWidthPercent}
+        minWidthPx={config.tableDeleteCellMinWidthPx}
         style={{ cursor: "unset" }}
       />
     </StyledHeaderWrapper>
