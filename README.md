@@ -26,7 +26,7 @@ TODO:
 - [x] Handle app errors like too many timesteps [5]
 - [x] Make model runtime errors more visible than just in console [4]
 - [x] File export/import [5]
-- [ ] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
+- [x] Heat transfer naming conventions correct (a to b, a is hotter than b to start) [5]
 - [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
 - [ ] Optional notes field for nodes/connections in table.
 - [ ] Logo + favicon [5]

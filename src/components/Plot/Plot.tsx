@@ -6,8 +6,7 @@ import { emptyOutput, ModelOutput } from "hotstuff-network";
 import LinePlot from "./LinePlot";
 import Tabs from "../Tabs/Tabs";
 import config from "../../config";
-
-const { maxPlotPoints, plotDomainMarginPercent } = config;
+import { getDataForPlots, getDataKeyForConnection } from "./plotUtils";
 
 const colors = [
   "#2ecc71",
@@ -57,75 +56,6 @@ export type PlotDimensions = {
   margin: Margin;
 };
 
-type TimeSeriesPlotData = {
-  time: number;
-  [key: string]: number;
-};
-
-type PlotDomain = [number, number];
-
-function roundToNearestTenth(input: number): number {
-  return Math.round(input * 10) / 10;
-}
-
-function plotShape(
-  data: ModelOutput
-): [TimeSeriesPlotData[], PlotDomain, TimeSeriesPlotData[], PlotDomain] {
-  // the number of points depends on the order of magnitude
-  const lowerMag = Math.floor(Math.log10(data.totalTimeS));
-  const divisibleBy = Math.pow(10, lowerMag - 1);
-  function include(val: number) {
-    return Math.abs(val % divisibleBy) === 0;
-  }
-
-  const includeAll = data.timeSeriesS.length < maxPlotPoints;
-
-  const tempsAtAllTimes: TimeSeriesPlotData[] = [];
-  let minTemp = 1e9;
-  let maxTemp = -1e9;
-  const heatTransfersAtAllTimes: TimeSeriesPlotData[] = [];
-  let minHeatTransfer = 1e9;
-  let maxHeatTransfer = -1e9;
-
-  data.timeSeriesS.forEach((t, idx) => {
-    if (includeAll || include(t)) {
-      const temp: TimeSeriesPlotData = { time: t };
-      const ht: TimeSeriesPlotData = { time: t };
-
-      data.nodeResults.forEach((nodeResult) => {
-        const tempVal = nodeResult.tempDegC[idx];
-        if (tempVal < minTemp) {
-          minTemp = tempVal;
-        } else if (tempVal > maxTemp) {
-          maxTemp = tempVal;
-        }
-        temp[nodeResult.node.name] = roundToNearestTenth(tempVal);
-      });
-
-      data.connectionResults.forEach((connectionResult) => {
-        const heatTransferVal = connectionResult.heatTransferW[idx];
-        if (heatTransferVal < minHeatTransfer) {
-          minHeatTransfer = heatTransferVal;
-        } else if (heatTransferVal > maxHeatTransfer) {
-          maxHeatTransfer = heatTransferVal;
-        }
-        ht[
-          `${connectionResult.connection.firstNode.name} to ${connectionResult.connection.secondNode.name}`
-        ] = roundToNearestTenth(heatTransferVal);
-      });
-
-      tempsAtAllTimes.push(temp);
-      heatTransfersAtAllTimes.push(ht);
-    }
-  });
-  return [
-    tempsAtAllTimes,
-    [minTemp, maxTemp],
-    heatTransfersAtAllTimes,
-    [minHeatTransfer, maxHeatTransfer],
-  ];
-}
-
 type PlotProps = {
   plotDimensions: PlotDimensions;
   modelOutput?: ModelOutput;
@@ -139,10 +69,10 @@ export default function Plot(props: PlotProps): React.ReactElement {
     modelHasOutput && props.modelOutput ? props.modelOutput : emptyOutput;
 
   const [tempPlotData, tempDomain, heatTransferPlotData, heatTransferDomain] =
-    plotShape(res);
+    getDataForPlots(res);
 
   const yTempDomainMargin =
-    (tempDomain[1] - tempDomain[0]) * plotDomainMarginPercent;
+    (tempDomain[1] - tempDomain[0]) * config.plotDomainMarginPercent;
   const yTempDomain: [number, number] | undefined = modelHasOutput
     ? [
         Math.floor(tempDomain[0] - yTempDomainMargin),
@@ -151,7 +81,8 @@ export default function Plot(props: PlotProps): React.ReactElement {
     : undefined;
 
   const yHeatTransferDomainMargin =
-    (heatTransferDomain[1] - heatTransferDomain[0]) * plotDomainMarginPercent;
+    (heatTransferDomain[1] - heatTransferDomain[0]) *
+    config.plotDomainMarginPercent;
   const yHeatTransferDomain: [number, number] | undefined = modelHasOutput
     ? [
         Math.floor(heatTransferDomain[0] - yHeatTransferDomainMargin),
@@ -166,7 +97,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
           <Line
             key={connectionResult.connection.id}
             type={"monotone"}
-            dataKey={`${connectionResult.connection.firstNode.name} to ${connectionResult.connection.secondNode.name}`}
+            dataKey={getDataKeyForConnection(connectionResult.connection)}
             stroke={colors[idx]}
             activeDot={{ r: 8 }}
             isAnimationActive={false}
