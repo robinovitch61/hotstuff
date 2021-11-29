@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { Point } from "./utils/pointUtils";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Plot from "./components/Plot/Plot";
-import config from "./config";
 import useWindowSize from "./components/Canvas/hooks/useWindowSize";
 import Canvas, { CanvasViewState } from "./components/Canvas/Canvas";
 import useDraw from "./hooks/useDraw";
@@ -30,8 +29,7 @@ import {
 import Modal from "./components/Modal/Modal";
 import ErrorModal from "./components/Modal/ErrorModal";
 import useTemporaryError from "./components/Sidebar/hooks/useTemporaryError";
-
-const { plotMargin, tabHeightPx, plotHeightBufferPx } = config;
+import config from "./config";
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -152,8 +150,8 @@ export default function App(): React.ReactElement {
     windowWidth * (1 - appState.panelSizes.editorWidthFraction);
   const plotHeight =
     (1 - appState.panelSizes.canvasHeightFraction) * windowHeight -
-    tabHeightPx -
-    plotHeightBufferPx;
+    config.tabHeightPx -
+    config.plotHeightBufferPx;
   const plotWidth = canvasWidth;
   const editorWidth = appState.panelSizes.editorWidthFraction * windowWidth;
 
@@ -163,7 +161,7 @@ export default function App(): React.ReactElement {
         plotDimensions={{
           height: plotHeight,
           width: plotWidth,
-          margin: plotMargin,
+          margin: config.plotMargin,
         }}
         modelOutput={output}
       />

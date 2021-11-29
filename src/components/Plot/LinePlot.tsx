@@ -105,6 +105,7 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis
         dataKey={xAxisKey}
+        tick={{ fontSize: `${config.plotTickFontSizePx}` }}
         label={{
           value: xLabel,
           position: "center",
@@ -112,6 +113,9 @@ export default function LinePlot(props: LinePlotProps): React.ReactElement {
         }}
       />
       <YAxis
+        domain={["dataMin", "auto"]}
+        allowDecimals={false}
+        tick={{ fontSize: `${config.plotTickFontSizePx}` }}
         padding={{
           top: config.plotYDomainPaddingPx,
           bottom: config.plotYDomainPaddingPx,

@@ -24,9 +24,9 @@ const config = {
   maxRadiusPx: 40,
   activeNodeOutlineWidthPx: 5,
   tabHeightPx: 25,
-  plotHeightBufferPx: 10,
   tableDeleteCellWidthPercent: 0.1,
   tableDeleteCellMinWidthPx: 40,
+  plotHeightBufferPx: 10,
   plotMargin: {
     left: 10,
     right: 20,
@@ -34,6 +34,7 @@ const config = {
     bottom: 20,
   },
   plotYDomainPaddingPx: 15,
+  plotTickFontSizePx: 15,
   maxPlotPoints: 400,
   multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
   errorMessageDurationSeconds: 4,

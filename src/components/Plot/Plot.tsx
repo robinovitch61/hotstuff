@@ -122,7 +122,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
       lines={heatTransferLines}
       xAxisKey={"time"}
       xLabel={"Time [s]"}
-      yLabel={"Heat Transfer [Watts]"}
+      yLabel={"Heat Transfer [W]"}
       unit={"W"}
     />
   );
