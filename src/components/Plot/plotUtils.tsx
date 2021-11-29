@@ -23,6 +23,10 @@ export function roundToNearestTenth(input: number): number {
   return Math.round(input * 10) / 10;
 }
 
+export function roundToNearestHundredth(input: number): number {
+  return Math.round(input * 100) / 100;
+}
+
 type TimeSeriesPlotData = {
   time: number;
   [key: string]: number;
@@ -61,7 +65,7 @@ export function getDataForPlots(
           ? heatTransferVal
           : -heatTransferVal;
         ht[getDataKeyForConnection(connectionResult.connection)] =
-          roundToNearestTenth(signedHeatTransferVal);
+          roundToNearestHundredth(signedHeatTransferVal);
       });
 
       tempsAtAllTimes.push(temp);
