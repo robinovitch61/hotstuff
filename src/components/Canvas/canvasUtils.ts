@@ -5,6 +5,10 @@ import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { scaleDiverging } from "d3-scale";
 import { HSConnectionKind } from "hotstuff-network";
+import { CellOption } from "../Sidebar/EditableTable/types";
+import { Cell } from "recharts";
+import { determineBrowser } from "../../utils/browserUtils";
+import { text } from "stream/consumers";
 
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
@@ -154,6 +158,60 @@ export function drawNode(
   drawNodeName(context, name, center, radius, textDirection);
 }
 
+export function drawLineBetween(
+  context: CanvasRenderingContext2D,
+  start: Point,
+  end: Point,
+  color: string,
+  startOffset = 0,
+  endOffset = 0,
+  middleChar = ""
+): void {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = color;
+  context.lineWidth = 2;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const angle = Math.atan2(dy, dx);
+  const length = Math.sqrt(dx * dx + dy * dy);
+  const adjLength = length - endOffset;
+
+  context.translate(start.x, start.y);
+  context.rotate(angle);
+
+  context.beginPath();
+  context.moveTo(startOffset, 0);
+  context.lineTo(adjLength, 0);
+
+  context.moveTo(adjLength, -0);
+  context.lineTo(startOffset, -0);
+
+  context.stroke();
+  context.closePath();
+  context.restore();
+
+  if (middleChar) {
+    context.font = "14px Helvetica";
+    const textMetrics = context.measureText(middleChar);
+    const browser = determineBrowser();
+    const width =
+      browser === "Firefox"
+        ? textMetrics.actualBoundingBoxRight - textMetrics.actualBoundingBoxLeft
+        : textMetrics.width;
+    const height =
+      textMetrics.actualBoundingBoxAscent +
+      textMetrics.actualBoundingBoxDescent;
+    const y = (start.y + end.y) / 2;
+    const x = (start.x + end.x) / 2;
+    context.fillStyle = "white";
+    const radius = browser === "Chrome" ? 7 : 9;
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fill();
+    context.fillText(middleChar, x - width / 2, y + height / 4);
+  }
+}
+
 export function drawBidirectionalArrow(
   context: CanvasRenderingContext2D,
   start: Point,
@@ -280,6 +338,24 @@ export function drawClearBox(
   context.restore();
 }
 
+function getEmojiForConnection(kind: HSConnectionKind): string {
+  if (kind == "cond") {
+    return "🔗";
+  } else if (kind == "conv") {
+    return "♨️";
+  } else {
+    return "☀️";
+  }
+}
+
+export function withEmojiPrefix(option: CellOption): CellOption {
+  const emoji = getEmojiForConnection(option.id as HSConnectionKind);
+  return {
+    ...option,
+    text: `${emoji} ${option.text}`,
+  };
+}
+
 export function drawConnection(
   context: CanvasRenderingContext2D,
   firstNodeCenter: Point,
@@ -288,25 +364,15 @@ export function drawConnection(
   secondNodeRadius: number,
   kind: HSConnectionKind
 ): void {
-  if (["cond", "conv"].includes(kind)) {
-    drawBidirectionalArrow(
-      context,
-      firstNodeCenter,
-      secondNodeCenter,
-      "black",
-      firstNodeRadius,
-      secondNodeRadius
-    );
-  } else {
-    drawUnidirectionalArrow(
-      context,
-      firstNodeCenter,
-      secondNodeCenter,
-      "black",
-      firstNodeRadius,
-      secondNodeRadius
-    );
-  }
+  drawLineBetween(
+    context,
+    firstNodeCenter,
+    secondNodeCenter,
+    "black",
+    firstNodeRadius,
+    secondNodeRadius,
+    getEmojiForConnection(kind)
+  );
 }
 
 export function intersectsCircle(

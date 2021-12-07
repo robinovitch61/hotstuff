@@ -20,6 +20,7 @@ import {
   getConnectionAfterValue,
 } from "../../../../utils/nodeConnectionUtils";
 import noteValidator from "../tableUtils";
+import { withEmojiPrefix } from "../../../Canvas/canvasUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 export type ConnectionTableColumn = TableColumn<AppConnectionTable>;
@@ -32,15 +33,15 @@ const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
 const connectionTypes: CellOption[] = [
   {
     id: "cond",
-    text: "🔗 Conduction",
+    text: "Conduction",
   },
   {
     id: "conv",
-    text: "♨️ Convection️️",
+    text: "Convection️️",
   },
   {
     id: "rad",
-    text: "☀️ Radiation️",
+    text: "Radiation️",
   },
 ];
 
@@ -167,7 +168,7 @@ export default function ConnectionTable(
         key: "kind",
         text: "Kind",
         minWidthPx: 120,
-        options: connectionTypes,
+        options: connectionTypes.map((t) => withEmojiPrefix(t)),
         onSelectOption: onSelectNewConnectionType,
       },
       {
