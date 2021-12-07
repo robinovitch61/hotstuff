@@ -6,9 +6,7 @@ import { CanvasState } from "./Canvas";
 import { scaleDiverging } from "d3-scale";
 import { HSConnectionKind } from "hotstuff-network";
 import { CellOption } from "../Sidebar/EditableTable/types";
-import { Cell } from "recharts";
 import { determineBrowser } from "../../utils/browserUtils";
-import { text } from "stream/consumers";
 
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);

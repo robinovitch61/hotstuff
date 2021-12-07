@@ -73,41 +73,41 @@ export default function ConnectionTable(
       "kind"
     );
 
-  const onSelectNewfirstNode = useCallback(
+  const onSelectNewFirstNode = useCallback(
     (id: string, option: CellOption) => {
       const connection = rows.find((conn) => conn.id === id);
-      const newfirstNodeNode = nodes.find((node) => node.id === option.id);
+      const newFirstNodeNode = nodes.find((node) => node.id === option.id);
       if (
         !connection ||
-        !newfirstNodeNode ||
-        newfirstNodeNode.id === connection.secondNode.id
+        !newFirstNodeNode ||
+        newFirstNodeNode.id === connection.secondNode.id
       ) {
         return;
       }
       onUpdateRow({
         ...connection,
-        firstNode: newfirstNodeNode,
-        firstNodeId: newfirstNodeNode.id,
+        firstNode: newFirstNodeNode,
+        firstNodeId: newFirstNodeNode.id,
       });
     },
     [nodes, onUpdateRow, rows]
   );
 
-  const onSelectNewsecondNode = useCallback(
+  const onSelectNewSecondNode = useCallback(
     (id: string, option: CellOption) => {
       const connection = rows.find((conn) => conn.id === id);
-      const newsecondNodeNode = nodes.find((node) => node.id === option.id);
+      const newSecondNodeNode = nodes.find((node) => node.id === option.id);
       if (
         !connection ||
-        !newsecondNodeNode ||
-        newsecondNodeNode.id === connection.firstNode.id
+        !newSecondNodeNode ||
+        newSecondNodeNode.id === connection.firstNode.id
       ) {
         return;
       }
       onUpdateRow({
         ...connection,
-        secondNode: newsecondNodeNode,
-        secondNodeId: newsecondNodeNode.id,
+        secondNode: newSecondNodeNode,
+        secondNodeId: newSecondNodeNode.id,
       });
     },
     [nodes, onUpdateRow, rows]
@@ -138,14 +138,14 @@ export default function ConnectionTable(
         text: "First Node",
         minWidthPx: 120,
         options: nodeOptions,
-        onSelectOption: onSelectNewfirstNode,
+        onSelectOption: onSelectNewFirstNode,
       },
       {
         key: "secondNodeId",
         text: "Second Node",
         minWidthPx: 120,
         options: nodeOptions,
-        onSelectOption: onSelectNewsecondNode,
+        onSelectOption: onSelectNewSecondNode,
       },
       {
         key: "resistanceDegKPerW",
@@ -183,8 +183,8 @@ export default function ConnectionTable(
     [
       nodeOptions,
       onSelectNewConnectionType,
-      onSelectNewfirstNode,
-      onSelectNewsecondNode,
+      onSelectNewFirstNode,
+      onSelectNewSecondNode,
       setTemporaryErrors,
     ]
   );

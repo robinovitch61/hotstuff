@@ -30,8 +30,19 @@ export default function DropDownTableCell(
     }
   }
 
+  const killMousePropagation = (event: React.MouseEvent) => {
+    // necessary for firefox
+    // https://github.com/facebook/react/issues/12584
+    event.stopPropagation();
+  };
+
   return (
-    <StyledSelect value={props.setOption?.id} onChange={handleChange}>
+    <StyledSelect
+      value={props.setOption?.id}
+      onMouseDown={killMousePropagation}
+      onMouseUp={killMousePropagation}
+      onChange={handleChange}
+    >
       {props.options.map((option) => (
         <option key={option.id} value={option.id}>
           {option.text}
