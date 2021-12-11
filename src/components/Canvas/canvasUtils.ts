@@ -190,6 +190,7 @@ export function drawLineBetween(
   context.restore();
 
   if (middleChar) {
+    context.save();
     context.font = "14px Helvetica";
     const textMetrics = context.measureText(middleChar);
     const browser = determineBrowser();
@@ -207,6 +208,7 @@ export function drawLineBetween(
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.fill();
     context.fillText(middleChar, x - width / 2, y + height / 4);
+    context.restore();
   }
 }
 
