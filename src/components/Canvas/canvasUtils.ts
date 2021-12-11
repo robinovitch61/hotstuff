@@ -163,8 +163,15 @@ export function drawLineBetween(
   color: string,
   startOffset = 0,
   endOffset = 0,
-  middleChar = ""
+  middleChar = "",
+  alreadyDrawn = 0,
+  leftToDraw = 1
 ): void {
+  // this assumes that there will never be more than 2 left to draw (can't have conduction + convection + radiation)
+  if (leftToDraw === 0) {
+    return;
+  }
+
   context.save();
   context.beginPath();
   context.strokeStyle = color;
@@ -190,6 +197,14 @@ export function drawLineBetween(
   context.restore();
 
   if (middleChar) {
+    const absOffset = 8;
+    const offset =
+      alreadyDrawn === 0 && leftToDraw === 2
+        ? -absOffset
+        : alreadyDrawn === 1 && leftToDraw === 1
+        ? absOffset
+        : 0;
+
     context.save();
     context.font = "14px Helvetica";
     const textMetrics = context.measureText(middleChar);
@@ -201,8 +216,13 @@ export function drawLineBetween(
     const height =
       textMetrics.actualBoundingBoxAscent +
       textMetrics.actualBoundingBoxDescent;
-    const y = (start.y + end.y) / 2;
-    const x = (start.x + end.x) / 2;
+
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const angle = Math.tanh(dy / dx);
+    const y = (start.y + end.y) / 2 + Math.sin(angle) * offset;
+    const x = (start.x + end.x) / 2 + Math.cos(angle) * offset;
+
     context.fillStyle = "white";
     const radius = browser === "Chrome" ? 7 : 9;
     context.arc(x, y, radius, 0, Math.PI * 2);
@@ -362,7 +382,9 @@ export function drawConnection(
   firstNodeRadius: number,
   secondNodeCenter: Point,
   secondNodeRadius: number,
-  kind: HSConnectionKind
+  kind: HSConnectionKind,
+  alreadyDrawn: number,
+  leftToDraw: number
 ): void {
   drawLineBetween(
     context,
@@ -371,7 +393,9 @@ export function drawConnection(
     "black",
     firstNodeRadius,
     secondNodeRadius,
-    getEmojiForConnection(kind)
+    getEmojiForConnection(kind),
+    alreadyDrawn,
+    leftToDraw
   );
 }
 

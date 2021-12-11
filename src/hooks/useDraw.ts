@@ -7,6 +7,11 @@ import {
 } from "../components/Canvas/canvasUtils";
 import { AppConnection, AppNode } from "../App";
 import { CanvasState } from "../components/Canvas/Canvas";
+import {
+  decrementConnectionCount,
+  getConnectionKey,
+  getConnectionsToCounts,
+} from "../utils/nodeConnectionUtils";
 
 export default function useDraw(
   appNodes: AppNode[],
@@ -38,6 +43,8 @@ export default function useDraw(
         );
       });
 
+      const connectionToCount = getConnectionsToCounts(appConnections);
+      const leftToDrawConnectionCount = new Map(connectionToCount);
       appConnections.map((conn) => {
         const { firstNode, secondNode, kind } = conn;
         const firstNodeAppNode = appNodes.find(
@@ -55,14 +62,21 @@ export default function useDraw(
             secondNodeAppNode.capacitanceJPerDegK,
             appNodes.map((node) => node.capacitanceJPerDegK)
           );
+
+          const key = getConnectionKey(conn);
+          const leftToDraw = leftToDrawConnectionCount.get(key) ?? 0;
+          const alreadyDrawn = (connectionToCount.get(key) ?? 0) - leftToDraw;
           drawConnection(
             context,
             firstNodeAppNode.center,
             firstNodeRadius,
             secondNodeAppNode.center,
             secondNodeRadius,
-            kind
+            kind,
+            alreadyDrawn,
+            leftToDraw
           );
+          decrementConnectionCount(leftToDrawConnectionCount, conn);
         }
       });
     },

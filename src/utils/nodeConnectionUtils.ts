@@ -271,3 +271,38 @@ export function filterConnectionOptions(
     return options;
   }
 }
+
+export function getConnectionKey(connection: HSConnection): string {
+  return connection.firstNode.id > connection.secondNode.id
+    ? `${connection.firstNode.id}-${connection.secondNode.id}`
+    : `${connection.secondNode.id}-${connection.firstNode.id}`;
+}
+
+export function getConnectionsToCounts(
+  connections: HSConnection[]
+): Map<string, number> {
+  const connectionToCount = new Map();
+  connections.forEach((conn) => {
+    incrementConnectionCount(connectionToCount, conn);
+  });
+  return connectionToCount;
+}
+
+export function incrementConnectionCount(
+  connectionsToCounts: Map<string, number>,
+  connection: HSConnection
+): void {
+  const key = getConnectionKey(connection);
+  connectionsToCounts.set(key, (connectionsToCounts.get(key) ?? 0) + 1);
+}
+
+export function decrementConnectionCount(
+  connectionsToCounts: Map<string, number>,
+  connection: HSConnection
+): void {
+  const key = getConnectionKey(connection);
+  const currentCount = connectionsToCounts.get(key) ?? 0;
+  if (currentCount > 1) {
+    connectionsToCounts.set(key, currentCount - 1);
+  }
+}
