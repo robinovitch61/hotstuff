@@ -306,13 +306,14 @@ function drawLineBetween(
         ? absOffset
         : 0;
     const textMetrics = context.measureText(middleChar);
-    const width =
-      browser === "Firefox"
+    let width =
+      browser === "Chrome"
         ? textMetrics.actualBoundingBoxRight - textMetrics.actualBoundingBoxLeft
         : textMetrics.width;
-    const height =
-      textMetrics.actualBoundingBoxAscent +
-      textMetrics.actualBoundingBoxDescent;
+    if (browser === "Safari") {
+      width *= 1.2; // canvas no like emoji
+    }
+    const height = textMetrics.actualBoundingBoxAscent;
     const radius = browser === "Chrome" ? 7 : 9;
 
     context.save();
@@ -329,7 +330,7 @@ function drawLineBetween(
     context.closePath();
 
     context.rotate(-angle);
-    context.translate(-width / 2, height / 4);
+    context.translate(-width / 2, height / 2);
     context.strokeText(middleChar, 0, 0);
 
     context.restore();
