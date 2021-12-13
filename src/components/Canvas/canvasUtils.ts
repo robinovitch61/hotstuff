@@ -161,9 +161,9 @@ export function drawLineBetween(
   start: Point,
   end: Point,
   color: string,
+  kind: HSConnectionKind,
   startOffset = 0,
   endOffset = 0,
-  middleChar = "",
   alreadyDrawn = 0,
   leftToDraw = 1
 ): void {
@@ -172,30 +172,35 @@ export function drawLineBetween(
     return;
   }
 
-  context.save();
-  context.beginPath();
-  context.strokeStyle = color;
-  context.lineWidth = 2;
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const angle = Math.atan2(dy, dx);
   const length = Math.sqrt(dx * dx + dy * dy);
   const adjLength = length - endOffset;
 
-  context.translate(start.x, start.y);
-  context.rotate(angle);
+  // draw connecting line
+  if (alreadyDrawn === 0) {
+    context.save();
 
-  context.beginPath();
-  context.moveTo(startOffset, 0);
-  context.lineTo(adjLength, 0);
+    context.strokeStyle = color;
+    context.lineWidth = 2;
 
-  context.moveTo(adjLength, -0);
-  context.lineTo(startOffset, -0);
+    context.translate(start.x, start.y);
+    context.rotate(angle);
 
-  context.stroke();
-  context.closePath();
-  context.restore();
+    context.beginPath();
+    context.moveTo(startOffset, 0);
+    context.lineTo(adjLength, 0);
+    context.moveTo(adjLength, -0);
+    context.lineTo(startOffset, -0);
+    context.stroke();
+    context.closePath();
 
+    context.restore();
+  }
+
+  // draw line labels
+  const middleChar = getEmojiForConnection(kind);
   if (middleChar) {
     const absOffset = 8;
     const offset =
@@ -206,7 +211,10 @@ export function drawLineBetween(
         : 0;
 
     context.save();
+
     context.font = "14px Helvetica";
+    context.fillStyle = "white";
+
     const textMetrics = context.measureText(middleChar);
     const browser = determineBrowser();
     const width =
@@ -216,18 +224,20 @@ export function drawLineBetween(
     const height =
       textMetrics.actualBoundingBoxAscent +
       textMetrics.actualBoundingBoxDescent;
-
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const angle = Math.tanh(dy / dx);
-    const y = (start.y + end.y) / 2 + Math.sin(angle) * offset;
-    const x = (start.x + end.x) / 2 + Math.cos(angle) * offset;
-
-    context.fillStyle = "white";
     const radius = browser === "Chrome" ? 7 : 9;
-    context.arc(x, y, radius, 0, Math.PI * 2);
+
+    context.translate(start.x, start.y);
+    context.rotate(angle);
+    context.translate(length / 2 + offset, 0);
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
     context.fill();
-    context.fillText(middleChar, x - width / 2, y + height / 4);
+    context.closePath();
+
+    context.rotate(-angle);
+    context.translate(-width / 2, height / 4);
+    context.strokeText(middleChar, 0, 0);
+
     context.restore();
   }
 }
@@ -391,9 +401,9 @@ export function drawConnection(
     firstNodeCenter,
     secondNodeCenter,
     "black",
+    kind,
     firstNodeRadius,
     secondNodeRadius,
-    getEmojiForConnection(kind),
     alreadyDrawn,
     leftToDraw
   );
