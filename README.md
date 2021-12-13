@@ -30,7 +30,7 @@ TODO:
 - [x] Optional notes field for nodes/connections in table. [5]
 - [x] Min widths to table columns, notes unbounded [5]
 - [x] Round to nearest 100s rather than 10s for heat transfer [5]
-- [ ] Visual difference to single, double connection lines amongst cond/conv/rad [5]
+- [x] Visual difference to single, double connection lines amongst cond/conv/rad [5]
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]
 - [ ] Tutorial popup instead of tutorial model [5]
