@@ -1,17 +1,7 @@
 import { useCallback } from "react";
-import {
-  determineColor,
-  determineRadius,
-  drawConnection,
-  drawNode,
-} from "../components/Canvas/canvasUtils";
+import { drawConnections, drawNodes } from "../components/Canvas/canvasUtils";
 import { AppConnection, AppNode } from "../App";
 import { CanvasState } from "../components/Canvas/Canvas";
-import {
-  decrementConnectionCount,
-  getConnectionKey,
-  getConnectionsToCounts,
-} from "../utils/nodeConnectionUtils";
 
 export default function useDraw(
   appNodes: AppNode[],
@@ -22,63 +12,8 @@ export default function useDraw(
 ] {
   const draw = useCallback(
     (context: CanvasRenderingContext2D) => {
-      appNodes.forEach((node) => {
-        const nodeRadius = determineRadius(
-          node.capacitanceJPerDegK,
-          appNodes.map((node) => node.capacitanceJPerDegK)
-        );
-        const nodeColor = determineColor(
-          node.temperatureDegC,
-          appNodes.map((node) => node.temperatureDegC)
-        );
-        drawNode(
-          context,
-          node.name,
-          node.center,
-          nodeRadius,
-          nodeColor,
-          node.isActive,
-          node.isBoundary,
-          node.textDirection
-        );
-      });
-
-      const connectionToCount = getConnectionsToCounts(appConnections);
-      const leftToDrawConnectionCount = new Map(connectionToCount);
-      appConnections.map((conn) => {
-        const { firstNode, secondNode, kind } = conn;
-        const firstNodeAppNode = appNodes.find(
-          (node) => node.id === firstNode.id
-        );
-        const secondNodeAppNode = appNodes.find(
-          (node) => node.id === secondNode.id
-        );
-        if (firstNodeAppNode && secondNodeAppNode) {
-          const firstNodeRadius = determineRadius(
-            firstNodeAppNode.capacitanceJPerDegK,
-            appNodes.map((node) => node.capacitanceJPerDegK)
-          );
-          const secondNodeRadius = determineRadius(
-            secondNodeAppNode.capacitanceJPerDegK,
-            appNodes.map((node) => node.capacitanceJPerDegK)
-          );
-
-          const key = getConnectionKey(conn);
-          const leftToDraw = leftToDrawConnectionCount.get(key) ?? 0;
-          const alreadyDrawn = (connectionToCount.get(key) ?? 0) - leftToDraw;
-          drawConnection(
-            context,
-            firstNodeAppNode.center,
-            firstNodeRadius,
-            secondNodeAppNode.center,
-            secondNodeRadius,
-            kind,
-            alreadyDrawn,
-            leftToDraw
-          );
-          decrementConnectionCount(leftToDrawConnectionCount, conn);
-        }
-      });
+      drawConnections(context, appNodes, appConnections);
+      drawNodes(context, appNodes);
     },
     [appConnections, appNodes]
   );

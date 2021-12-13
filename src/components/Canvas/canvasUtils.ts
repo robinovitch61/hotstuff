@@ -1,12 +1,17 @@
 import { diffPoints, ORIGIN, Point, scalePoint } from "../../utils/pointUtils";
 import config from "../../config";
-import { Direction } from "../../App";
+import { AppConnection, AppNode, Direction } from "../../App";
 import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { scaleDiverging } from "d3-scale";
 import { HSConnectionKind } from "hotstuff-network";
 import { CellOption } from "../Sidebar/EditableTable/types";
 import { determineBrowser } from "../../utils/browserUtils";
+import {
+  decrementConnectionCount,
+  getConnectionKey,
+  getConnectionsToCounts,
+} from "../../utils/nodeConnectionUtils";
 
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
@@ -156,7 +161,33 @@ export function drawNode(
   drawNodeName(context, name, center, radius, textDirection);
 }
 
-export function drawLineBetween(
+export function drawNodes(
+  context: CanvasRenderingContext2D,
+  appNodes: AppNode[]
+): void {
+  appNodes.forEach((node) => {
+    const nodeRadius = determineRadius(
+      node.capacitanceJPerDegK,
+      appNodes.map((node) => node.capacitanceJPerDegK)
+    );
+    const nodeColor = determineColor(
+      node.temperatureDegC,
+      appNodes.map((node) => node.temperatureDegC)
+    );
+    drawNode(
+      context,
+      node.name,
+      node.center,
+      nodeRadius,
+      nodeColor,
+      node.isActive,
+      node.isBoundary,
+      node.textDirection
+    );
+  });
+}
+
+function drawLineBetween(
   context: CanvasRenderingContext2D,
   start: Point,
   end: Point,
@@ -202,21 +233,15 @@ export function drawLineBetween(
   // draw line labels
   const middleChar = getEmojiForConnection(kind);
   if (middleChar) {
-    const absOffset = 8;
+    const browser = determineBrowser();
+    const absOffset = browser === "Safari" ? 10 : 8;
     const offset =
       alreadyDrawn === 0 && leftToDraw === 2
         ? -absOffset
         : alreadyDrawn === 1 && leftToDraw === 1
         ? absOffset
         : 0;
-
-    context.save();
-
-    context.font = "14px Helvetica";
-    context.fillStyle = "white";
-
     const textMetrics = context.measureText(middleChar);
-    const browser = determineBrowser();
     const width =
       browser === "Firefox"
         ? textMetrics.actualBoundingBoxRight - textMetrics.actualBoundingBoxLeft
@@ -225,6 +250,11 @@ export function drawLineBetween(
       textMetrics.actualBoundingBoxAscent +
       textMetrics.actualBoundingBoxDescent;
     const radius = browser === "Chrome" ? 7 : 9;
+
+    context.save();
+
+    context.font = "14px Helvetica";
+    context.fillStyle = "white";
 
     context.translate(start.x, start.y);
     context.rotate(angle);
@@ -240,6 +270,47 @@ export function drawLineBetween(
 
     context.restore();
   }
+}
+
+export function drawConnections(
+  context: CanvasRenderingContext2D,
+  appNodes: AppNode[],
+  appConnections: AppConnection[]
+): void {
+  const connectionToCount = getConnectionsToCounts(appConnections);
+  const leftToDrawConnectionCount = new Map(connectionToCount);
+  appConnections.map((conn) => {
+    const { firstNode, secondNode, kind } = conn;
+    const firstNodeAppNode = appNodes.find((node) => node.id === firstNode.id);
+    const secondNodeAppNode = appNodes.find(
+      (node) => node.id === secondNode.id
+    );
+    if (firstNodeAppNode && secondNodeAppNode) {
+      const firstNodeRadius = determineRadius(
+        firstNodeAppNode.capacitanceJPerDegK,
+        appNodes.map((node) => node.capacitanceJPerDegK)
+      );
+      const secondNodeRadius = determineRadius(
+        secondNodeAppNode.capacitanceJPerDegK,
+        appNodes.map((node) => node.capacitanceJPerDegK)
+      );
+
+      const key = getConnectionKey(conn);
+      const leftToDraw = leftToDrawConnectionCount.get(key) ?? 0;
+      const alreadyDrawn = (connectionToCount.get(key) ?? 0) - leftToDraw;
+      drawConnection(
+        context,
+        firstNodeAppNode.center,
+        firstNodeRadius,
+        secondNodeAppNode.center,
+        secondNodeRadius,
+        kind,
+        alreadyDrawn,
+        leftToDraw
+      );
+      decrementConnectionCount(leftToDrawConnectionCount, conn);
+    }
+  });
 }
 
 export function drawBidirectionalArrow(
@@ -386,7 +457,7 @@ export function withEmojiPrefix(option: CellOption): CellOption {
   };
 }
 
-export function drawConnection(
+function drawConnection(
   context: CanvasRenderingContext2D,
   firstNodeCenter: Point,
   firstNodeRadius: number,
