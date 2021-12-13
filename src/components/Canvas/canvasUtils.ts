@@ -16,18 +16,80 @@ import {
 const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
 
+function scientificNotation(num: number, precision: number): string {
+  return num.toExponential(precision).replace("+", "");
+}
+
+function roundRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  if (w < 2 * r) {
+    r = w / 2;
+  }
+  if (h < 2 * r) {
+    r = h / 2;
+  }
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+}
+
 function drawCircle(
   context: CanvasRenderingContext2D,
   center: Point,
   radius: number,
-  color: string
+  color: string,
+  powerGen: number
 ): void {
   context.save();
+
+  // draw node itself
   context.beginPath();
   context.arc(center.x, center.y, radius, 0, 2 * Math.PI);
   context.fillStyle = color;
   context.fill();
   context.closePath();
+
+  // draw power generation
+  if (powerGen !== 0) {
+    const genString =
+      (powerGen >= 1000 || powerGen <= -1000
+        ? scientificNotation(powerGen, 1)
+        : powerGen.toString()) + "W";
+    let width;
+    let fontPx = 12;
+    let textMetrics;
+    do {
+      context.font = `${fontPx}px Helvetica`;
+      textMetrics = context.measureText(genString);
+      width = textMetrics.width;
+      fontPx--;
+    } while (width + 10 > radius * 2);
+    const height = textMetrics.actualBoundingBoxAscent;
+
+    context.fillStyle = "black";
+    roundRect(
+      context,
+      center.x - width / 2 - 1,
+      center.y - height,
+      width + 2,
+      height * 2,
+      height / 4
+    );
+    context.fill();
+    context.fillStyle = "white";
+    context.fillText(genString, center.x - width / 2, center.y + height / 2);
+  }
+
   context.restore();
 }
 
@@ -149,9 +211,10 @@ export function drawNode(
   color: string,
   isActive: boolean,
   isBoundary: boolean,
-  textDirection: Direction
+  textDirection: Direction,
+  powerGen: number
 ): void {
-  drawCircle(context, center, radius, color);
+  drawCircle(context, center, radius, color, powerGen);
   if (isActive) {
     drawCircleOutline(context, center, radius, "black");
   }
@@ -182,7 +245,8 @@ export function drawNodes(
       nodeColor,
       node.isActive,
       node.isBoundary,
-      node.textDirection
+      node.textDirection,
+      node.powerGenW
     );
   });
 }
@@ -606,8 +670,8 @@ export function determineColor(
   const minTemp = Math.min(...allTemperatures);
   const maxTemp = Math.max(...allTemperatures);
   const range = maxTemp - minTemp;
-  const test = scaleDiverging<string>()
+  const colorScale = scaleDiverging<string>()
     .domain([minTemp - range / 3, (minTemp + maxTemp) / 2, maxTemp + range / 3])
     .range(["blue", "#ababab", "red"]);
-  return test(temperature);
+  return colorScale(temperature);
 }
