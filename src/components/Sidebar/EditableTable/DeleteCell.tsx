@@ -1,6 +1,7 @@
 import React from "react";
 import config from "../../../config";
 import { StyledDeleteCell } from "./style";
+import CrossMark from "../../../img/icons/CrossMark";
 
 type DeleteCellProps<T> = {
   row: T;
@@ -22,7 +23,7 @@ export default function DeleteCell<T>(
       minWidth={config.tableDeleteCellMinWidthPx}
       onClick={() => props.onDeleteRow(props.row)}
     >
-      ❌
+      <CrossMark />
     </StyledDeleteCell>
   );
 }

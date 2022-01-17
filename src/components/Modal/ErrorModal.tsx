@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components/macro";
 import config from "../../config";
 import { StyledExitButton } from "./style";
+import CrossMark from "../../img/icons/CrossMark";
 
 export const StyledError = styled.div<{ isVisible: boolean }>`
   color: red;
@@ -55,7 +56,7 @@ export default function ErrorModal(props: ErrorModalProps): React.ReactElement {
           setErrors([]);
         }}
       >
-        ❌
+        <CrossMark />
       </StyledExitButton>
       {errors.map((err) => (
         <div key={err}>{err}</div>

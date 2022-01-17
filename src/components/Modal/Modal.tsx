@@ -6,6 +6,7 @@ import useOnClickOutside from "../../hooks/useOnClickOutside";
 import ConfirmationModal from "./ConfirmationModal";
 import TheoryModal from "./TheoryModal";
 import { StyledExitButton } from "./style";
+import CrossMark from "../../img/icons/CrossMark";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   font-size: 1.1em;
@@ -72,7 +73,7 @@ export default function Modal(props: ModalProps): React.ReactElement {
           }))
         }
       >
-        ❌
+        <CrossMark />
       </StyledExitButton>
       {modalContent}
     </StyledModal>
