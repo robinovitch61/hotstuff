@@ -18,6 +18,7 @@ code {
 
 button {
   padding: 0.5em;
+  cursor: pointer;
 }
 
 /* force show scrollbars for webkit-based browsers on mac: https://gist.github.com/IceCreamYou/cd517596e5847a88e2bb0a091da43fb4 */
