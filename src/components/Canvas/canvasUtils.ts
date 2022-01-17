@@ -5,8 +5,6 @@ import * as React from "react";
 import { CanvasState } from "./Canvas";
 import { scaleDiverging } from "d3-scale";
 import { HSConnectionKind } from "hotstuff-network";
-import { CellOption } from "../Sidebar/EditableTable/types";
-import { determineBrowser } from "../../utils/browserUtils";
 import {
   decrementConnectionCount,
   getConnectionKey,
@@ -256,13 +254,13 @@ function drawLineBetween(
   start: Point,
   end: Point,
   color: string,
-  kind: HSConnectionKind,
+  imgForConnectionKind: HTMLImageElement,
   startOffset = 0,
   endOffset = 0,
   alreadyDrawn = 0,
   leftToDraw = 1
 ): void {
-  // this assumes that there will never be more than 2 left to draw (can't have conduction + convection + radiation)
+  // this function assumes there will never be more than 2 left to draw (can't have conduction + convection + radiation)
   if (leftToDraw === 0) {
     return;
   }
@@ -294,86 +292,76 @@ function drawLineBetween(
     context.restore();
   }
 
-  // draw line labels
-  const middleChar = getEmojiForConnection(kind);
-  if (middleChar) {
-    const browser = determineBrowser();
-    const absOffset = browser === "Safari" ? 10 : 8;
-    const offset =
-      alreadyDrawn === 0 && leftToDraw === 2
-        ? -absOffset
-        : alreadyDrawn === 1 && leftToDraw === 1
-        ? absOffset
-        : 0;
-    const textMetrics = context.measureText(middleChar);
-    let width =
-      browser === "Chrome"
-        ? textMetrics.actualBoundingBoxRight - textMetrics.actualBoundingBoxLeft
-        : textMetrics.width;
-    if (browser === "Safari") {
-      width *= 1.2; // canvas no like emoji
-    }
-    const height = textMetrics.actualBoundingBoxAscent;
-    const radius = browser === "Chrome" ? 7 : 9;
+  // draw image for connection kind
+  const imageSize = 20;
+  const offset =
+    alreadyDrawn === 0 && leftToDraw === 2
+      ? -(imageSize / 2)
+      : alreadyDrawn === 1 && leftToDraw === 1
+      ? imageSize / 2
+      : 0;
 
-    context.save();
+  context.save();
+  context.fillStyle = "white";
 
-    context.font = "14px Helvetica";
-    context.fillStyle = "white";
+  context.translate(start.x, start.y);
+  context.rotate(angle);
+  context.translate(length / 2 + offset, 0);
+  context.beginPath();
+  context.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
+  context.fill();
+  context.closePath();
 
-    context.translate(start.x, start.y);
-    context.rotate(angle);
-    context.translate(length / 2 + offset, 0);
-    context.beginPath();
-    context.arc(0, 0, radius, 0, Math.PI * 2);
-    context.fill();
-    context.closePath();
+  context.rotate(-angle);
+  context.translate(-imageSize / 2, imageSize / 2);
+  context.drawImage(imgForConnectionKind, 0, -imageSize, imageSize, imageSize);
 
-    context.rotate(-angle);
-    context.translate(-width / 2, height / 2);
-    context.strokeText(middleChar, 0, 0);
-
-    context.restore();
-  }
+  context.restore();
 }
 
 export function drawConnections(
   context: CanvasRenderingContext2D,
   appNodes: AppNode[],
-  appConnections: AppConnection[]
+  appConnections: AppConnection[],
+  connectionKindImageMap: Map<HSConnectionKind, HTMLImageElement>
 ): void {
   const connectionToCount = getConnectionsToCounts(appConnections);
   const leftToDrawConnectionCount = new Map(connectionToCount);
   appConnections.map((conn) => {
     const { firstNode, secondNode, kind } = conn;
-    const firstNodeAppNode = appNodes.find((node) => node.id === firstNode.id);
-    const secondNodeAppNode = appNodes.find(
-      (node) => node.id === secondNode.id
-    );
-    if (firstNodeAppNode && secondNodeAppNode) {
-      const firstNodeRadius = determineRadius(
-        firstNodeAppNode.capacitanceJPerDegK,
-        appNodes.map((node) => node.capacitanceJPerDegK)
+    const imgForConnectionKind = connectionKindImageMap.get(kind);
+    if (imgForConnectionKind) {
+      const firstNodeAppNode = appNodes.find(
+        (node) => node.id === firstNode.id
       );
-      const secondNodeRadius = determineRadius(
-        secondNodeAppNode.capacitanceJPerDegK,
-        appNodes.map((node) => node.capacitanceJPerDegK)
+      const secondNodeAppNode = appNodes.find(
+        (node) => node.id === secondNode.id
       );
+      if (firstNodeAppNode && secondNodeAppNode) {
+        const firstNodeRadius = determineRadius(
+          firstNodeAppNode.capacitanceJPerDegK,
+          appNodes.map((node) => node.capacitanceJPerDegK)
+        );
+        const secondNodeRadius = determineRadius(
+          secondNodeAppNode.capacitanceJPerDegK,
+          appNodes.map((node) => node.capacitanceJPerDegK)
+        );
 
-      const key = getConnectionKey(conn);
-      const leftToDraw = leftToDrawConnectionCount.get(key) ?? 0;
-      const alreadyDrawn = (connectionToCount.get(key) ?? 0) - leftToDraw;
-      drawConnection(
-        context,
-        firstNodeAppNode.center,
-        firstNodeRadius,
-        secondNodeAppNode.center,
-        secondNodeRadius,
-        kind,
-        alreadyDrawn,
-        leftToDraw
-      );
-      decrementConnectionCount(leftToDrawConnectionCount, conn);
+        const key = getConnectionKey(conn);
+        const leftToDraw = leftToDrawConnectionCount.get(key) ?? 0;
+        const alreadyDrawn = (connectionToCount.get(key) ?? 0) - leftToDraw;
+        drawConnection(
+          context,
+          firstNodeAppNode.center,
+          firstNodeRadius,
+          secondNodeAppNode.center,
+          secondNodeRadius,
+          imgForConnectionKind,
+          alreadyDrawn,
+          leftToDraw
+        );
+        decrementConnectionCount(leftToDrawConnectionCount, conn);
+      }
     }
   });
 }
@@ -504,31 +492,13 @@ export function drawClearBox(
   context.restore();
 }
 
-function getEmojiForConnection(kind: HSConnectionKind): string {
-  if (kind == "cond") {
-    return "🔗";
-  } else if (kind == "conv") {
-    return "♨️";
-  } else {
-    return "☀️";
-  }
-}
-
-export function withEmojiPrefix(option: CellOption): CellOption {
-  const emoji = getEmojiForConnection(option.id as HSConnectionKind);
-  return {
-    ...option,
-    text: `${emoji} ${option.text}`,
-  };
-}
-
 function drawConnection(
   context: CanvasRenderingContext2D,
   firstNodeCenter: Point,
   firstNodeRadius: number,
   secondNodeCenter: Point,
   secondNodeRadius: number,
-  kind: HSConnectionKind,
+  imgForConnectionKind: HTMLImageElement,
   alreadyDrawn: number,
   leftToDraw: number
 ): void {
@@ -537,7 +507,7 @@ function drawConnection(
     firstNodeCenter,
     secondNodeCenter,
     "black",
-    kind,
+    imgForConnectionKind,
     firstNodeRadius,
     secondNodeRadius,
     alreadyDrawn,
@@ -652,12 +622,10 @@ export function determineRadius(
 ): number {
   const min = Math.min(...allCapacitances);
   const max = Math.max(...allCapacitances);
-  // cap = min -> minRadius
-  // cap = max -> maxRadius
-  // radius = (cap - min) / (max - min) * 20 + 10
   if (min === max) {
     return DEFAULT_RADIUS;
   }
+  // linear interpolation
   return (
     ((capacitance - min) / (max - min)) * (maxRadiusPx - minRadiusPx) +
     minRadiusPx

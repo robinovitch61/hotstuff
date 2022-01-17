@@ -20,7 +20,6 @@ import {
   getConnectionAfterValue,
 } from "../../../../utils/nodeConnectionUtils";
 import noteValidator from "../tableUtils";
-import { withEmojiPrefix } from "../../../Canvas/canvasUtils";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 export type ConnectionTableColumn = TableColumn<AppConnectionTable>;
@@ -168,7 +167,7 @@ export default function ConnectionTable(
         key: "kind",
         text: "Kind",
         minWidthPx: 120,
-        options: connectionTypes.map((t) => withEmojiPrefix(t)),
+        options: connectionTypes,
         onSelectOption: onSelectNewConnectionType,
       },
       {
