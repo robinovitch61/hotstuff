@@ -1,6 +1,8 @@
+import * as React from "react";
+
 export type CellOption = {
   id: string;
-  text: string;
+  text: string | React.ReactElement;
 };
 
 export type SortDirection = "ASC" | "DESC";

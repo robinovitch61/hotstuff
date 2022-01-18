@@ -39,6 +39,7 @@ const config = {
   multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
   errorMessageDurationSeconds: 4,
   maxNoteLengthChars: 500,
+  activeColor: "rgba(112, 165, 255, 0.2)",
 };
 
 export default config;

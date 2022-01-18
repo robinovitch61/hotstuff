@@ -20,6 +20,7 @@ import {
   getConnectionAfterValue,
 } from "../../../../utils/nodeConnectionUtils";
 import noteValidator from "../tableUtils";
+import ConnectionKindOption from "./ConnectionKindOption";
 
 export type AppConnectionTable = AppConnection & { isActive: boolean };
 export type ConnectionTableColumn = TableColumn<AppConnectionTable>;
@@ -29,7 +30,7 @@ const defaultConnectionSortState: TableSortState<AppConnectionTable> = {
   direction: "ASC",
 };
 
-const connectionTypes: CellOption[] = [
+const connectionKindOptions: CellOption[] = [
   {
     id: "cond",
     text: "Conduction",
@@ -167,7 +168,10 @@ export default function ConnectionTable(
         key: "kind",
         text: "Kind",
         minWidthPx: 120,
-        options: connectionTypes,
+        options: connectionKindOptions.map((option) => ({
+          ...option,
+          text: ConnectionKindOption({ option }),
+        })),
         onSelectOption: onSelectNewConnectionType,
       },
       {

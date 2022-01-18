@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import config from "../../../config";
 
 export const StyledTableWrapper = styled.div`
   width: 100%;
@@ -22,11 +23,9 @@ export const StyledRow = styled.div<{
   display: inline-flex;
   align-items: center;
   min-width: 100%;
-  position: sticky;
   top: ${({ heightOffsetPx }) =>
     heightOffsetPx ? `${heightOffsetPx}px` : "0px"};
-  background: ${({ isActive }) =>
-    isActive ? "rgba(112, 165, 255, 0.2)" : "none"};
+  background: ${({ isActive }) => (isActive ? config.activeColor : "none")};
 `;
 
 export const StyledCell = styled.div<{
@@ -88,7 +87,8 @@ export const StyledColText = styled.div`
 
 export const StyledSortIcon = styled.div`
   position: absolute;
-  bottom: 0;
+  bottom: 2px;
   right: 50%;
   transform: translate(50%);
+  font-size: 10px;
 `;

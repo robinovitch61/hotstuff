@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { HSConnectionKind } from "hotstuff-network";
-import link from "../img/link.png";
-import hotsprings from "../img/hotsprings.png";
-import sunny from "../img/sunny.png";
+import connectionKindToImgSrc from "../utils/imageUtils";
 
 export default function useConnectionKindImageMap(): Map<
   HSConnectionKind,
@@ -13,20 +11,12 @@ export default function useConnectionKindImageMap(): Map<
   );
 
   useEffect(() => {
-    const linkImage = new Image();
-    linkImage.src = link;
-    linkImage.onload = () =>
-      setImages((prev) => new Map(prev.set("cond", linkImage)));
-
-    const hotspringsImage = new Image();
-    hotspringsImage.src = hotsprings;
-    hotspringsImage.onload = () =>
-      setImages((prev) => new Map(prev.set("conv", hotspringsImage)));
-
-    const sunnyImage = new Image();
-    sunnyImage.src = sunny;
-    sunnyImage.onload = () =>
-      setImages((prev) => new Map(prev.set("rad", sunnyImage)));
+    const connectionKinds: HSConnectionKind[] = ["cond", "conv", "rad"];
+    connectionKinds.forEach((kind) => {
+      const img = new Image();
+      img.src = connectionKindToImgSrc(kind);
+      img.onload = () => setImages((prev) => new Map(prev.set(kind, img)));
+    });
   }, []);
 
   return images;

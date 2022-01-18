@@ -41,6 +41,7 @@ const StyledTab = styled.div<{ width: number }>`
   border-radius: 5px 5px 0 0;
   border: 1px solid black;
   border-bottom: 2px solid black;
+  white-space: nowrap;
 
   &:hover,
   &:focus {
