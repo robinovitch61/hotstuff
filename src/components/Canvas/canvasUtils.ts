@@ -294,11 +294,12 @@ function drawLineBetween(
 
   // draw image for connection kind
   const imageSize = 20;
+  const buffer = 2;
   const offset =
     alreadyDrawn === 0 && leftToDraw === 2
-      ? -(imageSize / 2)
+      ? -(imageSize / 2 + buffer)
       : alreadyDrawn === 1 && leftToDraw === 1
-      ? imageSize / 2
+      ? imageSize / 2 + buffer
       : 0;
 
   context.save();
