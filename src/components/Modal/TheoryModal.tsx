@@ -45,7 +45,7 @@ export default function TheoryModal(): React.ReactElement {
       <ul>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\sum{q_{in/out}}`} />{" "}
-          is the sum of all heat transfer in or out in Watts{" "}
+          is the sum of all heat transfer in or out, in Watts{" "}
           <MathComponent display={false} tex={String.raw`[W]`} />
         </StyledListItem>
         <StyledListItem>
@@ -104,8 +104,9 @@ export default function TheoryModal(): React.ReactElement {
 
       <ul>
         <StyledListItem>
-          <MathComponent display={false} tex={String.raw`q`} /> is heat transfer
-          in Watts <MathComponent display={false} tex={String.raw`[W]`} />
+          <MathComponent display={false} tex={String.raw`q`} /> is heat
+          transfer, in Watts{" "}
+          <MathComponent display={false} tex={String.raw`[W]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`c`} /> is{" "}
@@ -120,14 +121,14 @@ export default function TheoryModal(): React.ReactElement {
             href={"https://en.wikipedia.org/wiki/Thermal_transmittance"}
             target={"_blank"}
           >
-            Thermal Transmittance
+            Thermal Transmittance,
           </StyledLink>{" "}
           in Watts per degree Kelvin{" "}
           <MathComponent display={false} tex={String.raw`[\frac{W}{K}]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\Delta T`} /> is the
-          temperature difference in degrees{" "}
+          temperature difference, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
       </ul>
@@ -153,12 +154,13 @@ export default function TheoryModal(): React.ReactElement {
 
       <ul>
         <StyledListItem>
-          <MathComponent display={false} tex={String.raw`q`} /> is heat transfer
-          in Watts <MathComponent display={false} tex={String.raw`[W]`} />
+          <MathComponent display={false} tex={String.raw`q`} /> is heat
+          transfer, in Watts{" "}
+          <MathComponent display={false} tex={String.raw`[W]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\Delta T`} /> is the
-          temperature difference in degrees{" "}
+          temperature difference, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
         <StyledListItem>
@@ -168,8 +170,8 @@ export default function TheoryModal(): React.ReactElement {
             target={"_blank"}
           >
             Thermal Resistance
-          </StyledLink>{" "}
-          in degrees Kelvin per Watt{" "}
+          </StyledLink>
+          , in degrees Kelvin per Watt{" "}
           <MathComponent display={false} tex={String.raw`[\frac{K}{W}]`} />
         </StyledListItem>
       </ul>
@@ -205,17 +207,17 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`Q`} /> is heat
-          transferred in Joules{" "}
+          transfer, in Joules{" "}
           <MathComponent display={false} tex={String.raw`[J]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\Delta T`} /> is the
-          temperature difference in degrees{" "}
+          temperature difference, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\frac{dQ}{dT}`} /> is
-          the rate of change of heat energy with respect to temperature in
+          the rate of change of heat energy with respect to temperature, in
           Joules per degree{" "}
           <MathComponent display={false} tex={String.raw`[\frac{J}{K}]`} />
         </StyledListItem>
@@ -230,8 +232,8 @@ export default function TheoryModal(): React.ReactElement {
 
       <ul>
         <StyledListItem>
-          <MathComponent display={false} tex={String.raw`q`} /> is heat transfer
-          in Watts (i.e. Joules per second){" "}
+          <MathComponent display={false} tex={String.raw`q`} /> is heat
+          transfer, in Watts (i.e. Joules per second){" "}
           <MathComponent display={false} tex={String.raw`[W = \frac{J}{s}]`} />
         </StyledListItem>
         <StyledListItem>
@@ -247,7 +249,7 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\frac{dT}{dt}`} /> is
-          the derivative of temperature with respect to time in degrees per
+          the derivative of temperature with respect to time, in degrees per
           second{" "}
           <MathComponent display={false} tex={String.raw`[\frac{K}{s}]`} />
         </StyledListItem>
@@ -255,7 +257,7 @@ export default function TheoryModal(): React.ReactElement {
 
       <StyledText>
         Note we now have two equations for{" "}
-        <MathComponent display={false} tex={String.raw`q`} />, heat transfer in
+        <MathComponent display={false} tex={String.raw`q`} />, heat transfer, in
         Watts. Equating these, working out the signs, and adding in power
         generated or consumed, we obtain the following:
       </StyledText>
@@ -279,13 +281,13 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\frac{dT}{dt}`} /> is
-          the derivative of temperature with respect to time in degrees per
+          the derivative of temperature with respect to time, in degrees per
           second{" "}
           <MathComponent display={false} tex={String.raw`[\frac{K}{s}]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\Delta T`} /> is the
-          temperature difference in degrees{" "}
+          temperature difference, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
         <StyledListItem>
@@ -295,8 +297,8 @@ export default function TheoryModal(): React.ReactElement {
             target={"_blank"}
           >
             Thermal Resistance
-          </StyledLink>{" "}
-          in degrees Kelvin per Watt{" "}
+          </StyledLink>
+          , in degrees Kelvin per Watt{" "}
           <MathComponent display={false} tex={String.raw`[\frac{K}{W}]`} />
         </StyledListItem>
         <StyledListItem>
@@ -326,7 +328,7 @@ export default function TheoryModal(): React.ReactElement {
 
       <MathComponent
         display={true}
-        tex={String.raw`\Delta T_{node} = \frac{\Delta{t}}{C_{node}}(\sum{\frac{T_{other\_node} - T_{node}}{R_{other\_node \leftrightarrow node}}} - q_{generated/consumed})`}
+        tex={String.raw`\Delta T_{node} = \frac{\Delta{t}}{C_{node}}\left(\sum{\frac{T_{other\_node} - T_{node}}{R_{other\_node \leftrightarrow node}}} - q_{generated/consumed}\right)`}
       />
 
       <ul>
@@ -338,7 +340,7 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`\Delta{t}`} /> is the
-          time step in seconds{" "}
+          time step, in seconds{" "}
           <MathComponent display={false} tex={String.raw`[s]`} />
         </StyledListItem>
         <StyledListItem>
@@ -349,19 +351,19 @@ export default function TheoryModal(): React.ReactElement {
           >
             Thermal Capacitance
           </StyledLink>{" "}
-          , or Heat Capacity, of the node of interest in Joules per degree
+          , or Heat Capacity, of the node of interest, in Joules per degree
           Kelvin{" "}
           <MathComponent display={false} tex={String.raw`[\frac{J}{K}]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`T_{other\_node}`} /> is
           the current temperature of a node that is thermally connected with the
-          node of interest in degrees{" "}
+          node of interest, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
         <StyledListItem>
           <MathComponent display={false} tex={String.raw`T_{node}`} /> is the
-          current temperature the node of interest in degrees{" "}
+          current temperature the node of interest, in degrees{" "}
           <MathComponent display={false} tex={String.raw`[K]`} />
         </StyledListItem>
         <StyledListItem>
@@ -376,9 +378,9 @@ export default function TheoryModal(): React.ReactElement {
           >
             Thermal Resistance
           </StyledLink>{" "}
-          between the two thermally connected nodes in degrees Kelvin per Watt
+          between the two thermally connected nodes, in degrees Kelvin per Watt
           <MathComponent display={false} tex={String.raw`[\frac{K}{W}]`} /> if
-          conduction or convection, or degrees Kelvin to the fourth per Watt
+          conduction or convection, or in degrees Kelvin to the fourth per Watt
           <MathComponent display={false} tex={String.raw`[\frac{K^4}{W}]`} /> if
           radiation
         </StyledListItem>
