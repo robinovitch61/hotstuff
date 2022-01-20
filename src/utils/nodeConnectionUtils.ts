@@ -125,22 +125,26 @@ export function getNewPossibleConnection(
   return undefined;
 }
 
-function newNodeName(i: number): string {
-  if (i === 1) {
-    return config.newNodeNamePrefix;
+export function newNodeName(allNodeNames: string[], name: string): string {
+  function makeName(i: number): string {
+    if (i === 1) {
+      return name;
+    }
+    return `${name} [${i}]`;
   }
-  return `${config.newNodeNamePrefix} [${i}]`;
+
+  let i = 1;
+  while (allNodeNames.includes(makeName(i))) {
+    i += 1;
+  }
+  return makeName(i);
 }
 
 export function getNewAppNode(appNodes: AppNode[], center: Point): AppNode {
   const allNodeNames = appNodes.map((node) => node.name);
-  let i = 1;
-  while (allNodeNames.includes(newNodeName(i))) {
-    i += 1;
-  }
 
   const newNode = makeNode({
-    name: newNodeName(i),
+    name: newNodeName(allNodeNames, config.newNodeNamePrefix),
     temperatureDegC: config.defaultTempDegC,
     capacitanceJPerDegK: config.defaultCapJPerDegK,
     powerGenW: config.defaultPowerGenW,
@@ -160,16 +164,7 @@ export function validateNodeName(name: string, otherNames: string[]): string {
   const trimName = name.trim();
   const safeName = trimName === "" ? config.defaultNodeName.trim() : trimName;
   const safeAllNames = otherNames.map((n) => n.trim());
-  if (safeAllNames.includes(safeName)) {
-    let i = 2;
-    const makeNewName = (i: number) => `${safeName} [${i}]`;
-    while (safeAllNames.includes(makeNewName(i))) {
-      i += 1;
-    }
-    return makeNewName(i);
-  } else {
-    return safeName;
-  }
+  return newNodeName(safeAllNames, safeName);
 }
 
 export function getConnectionAfterValue(

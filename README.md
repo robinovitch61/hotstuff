@@ -37,7 +37,7 @@ TODO:
   - [x] Resistance between nodes (thickness changes with resistance)
 - [x] Make node active in canvas when editing in table [5]
 - [x] Fix hash pattern drawing over power gen box [5]
-- [ ] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
+- [x] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
 - [ ] Tutorial popup instead of tutorial model [5]
 - [ ] Logo + favicon [5]
 - [ ] Fun default model (models?) [5]

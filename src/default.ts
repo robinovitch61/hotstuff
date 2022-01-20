@@ -1,5 +1,6 @@
 import { makeNode } from "hotstuff-network";
 import {
+  AppClipboard,
   AppConnection,
   AppNode,
   AppState,
@@ -93,4 +94,9 @@ export const defaultAppState: AppState = {
   canvasViewState: defaultCanvasViewState,
   savedCanvasState: defaultCanvasViewState,
   panelSizes: defaultPanelSizes,
+};
+
+export const defaultAppClipboard: AppClipboard = {
+  copiedNodes: [],
+  copiedConnections: [],
 };

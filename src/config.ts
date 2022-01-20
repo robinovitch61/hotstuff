@@ -42,6 +42,7 @@ const config = {
   errorMessageDurationSeconds: 4,
   maxNoteLengthChars: 500,
   activeColor: "rgba(112, 165, 255, 0.2)",
+  pasteXOffset: 45,
 };
 
 export default config;

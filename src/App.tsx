@@ -10,7 +10,11 @@ import useDoubleClick from "./hooks/useDoubleClick";
 import useNodeConnectionUtils from "./hooks/useNodeConnectionUtils";
 import useOnMouseDown from "./hooks/useOnMouseDown";
 import useKeyDown from "./hooks/useKeyDown";
-import { defaultAppState, defaultModalState } from "./default";
+import {
+  defaultAppClipboard,
+  defaultAppState,
+  defaultModalState,
+} from "./default";
 import useSessionStorageState from "./hooks/useSessionStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
 import {
@@ -75,6 +79,11 @@ export type AppState = {
   panelSizes: PanelSizes;
 };
 
+export type AppClipboard = {
+  copiedNodes: AppNode[];
+  copiedConnections: AppConnection[];
+};
+
 export type ExportedAppState = AppState & { output?: ModelOutput };
 
 export default function App(): React.ReactElement {
@@ -112,7 +121,17 @@ export default function App(): React.ReactElement {
   );
 
   const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
-  useKeyDown(keyboardActive, appState.nodes, setAppNodes, deleteNodes);
+  const [clipboard, setClipboard] = useState<AppClipboard>(defaultAppClipboard);
+  useKeyDown(
+    keyboardActive,
+    appState.nodes,
+    setAppNodes,
+    deleteNodes,
+    appState.connections,
+    setAppConnections,
+    clipboard,
+    setClipboard
+  );
 
   const [draw, clearAndRedraw] = useDraw(appState.nodes, appState.connections);
   const handleDoubleClick = useDoubleClick(

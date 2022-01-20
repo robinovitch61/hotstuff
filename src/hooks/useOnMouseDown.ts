@@ -45,7 +45,8 @@ export default function useOnMouseDown(
       const activeNodes = appNodes.filter((node) => node.isActive);
       const activeNodeIds = activeNodes.map((node) => node.id);
 
-      const clickedNode = appNodes.find((node) => {
+      // reversing is important here as the last appNodes are painted on top of the first ones
+      const clickedNode = appNodes.reverse().find((node) => {
         const nodeRadius = determineRadius(
           node.capacitanceJPerDegK,
           appNodes.map((node) => node.capacitanceJPerDegK)
