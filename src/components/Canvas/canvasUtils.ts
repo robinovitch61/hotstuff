@@ -54,8 +54,7 @@ function drawCircle(
   context: CanvasRenderingContext2D,
   center: Point,
   radius: number,
-  color: string,
-  powerGen: number
+  color: string
 ): void {
   context.save();
 
@@ -66,37 +65,43 @@ function drawCircle(
   context.fill();
   context.closePath();
 
-  // draw power generation
-  if (powerGen !== 0) {
-    const genString =
-      (powerGen >= 1000 || powerGen <= -1000
-        ? scientificNotation(powerGen, 1)
-        : powerGen.toString()) + "W";
-    let width;
-    let fontPx = 12;
-    let textMetrics;
-    do {
-      context.font = `${fontPx}px Helvetica`;
-      textMetrics = context.measureText(genString);
-      width = textMetrics.width;
-      fontPx--;
-    } while (width + 10 > radius * 2);
-    const height = textMetrics.actualBoundingBoxAscent;
+  context.restore();
+}
 
-    context.fillStyle = "black";
-    roundRect(
-      context,
-      center.x - width / 2 - 1,
-      center.y - height,
-      width + 2,
-      height * 2,
-      height / 4
-    );
-    context.fill();
-    context.fillStyle = "white";
-    context.fillText(genString, center.x - width / 2, center.y + height / 2);
-  }
+function drawPowerGen(
+  context: CanvasRenderingContext2D,
+  center: Point,
+  radius: number,
+  powerGen: number
+): void {
+  context.save();
+  const genString =
+    (powerGen >= 1000 || powerGen <= -1000
+      ? scientificNotation(powerGen, 1)
+      : powerGen.toString()) + "W";
+  let width;
+  let fontPx = 12;
+  let textMetrics;
+  do {
+    context.font = `${fontPx}px Helvetica`;
+    textMetrics = context.measureText(genString);
+    width = textMetrics.width;
+    fontPx--;
+  } while (width + 10 > radius * 2);
+  const height = textMetrics.actualBoundingBoxAscent;
 
+  context.fillStyle = "black";
+  roundRect(
+    context,
+    center.x - width / 2 - 1,
+    center.y - height,
+    width + 2,
+    height * 2,
+    height / 4
+  );
+  context.fill();
+  context.fillStyle = "white";
+  context.fillText(genString, center.x - width / 2, center.y + height / 2);
   context.restore();
 }
 
@@ -221,12 +226,15 @@ export function drawNode(
   textDirection: Direction,
   powerGen: number
 ): void {
-  drawCircle(context, center, radius, color, powerGen);
+  drawCircle(context, center, radius, color);
   if (isActive) {
     drawCircleOutline(context, center, radius, "black");
   }
   if (isBoundary) {
     drawHashPattern(context, center, radius);
+  }
+  if (powerGen !== 0) {
+    drawPowerGen(context, center, radius, powerGen);
   }
   drawNodeName(context, name, center, radius, textDirection);
 }
