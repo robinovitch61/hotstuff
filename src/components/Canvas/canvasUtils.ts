@@ -11,8 +11,17 @@ import {
   getConnectionsToCounts,
 } from "../../utils/nodeConnectionUtils";
 
-const { activeNodeOutlineWidthPx, minRadiusPx, maxRadiusPx } = config;
+const {
+  activeNodeOutlineWidthPx,
+  minRadiusPx,
+  maxRadiusPx,
+  minLineThicknessPx,
+  maxLineThicknessPx,
+} = config;
 export const DEFAULT_RADIUS = Math.floor((minRadiusPx + maxRadiusPx) / 2);
+export const DEFAULT_LINE_THICKNESS = Math.floor(
+  (minLineThicknessPx + maxLineThicknessPx) / 2
+);
 
 function scientificNotation(num: number, precision: number): string {
   return num.toExponential(precision).replace("+", "");
@@ -254,6 +263,7 @@ function drawLineBetween(
   start: Point,
   end: Point,
   color: string,
+  lineThicknessPx: number,
   imgForConnectionKind: HTMLImageElement,
   startOffset = 0,
   endOffset = 0,
@@ -276,7 +286,7 @@ function drawLineBetween(
     context.save();
 
     context.strokeStyle = color;
-    context.lineWidth = 2;
+    context.lineWidth = lineThicknessPx;
 
     context.translate(start.x, start.y);
     context.rotate(angle);
@@ -328,6 +338,7 @@ export function drawConnections(
 ): void {
   const connectionToCount = getConnectionsToCounts(appConnections);
   const leftToDrawConnectionCount = new Map(connectionToCount);
+  const allResistances = appConnections.map((conn) => conn.resistanceDegKPerW);
   appConnections.map((conn) => {
     const { firstNode, secondNode, kind } = conn;
     const imgForConnectionKind = connectionKindImageMap.get(kind);
@@ -357,6 +368,7 @@ export function drawConnections(
           firstNodeRadius,
           secondNodeAppNode.center,
           secondNodeRadius,
+          determineLineThickness(conn.resistanceDegKPerW, allResistances),
           imgForConnectionKind,
           alreadyDrawn,
           leftToDraw
@@ -367,83 +379,7 @@ export function drawConnections(
   });
 }
 
-export function drawBidirectionalArrow(
-  context: CanvasRenderingContext2D,
-  start: Point,
-  end: Point,
-  color: string,
-  startOffset = 0,
-  endOffset = 0
-): void {
-  context.save();
-  context.beginPath();
-  context.strokeStyle = color;
-  context.lineWidth = 2;
-  const headLength = 9;
-  const headWidth = 4;
-  const arrowGap = 0;
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const angle = Math.atan2(dy, dx);
-  const length = Math.sqrt(dx * dx + dy * dy);
-  const adjLength = length - endOffset;
-
-  context.translate(start.x, start.y);
-  context.rotate(angle);
-
-  context.beginPath();
-  context.moveTo(startOffset, arrowGap);
-  context.lineTo(adjLength, arrowGap);
-  context.moveTo(adjLength - headLength, headWidth + arrowGap);
-  context.lineTo(adjLength, arrowGap);
-  context.lineTo(adjLength - headLength, -(headWidth - arrowGap));
-
-  context.moveTo(adjLength, -arrowGap);
-  context.lineTo(startOffset, -arrowGap);
-  context.moveTo(startOffset + headLength, -(headWidth + arrowGap));
-  context.lineTo(startOffset, -arrowGap);
-  context.lineTo(startOffset + headLength, headWidth - arrowGap);
-
-  context.stroke();
-  context.closePath();
-  context.restore();
-}
-
-export function drawUnidirectionalArrow(
-  context: CanvasRenderingContext2D,
-  start: Point,
-  end: Point,
-  color: string,
-  startOffset = 0,
-  endOffset = 0
-): void {
-  context.save();
-  context.beginPath();
-  context.strokeStyle = color;
-  context.lineWidth = 2;
-  const headLength = 9;
-  const headWidth = 4;
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const angle = Math.atan2(dy, dx);
-  const length = Math.sqrt(dx * dx + dy * dy);
-  const adjLength = length - endOffset;
-
-  context.translate(start.x, start.y);
-  context.rotate(angle);
-
-  context.beginPath();
-  context.moveTo(startOffset, 0);
-  context.lineTo(adjLength, 0);
-  context.moveTo(adjLength - headLength, -headWidth);
-  context.lineTo(adjLength, 0);
-  context.lineTo(adjLength - headLength, headWidth);
-  context.stroke();
-  context.closePath();
-  context.restore();
-}
-
-export function drawArrowWithoutHead(
+export function drawLine(
   context: CanvasRenderingContext2D,
   start: Point,
   end: Point,
@@ -499,6 +435,7 @@ function drawConnection(
   firstNodeRadius: number,
   secondNodeCenter: Point,
   secondNodeRadius: number,
+  lineThicknessPx: number,
   imgForConnectionKind: HTMLImageElement,
   alreadyDrawn: number,
   leftToDraw: number
@@ -508,6 +445,7 @@ function drawConnection(
     firstNodeCenter,
     secondNodeCenter,
     "black",
+    lineThicknessPx,
     imgForConnectionKind,
     firstNodeRadius,
     secondNodeRadius,
@@ -644,4 +582,21 @@ export function determineColor(
     .domain([minTemp - range / 3, (minTemp + maxTemp) / 2, maxTemp + range / 3])
     .range(["blue", "#ababab", "red"]);
   return colorScale(temperature);
+}
+
+export function determineLineThickness(
+  resistance: number,
+  allResistances: number[]
+): number {
+  const min = Math.min(...allResistances);
+  const max = Math.max(...allResistances);
+  if (min === max) {
+    return DEFAULT_LINE_THICKNESS;
+  }
+  // linear interpolation
+  return (
+    ((resistance - min) / (max - min)) *
+      (maxLineThicknessPx - minLineThicknessPx) +
+    minLineThicknessPx
+  );
 }

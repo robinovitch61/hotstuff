@@ -31,9 +31,10 @@ TODO:
 - [x] Min widths to table columns, notes unbounded [5]
 - [x] Round to nearest 100s rather than 10s for heat transfer [5]
 - [x] Visual difference to single, double connection lines amongst cond/conv/rad [5]
-- [ ] Add info to canvas: [5]
+- [x] Images instead of emojis for cross-browser/OS compat [5]
+- [x] Add info to canvas: [5]
   - [x] Power gen for each node (number in middle)
-  - [ ] Resistance between nodes (thickness changes with resistance)
+  - [x] Resistance between nodes (thickness changes with resistance)
 - [ ] Make node active in canvas when editing in table [5]
 - [ ] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
 - [ ] Tutorial popup instead of tutorial model [5]

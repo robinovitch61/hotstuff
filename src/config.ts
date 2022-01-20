@@ -22,6 +22,8 @@ const config = {
   maxZoomDelta: 2,
   minRadiusPx: 20,
   maxRadiusPx: 40,
+  minLineThicknessPx: 2,
+  maxLineThicknessPx: 4,
   activeNodeOutlineWidthPx: 5,
   tabHeightPx: 25,
   tableDeleteCellWidthPercent: 0.1,

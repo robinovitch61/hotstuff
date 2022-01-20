@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { CanvasState } from "../components/Canvas/Canvas";
 import {
   determineRadius,
-  drawArrowWithoutHead,
+  drawLine,
   intersectsCircle,
   mouseToNodeCoords,
 } from "../components/Canvas/canvasUtils";
@@ -28,7 +28,7 @@ export default function useAddConnection(
       if (canvasState.context) {
         const nodeCoordsOfMouse = mouseToNodeCoords(event, canvasState);
         clearAndRedraw(canvasState);
-        drawArrowWithoutHead(
+        drawLine(
           canvasState.context,
           clickedNode.center,
           nodeCoordsOfMouse,
