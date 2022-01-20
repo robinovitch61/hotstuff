@@ -121,7 +121,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
               key={col.key}
               width={col.widthPercent}
               minWidth={col.minWidthPx}
-              onClick={() => onClickEditableCell(row.id)}
+              onFocus={() => onClickEditableCell(row.id)} // onFocus so as not to interfere with child onClicks
             >
               {tableCell}
             </StyledCell>
