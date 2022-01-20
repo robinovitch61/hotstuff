@@ -32,6 +32,7 @@ type SidebarProps = {
   onAddConnection: () => void;
   updateNodes: (nodes: AppNode[], clearActiveNodes: boolean) => void;
   deleteNodes: (nodeIds: string[]) => void;
+  setActiveNodes: (nodeIds: string[]) => void;
   updateConnections: (connections: AppConnection[]) => void;
   deleteConnections: (connectionIds: string[]) => void;
   onRunModel: () => ModelOutput | undefined;
@@ -50,6 +51,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
     onAddConnection,
     updateNodes,
     deleteNodes,
+    setActiveNodes,
     updateConnections,
     deleteConnections,
     onRunModel,
@@ -69,6 +71,7 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       onUpdateRow={(node: AppNode) => updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
       onAddButton={onAddNode}
+      onClickEditableCell={(rowId: string) => setActiveNodes([rowId])}
       setTemporaryErrors={setTemporaryTableErrors}
     />
   );

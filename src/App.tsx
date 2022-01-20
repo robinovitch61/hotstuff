@@ -261,6 +261,7 @@ export default function App(): React.ReactElement {
             setOutput(undefined);
           }}
           deleteNodes={deleteNodes}
+          setActiveNodes={setActiveNodes}
           updateConnections={(conns: AppConnection[]) => {
             updateConnections(conns);
             setOutput(undefined);

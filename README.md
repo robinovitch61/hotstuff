@@ -35,7 +35,7 @@ TODO:
 - [x] Add info to canvas: [5]
   - [x] Power gen for each node (number in middle)
   - [x] Resistance between nodes (thickness changes with resistance)
-- [ ] Make node active in canvas when editing in table [5]
+- [x] Make node active in canvas when editing in table [5]
 - [ ] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
 - [ ] Tutorial popup instead of tutorial model [5]
 - [ ] Logo + favicon [5]

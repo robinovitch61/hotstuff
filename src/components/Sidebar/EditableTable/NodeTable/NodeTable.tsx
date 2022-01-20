@@ -30,12 +30,19 @@ type NodeTableProps = {
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
   onAddButton: () => void;
+  onClickEditableCell: (rowId: string) => void;
   setTemporaryErrors: (error: string[]) => void;
 };
 
 export default function NodeTable(props: NodeTableProps): React.ReactElement {
-  const { rows, onUpdateRow, onDeleteRow, onAddButton, setTemporaryErrors } =
-    props;
+  const {
+    rows,
+    onUpdateRow,
+    onDeleteRow,
+    onAddButton,
+    onClickEditableCell,
+    setTemporaryErrors,
+  } = props;
 
   const [sortState, setSortState, sortByState] = useSortableTable<AppNode>(
     defaultNodeSortState,
@@ -114,6 +121,7 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
               key={col.key}
               width={col.widthPercent}
               minWidth={col.minWidthPx}
+              onClick={() => onClickEditableCell(row.id)}
             >
               {tableCell}
             </StyledCell>
