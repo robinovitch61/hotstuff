@@ -1,29 +1,17 @@
 import * as React from "react";
-import styled from "styled-components/macro";
 import { MathComponent } from "mathjax-react";
-
-const StyledTheoryModal = styled.div`
-  max-width: 1200px;
-  height: 100%;
-  overflow-y: auto;
-  padding: 3em;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-`;
-
-const StyledTitle = styled.h1``;
-
-const StyledText = styled.p``;
-
-const StyledLink = styled.a``;
-
-const StyledListItem = styled.li`
-  margin-bottom: 1em;
-`;
+import {
+  StyledLink,
+  StyledListItem,
+  StyledModalContent,
+  StyledSubTitle,
+  StyledText,
+  StyledTitle,
+} from "./style";
 
 export default function TheoryModal(): React.ReactElement {
   return (
-    <StyledTheoryModal>
+    <StyledModalContent>
       <StyledTitle>How Does thermalmodel.com Work?</StyledTitle>
 
       <StyledText>
@@ -69,10 +57,10 @@ export default function TheoryModal(): React.ReactElement {
           Lumped-Element model
         </StyledLink>
         , which produces accurate results when each &quot;lump&quot;, or in the
-        terminology of this tool, &quot;node&quot;, can be assumed to have
+        terminology of this website, &quot;node&quot;, can be assumed to have
         uniform temperature. A node can be assumed to be uniform temperature
-        when the diffusion of heat energy within it is much greater than the
-        transfer of heat into or out of it. This is quantified by a small{" "}
+        when the diffusion of heat within it is much greater than the transfer
+        of heat into or out of it. This is quantified by a small{" "}
         <StyledLink
           href={"https://en.wikipedia.org/wiki/Biot_number"}
           target={"_blank"}
@@ -88,6 +76,9 @@ export default function TheoryModal(): React.ReactElement {
         calculate node temperatures when it runs a model.
       </StyledText>
 
+      <StyledSubTitle>
+        Fourier&apos;s Law and Thermal Conductance
+      </StyledSubTitle>
       <StyledText>
         <StyledLink
           href={
@@ -133,6 +124,7 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
       </ul>
 
+      <StyledSubTitle>Thermal Resistance</StyledSubTitle>
       <StyledText>
         The reciprocal of Thermal Conductance is{" "}
         <StyledLink
@@ -143,14 +135,18 @@ export default function TheoryModal(): React.ReactElement {
         </StyledLink>{" "}
         , <MathComponent display={false} tex={String.raw`R = \frac{1}{c}`} />,
         measured in degrees Kelvin per Watt{" "}
-        <MathComponent display={false} tex={String.raw`[\frac{K}{W}]`} />. For a
-        given object or material, this can be thought of as the temperature
-        difference required to get one Watt of heat energy to flow through it.
-        Materials with higher thermal resistance require more of a temperature
-        difference to achieve the same heat flow.
+        <MathComponent display={false} tex={String.raw`[\frac{K}{W}]`} />. A
+        given object or material&apos;s Thermal Resistance can be thought of as
+        the temperature difference required to get one Watt of heat to flow
+        through it. A material with a higher Thermal Resistance requires a
+        higher temperature difference across it to achieve the same heat flow as
+        one with a lower Thermal Resistance.
       </StyledText>
 
-      <MathComponent display={true} tex={String.raw`q = -\frac{\Delta T}{R}`} />
+      <MathComponent
+        display={true}
+        tex={String.raw`q = -\frac{\Delta T}{R} \space\space\space[1]`}
+      />
 
       <ul>
         <StyledListItem>
@@ -176,16 +172,17 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
       </ul>
 
+      <StyledSubTitle>Thermal Capacitance</StyledSubTitle>
       <StyledText>
-        The definition of{" "}
         <StyledLink
           href={"https://en.wikipedia.org/wiki/Heat_capacity"}
           target={"_blank"}
         >
           Thermal Capacitance
         </StyledLink>{" "}
-        (different than Thermal Conductance above) is the amount of heat energy
-        applied to an object to produce 1 degree of temperature change in it:
+        (different than Thermal Conductance above) can be thought of as the
+        amount of heat energy absorbed by an object to increase its temperature
+        by 1 degree:
       </StyledText>
 
       <MathComponent
@@ -228,7 +225,10 @@ export default function TheoryModal(): React.ReactElement {
         we obtain the following:
       </StyledText>
 
-      <MathComponent display={true} tex={String.raw`q = C \frac{dT}{dt}`} />
+      <MathComponent
+        display={true}
+        tex={String.raw`q = C \frac{dT}{dt} \space\space\space[2]`}
+      />
 
       <ul>
         <StyledListItem>
@@ -255,8 +255,9 @@ export default function TheoryModal(): React.ReactElement {
         </StyledListItem>
       </ul>
 
+      <StyledSubTitle>Model Equation</StyledSubTitle>
       <StyledText>
-        Note we now have two equations for{" "}
+        We now have two equations for{" "}
         <MathComponent display={false} tex={String.raw`q`} />, heat transfer, in
         Watts. Equating these, working out the signs, and adding in power
         generated or consumed, we obtain the following:
@@ -312,10 +313,10 @@ export default function TheoryModal(): React.ReactElement {
       </ul>
 
       <StyledText>
-        This partial differential equation can be converted to a numerical
-        equation with reasonable results assuming the time step between discrete
-        states is small. In using thermalmodel.com, you&apos;ll notice that if
-        you increase the time step too much and rerun a model, unstable results
+        This partial differential equation can be simplified to a numerical
+        equation. The results of the equation are reasonable when the time step
+        size between discrete states is small. You&apos;ll notice that if you
+        rerun a model with too large a time step too much, unstable results
         appear - at too high a time step size, errors compound at each step and
         blow up the temperature differences to unreasonable numbers. If you see
         instability, decrease the time step size and rerun your model.
@@ -408,110 +409,6 @@ export default function TheoryModal(): React.ReactElement {
       </StyledText>
 
       <StyledText>
-        Nodes can be thermally connected through Conduction, Convection, or
-        Radiation. The user should calculate thermal resistance differently
-        depending on the type of connection, as follows:
-      </StyledText>
-
-      <MathComponent
-        display={true}
-        tex={String.raw`R_{conduction} = \frac{L}{kA} \quad \text{units:} \Big{[}\frac{K}{W}\Big{]}`}
-      />
-
-      <ul>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`L`} /> is the
-          conduction length, in meters{" "}
-          <MathComponent display={false} tex={String.raw`[m]`} />
-        </StyledListItem>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`k`} /> is the{" "}
-          <StyledLink
-            href={"https://en.wikipedia.org/wiki/Thermal_conductivity"}
-            target={"_blank"}
-          >
-            Thermal Conductivity
-          </StyledLink>
-          , in Watts per meter per degrees Kelvin{" "}
-          <MathComponent display={false} tex={String.raw`[\frac{W}{mK}]`} />
-        </StyledListItem>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`A`} /> is the
-          conduction area, in meters squared{" "}
-          <MathComponent display={false} tex={String.raw`[m^2]`} />
-        </StyledListItem>
-      </ul>
-
-      <MathComponent
-        display={true}
-        tex={String.raw`R_{convection} = \frac{1}{hA} \quad \text{units:} \Big{[}\frac{K}{W}\Big{]}`}
-      />
-
-      <ul>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`h`} /> is the{" "}
-          <StyledLink
-            href={"https://en.wikipedia.org/wiki/Heat_transfer_coefficient"}
-            target={"_blank"}
-          >
-            Convective Heat Transfer Coefficient
-          </StyledLink>
-          , in Watts per meters squared per degrees Kelvin{" "}
-          <MathComponent display={false} tex={String.raw`[\frac{W}{m^2K}]`} />
-        </StyledListItem>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`A`} /> is the
-          convection area, in meters squared{" "}
-          <MathComponent display={false} tex={String.raw`[m^2]`} />
-        </StyledListItem>
-      </ul>
-
-      <MathComponent
-        display={true}
-        tex={String.raw`R_{radiation} = \frac{1}{\epsilon \sigma A} \quad \text{units:} \Big{[}\frac{K^4}{W}\Big{]}`}
-      />
-
-      <ul>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`\epsilon`} /> is the{" "}
-          <StyledLink
-            href={"https://en.wikipedia.org/wiki/Emissivity"}
-            target={"_blank"}
-          >
-            Emissivity
-          </StyledLink>
-          , a unit-less quantity
-        </StyledListItem>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`\sigma`} /> is the{" "}
-          <StyledLink
-            href={
-              "https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_constant"
-            }
-            target={"_blank"}
-          >
-            Stefan-Boltzmann constant
-          </StyledLink>
-          ,{" "}
-          <MathComponent display={false} tex={String.raw`5.67 \cdot 10^{−8}`} />{" "}
-          Watts per meters squared per degrees Kelvin to the fourth{" "}
-          <MathComponent display={false} tex={String.raw`[\frac{W}{m^2K^4}]`} />
-        </StyledListItem>
-        <StyledListItem>
-          <MathComponent display={false} tex={String.raw`A`} /> is the radiation
-          area, in meters squared{" "}
-          <MathComponent display={false} tex={String.raw`[m^2]`} />
-        </StyledListItem>
-      </ul>
-
-      <StyledText>
-        In building your model, you&apos;re responsible for determining thermal
-        resistances between nodes, thermal capacitances of nodes, and power
-        generation or consumption in each node in your model. From there,
-        thermalmodel.com will do the rest.
-      </StyledText>
-
-      <StyledText>
         The source code for the model can be seen{" "}
         <StyledLink
           href={
@@ -523,6 +420,6 @@ export default function TheoryModal(): React.ReactElement {
         </StyledLink>
         .
       </StyledText>
-    </StyledTheoryModal>
+    </StyledModalContent>
   );
 }

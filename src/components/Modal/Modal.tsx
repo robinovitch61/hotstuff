@@ -7,6 +7,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import TheoryModal from "./TheoryModal";
 import { StyledExitButton } from "./style";
 import CrossMark from "../../img/icons/CrossMark";
+import TutorialModal from "./TutorialModal";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   font-size: 1.1em;
@@ -43,6 +44,8 @@ function getModalContent(
     );
   } else if (type === "theory") {
     return <TheoryModal />;
+  } else if (type === "tutorial") {
+    return <TutorialModal />;
   } else {
     return <h1>Coming Soon</h1>;
   }

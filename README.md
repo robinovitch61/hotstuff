@@ -38,18 +38,21 @@ TODO:
 - [x] Make node active in canvas when editing in table [5]
 - [x] Fix hash pattern drawing over power gen box [5]
 - [x] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
-- [ ] Tutorial popup instead of tutorial model [5]
-- [ ] Logo + favicon [5]
-- [ ] Fun default model (models?) [5]
+- [x] Tutorial popup instead of tutorial model [5]
 - [ ] About section [5]
+- [ ] Logo + favicon [5]
+- [ ] Fun default models [5]
 - [ ] Visual glowup [5]:
   - [x] Tabs should scroll horizontally if table scrollable horizontally
   - [ ] Weird hover thing in safari when click tabs
   - [ ] Model control panel more organized + responsive
   - [ ] General buttons nicer
   - [ ] Add node/connection buttons arrangement
+- [ ] Launch!
+
+Future possible stuff:
 - [ ] Resistance calculator [4]
   - [ ] Link to engineers edge website
   - [ ] Calculator pops up while editing
-- [ ] Horizontal/vertical snap functionality for creating grid [1]
+- [ ] Horizontal/vertical node position snap functionality for creating grid [1]
 - [x] Reset all stored state button (with confirmation) - not important if not the tutorial [1]
