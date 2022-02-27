@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import config from "../../config";
 
 export const StyledInput = styled.input`
   display: inline-block;
@@ -19,7 +20,7 @@ export const StyledInput = styled.input`
 export const StyledEditor = styled.div<{ width: number; height: number }>`
   height: ${(props) => props.height}px;
   width: ${(props) => props.width}px;
-  border-left: 3px solid black;
+  border-left: ${config.borderWidthPx}px solid black;
 `;
 
 export const StyledTables = styled.div<{ heightFrac: number }>`

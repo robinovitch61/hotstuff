@@ -26,6 +26,7 @@ import useResizablePanels from "./hooks/useResizablePanels";
 import {
   StyledApp,
   StyledCanvas,
+  StyledHeader,
   StyledHorizontalBorder,
   StyledVerticalBorder,
   StyledWorkspace,
@@ -34,6 +35,8 @@ import Modal from "./components/Modal/Modal";
 import ErrorModal from "./components/Modal/ErrorModal";
 import useTemporaryError from "./components/Sidebar/hooks/useTemporaryError";
 import config from "./config";
+import ModalControls from "./components/Header/ModalControls";
+import Logo from "./components/Header/Logo";
 
 export type Direction = "L" | "R" | "U" | "D";
 
@@ -164,7 +167,9 @@ export default function App(): React.ReactElement {
   // widthPercent/heights
   const workspaceWidth = windowWidth;
   const workspaceHeight = windowHeight;
-  const canvasHeight = windowHeight * appState.panelSizes.canvasHeightFraction;
+  const headerHeight = config.headerHeightPx;
+  const canvasHeight =
+    windowHeight * appState.panelSizes.canvasHeightFraction - headerHeight;
   const canvasWidth =
     windowWidth * (1 - appState.panelSizes.editorWidthFraction);
   const plotHeight =
@@ -247,6 +252,10 @@ export default function App(): React.ReactElement {
           height={workspaceHeight}
           width={(1 - appState.panelSizes.editorWidthFraction) * workspaceWidth}
         >
+          <StyledHeader height={headerHeight}>
+            <Logo />
+            <ModalControls setModalState={setModalState} />
+          </StyledHeader>
           <StyledCanvas height={canvasHeight}>
             <Canvas
               canvasWidth={canvasWidth}
@@ -260,7 +269,6 @@ export default function App(): React.ReactElement {
               savedCanvasViewState={appState.savedCanvasState}
               setSavedCanvasViewState={setSavedCanvasState}
               setKeyboardActive={setKeyboardActive}
-              setModalState={setModalState}
             />
           </StyledCanvas>
           {plot}

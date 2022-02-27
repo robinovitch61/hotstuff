@@ -5,8 +5,6 @@ import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 import { Point } from "../../utils/pointUtils";
 import CanvasControls from "./CanvasControls";
 import useOnClickCanvas from "./hooks/useOnClickCanvas";
-import { ModalState } from "../../App";
-import ModalControls from "./ModalControls";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
@@ -50,7 +48,6 @@ export type CanvasProps = {
   savedCanvasViewState: CanvasViewState;
   setSavedCanvasViewState: (newSavedCanvasState: CanvasViewState) => void;
   setKeyboardActive: React.Dispatch<React.SetStateAction<boolean>>;
-  setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
 };
 
 export default function Canvas(props: CanvasProps): React.ReactElement {
@@ -66,7 +63,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
     savedCanvasViewState,
     setSavedCanvasViewState,
     setKeyboardActive,
-    setModalState,
   } = props;
 
   // hooks
@@ -115,7 +111,6 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
 
   return (
     <StyledCanvasWrapper>
-      <ModalControls setModalState={setModalState} />
       <CanvasControls
         setCanvasViewState={setCanvasViewState}
         canvasState={{

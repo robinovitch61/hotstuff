@@ -39,8 +39,10 @@ TODO:
 - [x] Fix hash pattern drawing over power gen box [5]
 - [x] Copy/paste all selected with suffix to avoid nodes being named the same thing [5]
 - [x] Tutorial popup instead of tutorial model [5]
+- [x] Logo [5]
+- [ ] Put "Show Example" button in ModalControls header and remove reset [5]
 - [ ] About section [5]
-- [ ] Logo + favicon [5]
+- [ ] Favicon [5]
 - [ ] Fun default models [5]
 - [ ] Visual glowup [5]:
   - [x] Tabs should scroll horizontally if table scrollable horizontally

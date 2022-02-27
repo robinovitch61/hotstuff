@@ -8,6 +8,7 @@ import TheoryModal from "./TheoryModal";
 import { StyledExitButton } from "./style";
 import CrossMark from "../../img/icons/CrossMark";
 import TutorialModal from "./TutorialModal";
+import config from "../../config";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   font-size: 1.1em;
@@ -21,7 +22,7 @@ const StyledModal = styled.div<{ visible: boolean }>`
   top: 0;
   bottom: 0;
   margin: auto;
-  border: 3px solid black;
+  border: ${config.borderWidthPx}px solid black;
   z-index: 10;
   background: white;
   display: ${(props) => (props.visible ? "flex" : "none")};

@@ -6,6 +6,7 @@ import { emptyOutput, ModelOutput } from "hotstuff-network";
 import LinePlot from "./LinePlot";
 import Tabs from "../Tabs/Tabs";
 import { getDataForPlots, getDataKeyForConnection } from "./plotUtils";
+import config from "../../config";
 
 const colors = [
   "#2ecc71",
@@ -37,7 +38,7 @@ const StyledCharts = styled.div`
 const StyledPlot = styled.div<{ height: number; width: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
-  border-top: 3px solid black;
+  border-top: ${config.borderWidthPx}px solid black;
   margin: 0;
   padding: 0;
 `;

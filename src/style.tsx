@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import config from "./config";
 
 export const StyledApp = styled.div<{ height: number; modalOpen: boolean }>`
   display: flex;
@@ -42,6 +43,14 @@ export const StyledVerticalBorder = styled(StyledDraggableBorder)<{
 export const StyledWorkspace = styled.div<{ height: number; width: number }>`
   height: ${(props) => props.height}px;
   width: ${(props) => props.width}px;
+`;
+
+export const StyledHeader = styled.div<{ height: number }>`
+  height: ${(props) => props.height}px;
+  border-bottom: ${config.borderWidthPx}px solid black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 export const StyledCanvas = styled.div<{ height: number }>`

@@ -11,6 +11,7 @@ import {
   importFileFromUser,
   nicelyFormattedJsonString,
 } from "./ioUtils";
+import config from "../../config";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -18,7 +19,7 @@ const StyledModelControlsWrapper = styled.div`
   width: 100%;
   justify-content: center;
   align-items: center;
-  border-top: 3px solid black;
+  border-top: ${config.borderWidthPx}px solid black;
   flex-wrap: wrap;
 `;
 

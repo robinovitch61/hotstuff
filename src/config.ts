@@ -1,6 +1,8 @@
 type MouseEventKey = "shiftKey" | "altKey" | "metaKey" | "ctrlKey";
 
 const config = {
+  borderWidthPx: 2,
+  headerHeightPx: 60,
   maxTimeSteps: 100000,
   defaultTempDegC: 23,
   defaultCapJPerDegK: 10,
