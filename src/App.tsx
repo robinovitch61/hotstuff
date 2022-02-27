@@ -26,7 +26,6 @@ import useResizablePanels from "./hooks/useResizablePanels";
 import {
   StyledApp,
   StyledCanvas,
-  StyledHeader,
   StyledHorizontalBorder,
   StyledVerticalBorder,
   StyledWorkspace,
@@ -37,6 +36,7 @@ import useTemporaryError from "./components/Sidebar/hooks/useTemporaryError";
 import config from "./config";
 import ModalControls from "./components/Header/ModalControls";
 import Logo from "./components/Header/Logo";
+import { StyledHeader } from "./components/Header/style";
 
 export type Direction = "L" | "R" | "U" | "D";
 
