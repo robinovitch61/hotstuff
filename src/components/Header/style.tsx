@@ -7,5 +7,5 @@ export const StyledHeader = styled.div<{ height: number }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #dedede;
+  background: ${config.lightGrey};
 `;

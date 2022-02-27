@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import config from "../../../../config";
 import { AppNode } from "../../../../App";
 import {
-  StyledAddButton,
   StyledCell,
   StyledRow,
   StyledTable,
@@ -29,7 +28,6 @@ type NodeTableProps = {
   rows: AppNode[];
   onUpdateRow: (row: AppNode) => void;
   onDeleteRow: (row: AppNode) => void;
-  onAddButton: () => void;
   onClickEditableCell: (rowId: string) => void;
   setTemporaryErrors: (error: string[]) => void;
 };
@@ -39,7 +37,6 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
     rows,
     onUpdateRow,
     onDeleteRow,
-    onAddButton,
     onClickEditableCell,
     setTemporaryErrors,
   } = props;
@@ -141,7 +138,6 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
           setSortState={setSortState}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
-        <StyledAddButton onClick={onAddButton}>+</StyledAddButton>
       </StyledTable>
     </StyledTableWrapper>
   );

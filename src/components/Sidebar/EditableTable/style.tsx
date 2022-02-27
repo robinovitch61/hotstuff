@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 import config from "../../../config";
+import { StyledButton } from "../../../style";
 
 export const StyledTableWrapper = styled.div`
   width: 100%;
@@ -14,7 +15,19 @@ export const StyledTableBody = styled.div`
   width: 100%;
 `;
 
-export const StyledAddButton = styled.button``;
+export const StyledAddButtonWrapper = styled.div`
+  position: sticky;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+`;
+
+export const StyledAddButton = styled(StyledButton)`
+  padding: 0.5em 1em;
+  margin-top: 5px;
+  font-size: 0.75em;
+`;
 
 export const StyledRow = styled.div<{
   heightOffsetPx?: number;

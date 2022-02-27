@@ -23,21 +23,23 @@ const StyledTabs = styled.div`
   z-index: 1;
 `;
 
-const StyledTab = styled.div<{ width: number }>`
+const StyledTab = styled.button<{ width: number; active: boolean }>`
   display: inline-flex;
+  font-size: 16px;
   width: ${({ width }) => `${width * 100}%`};
   cursor: pointer;
   text-decoration: none;
   align-items: center;
-  //background: lightgray;
+  background: ${(props) =>
+    props.active ? config.tabColor : config.inactiveTabColor};
   //background: rgb(85, 9, 121);
-  background: linear-gradient(
-    90deg,
-    rgba(46, 228, 233, 1) 0%,
-    rgba(46, 228, 233, 1) 40%,
-    rgba(255, 0, 230, 1) 80%,
-    rgba(85, 9, 121, 1) 100%
-  );
+  //background: linear-gradient(
+  //  90deg,
+  //  rgba(46, 228, 233, 1) 0%,
+  //  rgba(46, 228, 233, 1) 40%,
+  //  rgba(255, 0, 230, 1) 80%,
+  //  rgba(85, 9, 121, 1) 100%
+  //);
   border-radius: 5px 5px 0 0;
   border: 1px solid black;
   border-bottom: 2px solid black;
@@ -49,12 +51,10 @@ const StyledTab = styled.div<{ width: number }>`
   }
 `;
 
-const StyledTabText = styled.div`
+const StyledTabText = styled.div<{ active: boolean }>`
   font-size: 1.1em;
-  padding: 0.2em 0.5em;
-
-  &.active {
-    font-weight: bold;
+  font-weight: ${(props) => (props.active ? "bold" : "unset")};
+  opacity: ${(props) => (props.active ? 1 : "inherit")};
   }
 `;
 
@@ -66,6 +66,7 @@ const StyledInnerContent = styled.div<{ topLeftRounded: boolean }>`
 type Tab = {
   text: string;
   component: React.ReactElement;
+  after?: React.ReactElement;
   width: number; // between 0 and 1
 };
 
@@ -81,6 +82,7 @@ export default function Tabs(props: TabsProps): React.ReactElement {
       {props.tabs.length > 1 && (
         <StyledTabs>
           {props.tabs.map((tab, idx) => {
+            const active = idx === activeIdx;
             return (
               <StyledTab
                 key={tab.text}
@@ -92,10 +94,9 @@ export default function Tabs(props: TabsProps): React.ReactElement {
                   }
                 }}
                 width={tab.width}
+                active={active}
               >
-                <StyledTabText className={idx === activeIdx ? "active" : ""}>
-                  {tab.text}
-                </StyledTabText>
+                <StyledTabText active={active}>{tab.text}</StyledTabText>
               </StyledTab>
             );
           })}
@@ -105,6 +106,8 @@ export default function Tabs(props: TabsProps): React.ReactElement {
       <StyledInnerContent topLeftRounded={props.tabs.length <= 1}>
         {props.tabs.filter((_, idx) => idx === activeIdx)[0].component}
       </StyledInnerContent>
+
+      {props.tabs.filter((_, idx) => idx === activeIdx)[0].after}
     </StyledTabsWrapper>
   );
 }

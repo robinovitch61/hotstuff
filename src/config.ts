@@ -1,5 +1,7 @@
 type MouseEventKey = "shiftKey" | "altKey" | "metaKey" | "ctrlKey";
 
+const lightGrey = "#dedede";
+
 const config = {
   borderWidthPx: 2,
   headerHeightPx: 50,
@@ -45,6 +47,11 @@ const config = {
   maxNoteLengthChars: 500,
   activeColor: "rgba(112, 165, 255, 0.2)",
   pasteXOffset: 45,
+  lightGrey: lightGrey,
+  primaryColor: "#000000",
+  secondaryColor: "#ffffff",
+  tabColor: lightGrey,
+  inactiveTabColor: "white",
 };
 
 export default config;

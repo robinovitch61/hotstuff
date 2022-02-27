@@ -19,6 +19,7 @@ import { ModelOutput } from "hotstuff-network";
 import useTemporaryError from "./hooks/useTemporaryError";
 import config from "../../config";
 import ErrorModal from "../Modal/ErrorModal";
+import { StyledAddButton, StyledAddButtonWrapper } from "./EditableTable/style";
 
 type SidebarProps = {
   appState: AppState;
@@ -70,10 +71,15 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       rows={appState.nodes}
       onUpdateRow={(node: AppNode) => updateNodes([node], false)}
       onDeleteRow={(node: AppNode) => deleteNodes([node.id])}
-      onAddButton={onAddNode}
       onClickEditableCell={(rowId: string) => setActiveNodes([rowId])}
       setTemporaryErrors={setTemporaryTableErrors}
     />
+  );
+
+  const nodeAddButton = (
+    <StyledAddButtonWrapper>
+      <StyledAddButton onClick={onAddNode}>Add Node</StyledAddButton>
+    </StyledAddButtonWrapper>
   );
 
   const connectionTable = (
@@ -86,9 +92,16 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
       onDeleteRow={(connection: AppConnection) =>
         deleteConnections([connection.id])
       }
-      onAddButton={onAddConnection}
       setTemporaryErrors={setTemporaryTableErrors}
     />
+  );
+
+  const connectionAddButton = (
+    <StyledAddButtonWrapper>
+      <StyledAddButton onClick={onAddConnection}>
+        Add Connection
+      </StyledAddButton>
+    </StyledAddButtonWrapper>
   );
 
   return (
@@ -97,8 +110,18 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
         <ErrorModal errors={tableErrors} setErrors={setTableErrors} />
         <Tabs
           tabs={[
-            { text: "Nodes", component: nodeTable, width: 0.5 },
-            { text: "Connections", component: connectionTable, width: 0.5 },
+            {
+              text: "Nodes",
+              component: nodeTable,
+              after: nodeAddButton,
+              width: 0.5,
+            },
+            {
+              text: "Connections",
+              component: connectionTable,
+              after: connectionAddButton,
+              width: 0.5,
+            },
           ]}
         />
       </StyledTables>

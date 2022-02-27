@@ -2,8 +2,9 @@ import * as React from "react";
 import styled from "styled-components/macro";
 import { ORIGIN } from "../../utils/pointUtils";
 import { CanvasState, CanvasViewState } from "./Canvas";
+import { StyledButton } from "../../style";
 
-const StyledButtons = styled.div`
+const StyledCanvasControlButtons = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
@@ -11,8 +12,9 @@ const StyledButtons = styled.div`
   flex-direction: column;
 `;
 
-const StyledButton = styled.button`
+const StyledCanvasControlButton = styled(StyledButton)`
   margin: 0.2em;
+  font-size: 0.75em;
 `;
 
 type CanvasControlsProps = {
@@ -26,16 +28,16 @@ export default function CanvasControls(
   props: CanvasControlsProps
 ): React.ReactElement {
   return (
-    <StyledButtons>
-      <StyledButton
+    <StyledCanvasControlButtons>
+      <StyledCanvasControlButton
         onClick={() =>
           props.canvasState.context &&
           props.setCanvasViewState({ offset: ORIGIN, scale: 1 })
         }
       >
         Reset View
-      </StyledButton>
-      <StyledButton
+      </StyledCanvasControlButton>
+      <StyledCanvasControlButton
         onClick={() =>
           props.canvasState.context &&
           props.setCanvasViewState({
@@ -45,8 +47,8 @@ export default function CanvasControls(
         }
       >
         Reset View to Saved
-      </StyledButton>
-      <StyledButton
+      </StyledCanvasControlButton>
+      <StyledCanvasControlButton
         onClick={() => {
           props.setSavedCanvasState({
             offset: props.canvasState.canvasViewState.offset,
@@ -55,7 +57,7 @@ export default function CanvasControls(
         }}
       >
         Save View
-      </StyledButton>
-    </StyledButtons>
+      </StyledCanvasControlButton>
+    </StyledCanvasControlButtons>
   );
 }

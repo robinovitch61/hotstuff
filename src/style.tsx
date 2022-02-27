@@ -1,4 +1,6 @@
 import styled from "styled-components/macro";
+import config from "./config";
+import { css } from "styled-components";
 
 export const StyledApp = styled.div<{ height: number; modalOpen: boolean }>`
   display: flex;
@@ -47,4 +49,31 @@ export const StyledWorkspace = styled.div<{ height: number; width: number }>`
 export const StyledCanvas = styled.div<{ height: number }>`
   width: 100%;
   height: ${(props) => props.height}px;
+`;
+
+const sharedButtonStyles = css<{ primary?: boolean }>`
+  background: ${(props) =>
+    !!props.primary ? config.primaryColor : config.secondaryColor};
+  color: ${(props) => (!!props.primary ? "white" : "inherit")};
+  border: 1px solid black;
+  padding: 0.5em 0.8em;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover,
+  &:focus {
+    opacity: 0.7;
+    font-style: italic;
+  }
+`;
+
+export const StyledButton = styled.button`
+  ${sharedButtonStyles}
+`;
+
+export const StyledAnchorAsButton = styled.a`
+  ${sharedButtonStyles}
 `;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import styled from "styled-components/macro";
 import EditableNumberInput from "./EditableNumberInput";
 import { AppState, ExportedAppState, ModalState, Timing } from "../../App";
@@ -12,6 +12,7 @@ import {
   nicelyFormattedJsonString,
 } from "./ioUtils";
 import config from "../../config";
+import { StyledAnchorAsButton, StyledButton } from "../../style";
 
 const StyledModelControlsWrapper = styled.div`
   display: flex;
@@ -23,15 +24,12 @@ const StyledModelControlsWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-const StyledButton = styled.button`
+const StyledModelControlButton = styled(StyledButton)`
   margin-top: 5px;
   margin-bottom: 5px;
 `;
 
-const StyledAnchor = styled.a`
-  margin-top: 5px;
-  margin-bottom: 5px;
-`;
+const StyledAnchor = styled(StyledAnchorAsButton)``;
 
 const StyledImport = styled.div`
   padding: 0.2em;
@@ -96,6 +94,14 @@ export default function ModelControls(
   const downloadModelRef = useRef<HTMLAnchorElement>(null);
   const runAndDownloadModelRef = useRef<HTMLAnchorElement>(null);
 
+  const runAndDownloadFromAnchor = useCallback(() => {
+    const newOutput = onRunModel();
+    downloadExportedAppStateFromAnchor(runAndDownloadModelRef, {
+      ...appState,
+      output: newOutput,
+    });
+  }, [appState, onRunModel]);
+
   return (
     <StyledModelControlsWrapper>
       <StyledTimeControls>
@@ -126,8 +132,10 @@ export default function ModelControls(
         </StyledTimeControl>
       </StyledTimeControls>
       <StyledTopControls>
-        <StyledButton onClick={onRunModel}>Run Model</StyledButton>
-        <StyledButton
+        <StyledModelControlButton primary onClick={onRunModel}>
+          Run Model
+        </StyledModelControlButton>
+        <StyledModelControlButton
           onClick={() =>
             navigator.clipboard.writeText(
               nicelyFormattedJsonString<AppState>(appState)
@@ -135,8 +143,8 @@ export default function ModelControls(
           }
         >
           Copy Model
-        </StyledButton>
-        <StyledButton
+        </StyledModelControlButton>
+        <StyledModelControlButton
           onClick={() => {
             const newOutput = onRunModel();
             navigator.clipboard.writeText(
@@ -148,21 +156,27 @@ export default function ModelControls(
           }}
         >
           Run & Copy Results
-        </StyledButton>
+        </StyledModelControlButton>
         <StyledAnchor
+          tabIndex={0}
           ref={downloadModelRef}
           onClick={() => downloadAppStateFromAnchor(downloadModelRef, appState)}
+          onKeyUp={(event: React.KeyboardEvent) => {
+            if (event.key === "Enter") {
+              downloadAppStateFromAnchor(downloadModelRef, appState);
+            }
+          }}
         >
           Download Model
         </StyledAnchor>
         <StyledAnchor
+          tabIndex={0}
           ref={runAndDownloadModelRef}
-          onClick={() => {
-            const newOutput = onRunModel();
-            downloadExportedAppStateFromAnchor(runAndDownloadModelRef, {
-              ...appState,
-              output: newOutput,
-            });
+          onClick={runAndDownloadFromAnchor}
+          onKeyUp={(event: React.KeyboardEvent) => {
+            if (event.key === "Enter") {
+              runAndDownloadFromAnchor();
+            }
           }}
         >
           Run & Download Results
@@ -174,7 +188,7 @@ export default function ModelControls(
           value={stagedAppState}
           onChange={(event) => setStagedAppState(event.target.value)}
         />
-        <StyledButton
+        <StyledModelControlButton
           onClick={() => {
             const inputObject = JSON.parse(stagedAppState);
             setAppState(inputObject);
@@ -183,7 +197,7 @@ export default function ModelControls(
           }}
         >
           Import
-        </StyledButton>
+        </StyledModelControlButton>
         <div>
           <input
             id={"file-importer"}
@@ -198,7 +212,7 @@ export default function ModelControls(
         </div>
       </StyledImport>
 
-      <StyledButton
+      <StyledModelControlButton
         onClick={() =>
           setModalState((prev) => ({
             ...prev,
@@ -216,7 +230,7 @@ export default function ModelControls(
         }
       >
         Reset
-      </StyledButton>
+      </StyledModelControlButton>
     </StyledModelControlsWrapper>
   );
 }

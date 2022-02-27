@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from "react";
 import config from "../../../../config";
 import { AppConnection, AppNode } from "../../../../App";
 import {
-  StyledAddButton,
   StyledCell,
   StyledRow,
   StyledTable,
@@ -50,21 +49,13 @@ type ConnectionTableProps = {
   nodes: AppNode[];
   onUpdateRow: (row: AppConnection) => void;
   onDeleteRow: (row: AppConnection) => void;
-  onAddButton: () => void;
   setTemporaryErrors: (error: string[]) => void;
 };
 
 export default function ConnectionTable(
   props: ConnectionTableProps
 ): React.ReactElement {
-  const {
-    rows,
-    nodes,
-    onUpdateRow,
-    onDeleteRow,
-    onAddButton,
-    setTemporaryErrors,
-  } = props;
+  const { rows, nodes, onUpdateRow, onDeleteRow, setTemporaryErrors } = props;
 
   const [sortState, setSortState, sortByState] =
     useSortableTable<AppConnectionTable>(
@@ -275,7 +266,6 @@ export default function ConnectionTable(
           setSortState={setSortState}
         />
         <StyledTableBody>{tableRows}</StyledTableBody>
-        <StyledAddButton onClick={onAddButton}>+</StyledAddButton>
       </StyledTable>
     </StyledTableWrapper>
   );

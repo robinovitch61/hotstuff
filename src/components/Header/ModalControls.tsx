@@ -1,10 +1,11 @@
 import * as React from "react";
 import { ModalState } from "../../App";
 import styled from "styled-components/macro";
+import { StyledButton } from "../../style";
 
 const StyledModalControls = styled.div``;
 
-const StyledModalControlButton = styled.button`
+const StyledModalControlButton = styled(StyledButton)`
   margin-right: 1em;
 `;
 
