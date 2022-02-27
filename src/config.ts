@@ -15,7 +15,7 @@ const config = {
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
   defaultSmallResistanceDegKPerW: 0.01,
-  defaultEditorWidthFraction: 1 - 1 / 1.61803398875,
+  defaultEditorWidthFraction: 0.45,
   defaultCanvasHeightFraction: 1 / 1.61803398875,
   defaultTableHeightFraction: 0.5,
   minPanelFraction: 0.1,

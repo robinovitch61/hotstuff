@@ -14,13 +14,13 @@ export default function useDraw(
   const connectionKindImageMap = useConnectionKindImageMap();
   const draw = useCallback(
     (context: CanvasRenderingContext2D) => {
+      drawNodes(context, appNodes);
       drawConnections(
         context,
         appNodes,
         appConnections,
         connectionKindImageMap
       );
-      drawNodes(context, appNodes);
     },
     [appConnections, appNodes, connectionKindImageMap]
   );
