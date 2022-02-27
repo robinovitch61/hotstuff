@@ -1,3 +1,11 @@
+***
+
+<p align="center">
+  <img width="300" src="https://github.com/robinovitch61/hotstuff/blob/main/src/img/thermalmodel-logo.png">
+</p>
+
+***
+
 # [thermalmodel.com](https://thermalmodel.com)
 
 TODO:
