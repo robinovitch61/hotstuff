@@ -55,6 +55,7 @@ const StyledTabText = styled.div<{ active: boolean }>`
   font-size: 1.1em;
   font-weight: ${(props) => (props.active ? "bold" : "unset")};
   opacity: ${(props) => (props.active ? 1 : "inherit")};
+  text-decoration: ${(props) => (props.active ? "underline" : "unset")};
   }
 `;
 

@@ -42,7 +42,7 @@ const config = {
   plotYDomainPaddingPx: 15,
   plotTickFontSizePx: 15,
   maxPlotPoints: 400,
-  multiSelectKeys: ["metaKey", "ctrlKey"] as MouseEventKey[],
+  multiSelectKeys: ["shiftKey", "metaKey", "ctrlKey"] as MouseEventKey[],
   errorMessageDurationSeconds: 4,
   maxNoteLengthChars: 500,
   activeColor: "rgba(112, 165, 255, 0.2)",
@@ -51,7 +51,7 @@ const config = {
   primaryColor: "#000000",
   secondaryColor: "#ffffff",
   tabColor: lightGrey,
-  inactiveTabColor: "white",
+  inactiveTabColor: lightGrey,
 };
 
 export default config;

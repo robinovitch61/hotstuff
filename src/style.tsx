@@ -63,10 +63,15 @@ const sharedButtonStyles = css<{ primary?: boolean }>`
   text-decoration: none;
   text-align: center;
 
-  &:hover,
-  &:focus {
+  &:focus,
+  &:hover {
     opacity: 0.7;
     font-style: italic;
+  }
+
+  :focus:not(:focus-visible) {
+    opacity: 1;
+    font-style: unset;
   }
 `;
 

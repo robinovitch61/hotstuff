@@ -13,8 +13,6 @@ export const StyledModalContent = styled.div`
   height: 100%;
   overflow-y: auto;
   padding: 3em;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
 `;
 
 export const StyledTitle = styled.h1`

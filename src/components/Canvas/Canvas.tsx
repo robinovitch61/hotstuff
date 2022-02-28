@@ -5,11 +5,20 @@ import usePanZoomCanvas from "./hooks/usePanZoomCanvas";
 import { Point } from "../../utils/pointUtils";
 import CanvasControls from "./CanvasControls";
 import useOnClickCanvas from "./hooks/useOnClickCanvas";
+import { roundToNearestHundredth } from "../Plot/plotUtils";
 
 const StyledCanvasWrapper = styled.div`
   display: block;
   max-height: 100%;
   position: relative;
+`;
+
+const StyledCanvasState = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 0.5em;
+  font-size: 0.75em;
 `;
 
 const StyledCanvas = styled.canvas<{ cssWidth: number; cssHeight: number }>`
@@ -111,6 +120,11 @@ export default function Canvas(props: CanvasProps): React.ReactElement {
 
   return (
     <StyledCanvasWrapper>
+      <StyledCanvasState>
+        <div>{`x: ${Math.round(canvasViewState.offset.x)}`}</div>
+        <div>{`y: ${Math.round(canvasViewState.offset.y)}`}</div>
+        <div>{`scale: ${roundToNearestHundredth(canvasViewState.scale)}`}</div>
+      </StyledCanvasState>
       <CanvasControls
         setCanvasViewState={setCanvasViewState}
         canvasState={{

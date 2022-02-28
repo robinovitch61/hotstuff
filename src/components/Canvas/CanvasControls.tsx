@@ -32,21 +32,21 @@ export default function CanvasControls(
       <StyledCanvasControlButton
         onClick={() =>
           props.canvasState.context &&
-          props.setCanvasViewState({ offset: ORIGIN, scale: 1 })
-        }
-      >
-        Reset View
-      </StyledCanvasControlButton>
-      <StyledCanvasControlButton
-        onClick={() =>
-          props.canvasState.context &&
           props.setCanvasViewState({
             offset: props.savedCanvasState.offset,
             scale: props.savedCanvasState.scale,
           })
         }
       >
-        Reset View to Saved
+        Saved View
+      </StyledCanvasControlButton>
+      <StyledCanvasControlButton
+        onClick={() =>
+          props.canvasState.context &&
+          props.setCanvasViewState({ offset: ORIGIN, scale: 1 })
+        }
+      >
+        Zero View
       </StyledCanvasControlButton>
       <StyledCanvasControlButton
         onClick={() => {
@@ -56,7 +56,7 @@ export default function CanvasControls(
           });
         }}
       >
-        Save View
+        Overwrite Saved View
       </StyledCanvasControlButton>
     </StyledCanvasControlButtons>
   );
