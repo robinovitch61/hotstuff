@@ -21,6 +21,7 @@ export const StyledAddButtonWrapper = styled.div`
   left: 0;
   display: flex;
   justify-content: center;
+  margin-bottom: 1em;
 `;
 
 export const StyledAddButton = styled(StyledButton)`
