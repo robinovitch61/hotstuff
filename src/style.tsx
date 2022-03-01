@@ -62,6 +62,7 @@ const sharedButtonStyles = css<{ primary?: boolean }>`
   outline: inherit;
   text-decoration: none;
   text-align: center;
+  white-space: nowrap;
 
   &:focus,
   &:hover {

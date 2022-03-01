@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  AppConnection,
-  AppNode,
-  AppState,
-  ModalState,
-  Timing,
-} from "../../App";
+import { AppConnection, AppNode, AppState, Timing } from "../../App";
 import NodeTable from "./EditableTable/NodeTable/NodeTable";
 import ConnectionTable from "./EditableTable/ConnectionTable/ConnectionTable";
 import Tabs from "../Tabs/Tabs";
@@ -25,7 +19,6 @@ type SidebarProps = {
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
   setOutput: React.Dispatch<React.SetStateAction<ModelOutput | undefined>>;
-  setModalState: React.Dispatch<React.SetStateAction<ModalState>>;
   width: number;
   height: number;
   setTiming: (newTiming: Timing) => void;
@@ -44,7 +37,6 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
     appState,
     setAppState,
     setOutput,
-    setModalState,
     width,
     height,
     setTiming,
@@ -136,7 +128,6 @@ export default function Sidebar(props: SidebarProps): React.ReactElement {
           appState={appState}
           setAppState={setAppState}
           setOutput={setOutput}
-          setModalState={setModalState}
           onRunModel={() => {
             if (
               Math.ceil(

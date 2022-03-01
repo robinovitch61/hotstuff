@@ -34,7 +34,7 @@ import Modal from "./components/Modal/Modal";
 import ErrorModal from "./components/Modal/ErrorModal";
 import useTemporaryError from "./components/Sidebar/hooks/useTemporaryError";
 import config from "./config";
-import ModalControls from "./components/Header/ModalControls";
+import ModalControls from "./components/Header/HeaderControls";
 import Logo from "./components/Header/Logo";
 import { StyledHeader } from "./components/Header/style";
 
@@ -254,7 +254,11 @@ export default function App(): React.ReactElement {
         >
           <StyledHeader height={headerHeight}>
             <Logo />
-            <ModalControls setModalState={setModalState} />
+            <ModalControls
+              setModalState={setModalState}
+              setAppState={setAppState}
+              setOutput={setOutput}
+            />
           </StyledHeader>
           <StyledCanvas height={canvasHeight}>
             <Canvas
@@ -277,7 +281,6 @@ export default function App(): React.ReactElement {
           appState={appState}
           setAppState={setAppState}
           setOutput={setOutput}
-          setModalState={setModalState}
           height={windowHeight}
           width={editorWidth}
           setTiming={setTiming}
