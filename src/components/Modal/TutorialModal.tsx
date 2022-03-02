@@ -14,7 +14,7 @@ export default function TutorialModal(): React.ReactElement {
     <StyledModalContent>
       <StyledTitle>How to Use This Website</StyledTitle>
 
-      <StyledSubTitle>Canvas Controls</StyledSubTitle>
+      <StyledSubTitle>Controls</StyledSubTitle>
       <ul>
         <li>Click a node to select it</li>
         <li>Click and drag a node to move it</li>
