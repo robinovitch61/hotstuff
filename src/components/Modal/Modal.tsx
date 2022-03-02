@@ -9,6 +9,7 @@ import { StyledExitButton } from "./style";
 import CrossMark from "../../img/icons/CrossMark";
 import TutorialModal from "./TutorialModal";
 import config from "../../config";
+import AboutModal from "./AboutModal";
 
 const StyledModal = styled.div<{ visible: boolean }>`
   font-size: 1.1em;
@@ -48,7 +49,7 @@ function getModalContent(
   } else if (type === "tutorial") {
     return <TutorialModal />;
   } else {
-    return <h1>Coming Soon</h1>;
+    return <AboutModal />;
   }
 }
 
