@@ -1,7 +1,7 @@
 import styled from "styled-components/macro";
 import config from "../../config";
 
-export const StyledInput = styled.input`
+export const StyledInput = styled.input<{ fontSize?: string }>`
   display: inline-block;
   border: none;
   width: 100%;
@@ -9,6 +9,7 @@ export const StyledInput = styled.input`
   text-align: center;
   padding: 0;
   background: unset;
+  font-size: ${(props) => props.fontSize || ""};
 
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {

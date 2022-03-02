@@ -18,6 +18,7 @@ type EditableNumberInputProps = {
   onBlur: (value: number) => void;
   afterValue?: string;
   validator?: (val: string) => string;
+  fontSize?: string;
 };
 
 export default function EditableNumberInput(
@@ -36,6 +37,7 @@ export default function EditableNumberInput(
       getNewValue={getFloatVal}
       afterValue={props.afterValue}
       validator={validator}
+      fontSize={props.fontSize}
     />
   );
 }

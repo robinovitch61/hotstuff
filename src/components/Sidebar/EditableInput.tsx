@@ -11,12 +11,14 @@ type EditableInputProps<T> = {
   getNewValue: (event: React.ChangeEvent<HTMLInputElement>) => T | undefined;
   afterValue?: string;
   validator: (value: string) => T;
+  fontSize?: string;
 };
 
 export default function EditableInput<T extends CanBeMadeString>(
   props: EditableInputProps<T>
 ): React.ReactElement {
-  const { initialValue, onBlur, getNewValue, afterValue, validator } = props;
+  const { initialValue, onBlur, getNewValue, afterValue, validator, fontSize } =
+    props;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,6 +61,7 @@ export default function EditableInput<T extends CanBeMadeString>(
     <StyledInput
       ref={inputRef}
       type="text"
+      fontSize={fontSize}
       value={value}
       onChange={handleOnChange}
       onFocus={() =>

@@ -11,61 +11,82 @@ import {
   nicelyFormattedJsonString,
 } from "./ioUtils";
 import config from "../../config";
-import { StyledAnchorAsButton, StyledButton } from "../../style";
+import {
+  StyledAnchorAsButton,
+  StyledButton,
+  StyledLabelAsButton,
+} from "../../style";
 
 const StyledModelControlsWrapper = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  align-items: center;
+  justify-content: space-evenly;
+  border-top: ${config.borderWidthPx}px solid black;
+  overflow: hidden;
+`;
+
+const StyledModelControlButtons = styled.div`
+  display: flex;
   justify-content: center;
   align-items: center;
-  border-top: ${config.borderWidthPx}px solid black;
-  flex-wrap: wrap;
+  width: 80%;
 `;
 
 const StyledModelControlButton = styled(StyledButton)`
-  margin-top: 5px;
-  margin-bottom: 5px;
+  height: 100%;
+`;
+
+const StyledCopyAndDownloadButtons = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  grid-gap: 0.5em;
+  margin-left: 1em;
 `;
 
 const StyledAnchor = styled(StyledAnchorAsButton)``;
 
-const StyledImport = styled.div`
-  padding: 0.2em;
-  border: 1px solid black;
-`;
-
 const StyledInput = styled.input`
   margin-right: 0.5em;
+  font-size: 1.2em;
 `;
 
-const StyledTopControls = styled.div`
+const StyledTimeControls = styled.div`
   display: flex;
-  > * {
-    margin: 1em;
-  }
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80px;
 `;
-
-const StyledTimeControls = styled.div``;
 
 const StyledTimeControl = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  margin: 0.5em;
 `;
 
 const StyledInputWrapper = styled.div`
   border: 1px solid black;
   border-radius: 2px;
-  max-width: 3em;
   height: 1.5em;
+  width: 5em;
+`;
+
+const StyledImportModel = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledImportFromFile = styled(StyledLabelAsButton)`
+  display: block;
 `;
 
 const StyledLabel = styled.label`
   margin-right: 0.2em;
+  font-size: 1.5rem;
+  white-space: nowrap;
 `;
 
 export type ModelControlsProps = {
@@ -87,12 +108,62 @@ export default function ModelControls(
 
   return (
     <StyledModelControlsWrapper>
+      <StyledModelControlButtons>
+        <StyledModelControlButton primary onClick={onRunModel}>
+          Run Model
+        </StyledModelControlButton>
+        <StyledCopyAndDownloadButtons>
+          <StyledModelControlButton
+            onClick={() =>
+              navigator.clipboard.writeText(
+                nicelyFormattedJsonString<AppState>(appState)
+              )
+            }
+          >
+            Copy Model
+          </StyledModelControlButton>
+          <StyledModelControlButton
+            onClick={() => {
+              const newOutput = onRunModel();
+              navigator.clipboard.writeText(
+                nicelyFormattedJsonString<ExportedAppState>({
+                  ...appState,
+                  output: newOutput,
+                })
+              );
+            }}
+          >
+            Run & Copy
+          </StyledModelControlButton>
+          <StyledAnchor
+            ref={downloadModelRef}
+            onClick={() =>
+              downloadAppStateFromAnchor(downloadModelRef, appState)
+            }
+          >
+            Download Model
+          </StyledAnchor>
+          <StyledAnchor
+            ref={runAndDownloadModelRef}
+            onClick={() => {
+              const newOutput = onRunModel();
+              downloadExportedAppStateFromAnchor(runAndDownloadModelRef, {
+                ...appState,
+                output: newOutput,
+              });
+            }}
+          >
+            Run & Download
+          </StyledAnchor>
+        </StyledCopyAndDownloadButtons>
+      </StyledModelControlButtons>
       <StyledTimeControls>
         <StyledTimeControl>
-          <StyledLabel>Run Time [s]:</StyledLabel>
+          <StyledLabel>Run Time [seconds]:</StyledLabel>
           <StyledInputWrapper>
             <EditableNumberInput
               initialValue={appState.timing.totalTimeS}
+              fontSize={config.timeControlsFontSize}
               onBlur={(newTotalTimeS: number) =>
                 setTiming({ ...appState.timing, totalTimeS: newTotalTimeS })
               }
@@ -100,10 +171,11 @@ export default function ModelControls(
           </StyledInputWrapper>
         </StyledTimeControl>
         <StyledTimeControl>
-          <StyledLabel>Time Step [s]:</StyledLabel>
+          <StyledLabel>Timestep [seconds]:</StyledLabel>
           <StyledInputWrapper>
             <EditableNumberInput
               initialValue={appState.timing.timeStepS}
+              fontSize={config.timeControlsFontSize}
               onBlur={(newTimeStepS: number) =>
                 setTiming({
                   ...appState.timing,
@@ -114,55 +186,11 @@ export default function ModelControls(
           </StyledInputWrapper>
         </StyledTimeControl>
       </StyledTimeControls>
-      <StyledTopControls>
-        <StyledModelControlButton primary onClick={onRunModel}>
-          Run Model
-        </StyledModelControlButton>
-        <StyledModelControlButton
-          onClick={() =>
-            navigator.clipboard.writeText(
-              nicelyFormattedJsonString<AppState>(appState)
-            )
-          }
-        >
-          Copy Model
-        </StyledModelControlButton>
-        <StyledModelControlButton
-          onClick={() => {
-            const newOutput = onRunModel();
-            navigator.clipboard.writeText(
-              nicelyFormattedJsonString<ExportedAppState>({
-                ...appState,
-                output: newOutput,
-              })
-            );
-          }}
-        >
-          Run & Copy Results
-        </StyledModelControlButton>
-        <StyledAnchor
-          ref={downloadModelRef}
-          onClick={() => downloadAppStateFromAnchor(downloadModelRef, appState)}
-        >
-          Download Model
-        </StyledAnchor>
-        <StyledAnchor
-          ref={runAndDownloadModelRef}
-          onClick={() => {
-            const newOutput = onRunModel();
-            downloadExportedAppStateFromAnchor(runAndDownloadModelRef, {
-              ...appState,
-              output: newOutput,
-            });
-          }}
-        >
-          Run & Download Results
-        </StyledAnchor>
-      </StyledTopControls>
-      <StyledImport>
+      <StyledImportModel>
         <StyledLabel>Model:</StyledLabel>
         <StyledInput
           value={stagedAppState}
+          placeholder={"Paste a Model Here"}
           onChange={(event) => setStagedAppState(event.target.value)}
         />
         <StyledModelControlButton
@@ -175,19 +203,21 @@ export default function ModelControls(
         >
           Import
         </StyledModelControlButton>
-        <div>
-          <input
-            id={"file-importer"}
-            type={"file"}
-            accept={".json"}
-            style={{ display: "none" }}
-            onChange={(event) =>
-              importFileFromUser(event, setAppState, setOutput)
-            }
-          />
-          <label htmlFor={"file-importer"}>Import Model from File</label>
-        </div>
-      </StyledImport>
+      </StyledImportModel>
+      <div>
+        <input
+          id={"file-importer"}
+          type={"file"}
+          accept={".json"}
+          style={{ display: "none" }}
+          onChange={(event) =>
+            importFileFromUser(event, setAppState, setOutput)
+          }
+        />
+        <StyledImportFromFile htmlFor={"file-importer"}>
+          Import Model from File
+        </StyledImportFromFile>
+      </div>
     </StyledModelControlsWrapper>
   );
 }

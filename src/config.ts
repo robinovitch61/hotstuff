@@ -15,10 +15,11 @@ const config = {
   defaultNodeRadius: 20,
   defaultResistanceDegKPerW: 10,
   defaultSmallResistanceDegKPerW: 0.01,
+  defaultSmallCapacitanceJPerDegK: 1,
   defaultEditorWidthFraction: 0.45,
   defaultCanvasHeightFraction: 1 / 1.61803398875,
   defaultTableHeightFraction: 0.5,
-  minPanelFraction: 0.1,
+  minPanelFraction: 0.2,
   newNodeNamePrefix: "New Node",
   zoomSensitivity: 1500, // bigger = less zoom per click
   minZoom: 0.5,
@@ -52,6 +53,7 @@ const config = {
   secondaryColor: "#ffffff",
   tabColor: lightGrey,
   inactiveTabColor: lightGrey,
+  timeControlsFontSize: "20px",
 };
 
 export default config;

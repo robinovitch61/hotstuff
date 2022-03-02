@@ -77,6 +77,18 @@ export default function NodeTable(props: NodeTableProps): React.ReactElement {
         key: "capacitanceJPerDegK",
         text: "Capacitance [J/K]",
         minWidthPx: 120,
+        validator: (rowId, capacitanceVal) => {
+          const capacitanceNumber = parseFloat(capacitanceVal);
+          if (capacitanceNumber <= 0) {
+            if (capacitanceNumber === 0) {
+              setTemporaryErrors(["Capacitance cannot be zero"]);
+            } else {
+              setTemporaryErrors(["Capacitance cannot be negative"]);
+            }
+            return config.defaultSmallResistanceDegKPerW.toString();
+          }
+          return capacitanceVal;
+        },
       },
       {
         key: "powerGenW",

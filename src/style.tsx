@@ -66,13 +66,7 @@ const sharedButtonStyles = css<{ primary?: boolean }>`
 
   &:focus,
   &:hover {
-    opacity: 0.7;
-    font-style: italic;
-  }
-
-  :focus:not(:focus-visible) {
-    opacity: 1;
-    font-style: unset;
+    text-decoration: underline;
   }
 `;
 
@@ -81,5 +75,9 @@ export const StyledButton = styled.button`
 `;
 
 export const StyledAnchorAsButton = styled.a`
+  ${sharedButtonStyles}
+`;
+
+export const StyledLabelAsButton = styled.label`
   ${sharedButtonStyles}
 `;
