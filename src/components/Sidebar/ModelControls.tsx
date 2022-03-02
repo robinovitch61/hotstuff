@@ -38,6 +38,10 @@ const StyledModelControlButton = styled(StyledButton)`
   height: 100%;
 `;
 
+const StyledRunButton = styled(StyledModelControlButton)`
+  font-size: 1.3rem;
+`;
+
 const StyledCopyAndDownloadButtons = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 50%);
@@ -85,7 +89,7 @@ const StyledImportFromFile = styled(StyledLabelAsButton)`
 
 const StyledLabel = styled.label`
   margin-right: 0.2em;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   white-space: nowrap;
 `;
 
@@ -109,9 +113,9 @@ export default function ModelControls(
   return (
     <StyledModelControlsWrapper>
       <StyledModelControlButtons>
-        <StyledModelControlButton primary onClick={onRunModel}>
+        <StyledRunButton primary onClick={onRunModel}>
           Run Model
-        </StyledModelControlButton>
+        </StyledRunButton>
         <StyledCopyAndDownloadButtons>
           <StyledModelControlButton
             onClick={() => {
