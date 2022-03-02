@@ -114,11 +114,14 @@ export default function ModelControls(
         </StyledModelControlButton>
         <StyledCopyAndDownloadButtons>
           <StyledModelControlButton
-            onClick={() =>
+            onClick={() => {
               navigator.clipboard.writeText(
-                nicelyFormattedJsonString<AppState>(appState)
-              )
-            }
+                nicelyFormattedJsonString<ExportedAppState>({
+                  ...appState,
+                  output: undefined,
+                })
+              );
+            }}
           >
             Copy Model
           </StyledModelControlButton>
@@ -201,7 +204,7 @@ export default function ModelControls(
             setStagedAppState("");
           }}
         >
-          Import
+          Import Pasted
         </StyledModelControlButton>
       </StyledImportModel>
       <div>

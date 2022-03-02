@@ -49,16 +49,17 @@ TODO:
 - [x] Tutorial popup instead of tutorial model [5]
 - [x] Logo [5]
 - [x] Fix clipping of connection lines when Fixed Temp [5]
+- [ ] Escape to exit modal [5]
 - [ ] About section [5]
 - [ ] Favicon [5]
 - [ ] Fun default models [5]
-- [ ] Put "Show Example" button in ModalControls header and remove reset [5]
-- [ ] Visual glowup [5]:
+- [x] Put "Show Example" button in ModalControls header and remove reset [5]
+- [x] Visual glowup [5]:
   - [x] Tabs should scroll horizontally if table scrollable horizontally
   - [x] Weird hover thing in safari when click tabs
-  - [ ] Model control panel more organized + responsive
+  - [x] Model control panel more organized + responsive
   - [x] General buttons nicer
-  - [ ] Add node/connection buttons arrangement
+  - [x] Add node/connection buttons arrangement
 - [ ] Launch!
 
 Future possible stuff:
