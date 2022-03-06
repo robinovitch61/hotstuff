@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import styled from "styled-components/macro";
 import config from "../../config";
 
-const StyledTabsWrapper = styled.div`
+const StyledTabsWrapper = styled.div<{ overflow?: OverflowOptions }>`
   display: inline-flex;
   width: 100%;
   flex-direction: column;
-  overflow: auto;
+  overflow: ${(props) => props.overflow || "auto"};
   position: relative;
 `;
 
@@ -44,6 +44,7 @@ const StyledTab = styled.button<{ width: number; active: boolean }>`
   border: 1px solid black;
   border-bottom: 2px solid black;
   white-space: nowrap;
+  margin: 0;
 
   &:hover,
   &:focus {
@@ -64,22 +65,25 @@ const StyledInnerContent = styled.div<{ topLeftRounded: boolean }>`
   position: relative;
 `;
 
+export type OverflowOptions = "auto" | "hidden";
+
 type Tab = {
   text: string;
   component: React.ReactElement;
-  after?: React.ReactElement;
   width: number; // between 0 and 1
+  after?: React.ReactElement;
 };
 
 export type TabsProps = {
   tabs: Tab[];
+  overflow?: OverflowOptions;
 };
 
 export default function Tabs(props: TabsProps): React.ReactElement {
   const [activeIdx, setActiveIdx] = useState(0);
 
   return (
-    <StyledTabsWrapper>
+    <StyledTabsWrapper overflow={props.overflow}>
       {props.tabs.length > 1 && (
         <StyledTabs>
           {props.tabs.map((tab, idx) => {

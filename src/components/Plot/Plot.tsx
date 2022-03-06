@@ -147,6 +147,7 @@ export default function Plot(props: PlotProps): React.ReactElement {
               width: 0.5,
             },
           ]}
+          overflow="hidden"
         />
       </StyledCharts>
     </StyledPlot>

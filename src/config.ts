@@ -30,7 +30,7 @@ const config = {
   minLineThicknessPx: 2,
   maxLineThicknessPx: 4,
   activeNodeOutlineWidthPx: 5,
-  tabHeightPx: 25,
+  tabHeightPx: 35,
   tableDeleteCellWidthPercent: 0.1,
   tableDeleteCellMinWidthPx: 40,
   plotHeightBufferPx: 10,

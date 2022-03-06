@@ -27,7 +27,7 @@ export const StyledHorizontalBorder = styled(StyledDraggableBorder)<{
   height: 10px;
   top: ${(props) => props.y * 100}%;
   transform: translate(0, -5px);
-  cursor: row-resize;
+  cursor: ns-resize;
   left: ${(props) => props.left * 100}%;
 `;
 
@@ -38,7 +38,7 @@ export const StyledVerticalBorder = styled(StyledDraggableBorder)<{
   width: 10px;
   left: ${(props) => props.x * 100}%;
   transform: translate(-5px, 0);
-  cursor: col-resize;
+  cursor: ew-resize;
 `;
 
 export const StyledWorkspace = styled.div<{ height: number; width: number }>`
