@@ -6,14 +6,6 @@ This is the thermal model core logic that powers [thermalmodel.com](https://ther
 npm i hotstuff-network
 ```
 
-### Dev
-
-**Releasing a new version:**
-```
-npm version patch/minor/major
-npm publish
-```
-
 ### Usage
 ```typescript
 import { run, makeNode, makeConnection } from "hotstuff-network";
@@ -129,6 +121,15 @@ console.log(JSON.stringify(results, null, 2)); // output below:
  */
 ```
 
-### TODO
-- [ ] information about instability
-- [ ] variable power inputs
+### Development
+
+Running tests:
+```shell
+npm run test
+```
+
+Releasing a new version:
+```shell
+npm version patch/minor/major
+npm publish
+```
