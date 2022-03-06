@@ -1,13 +1,17 @@
 import * as React from "react";
-import { MathComponent } from "mathjax-react";
 import {
   StyledLink,
-  StyledListItem,
   StyledModalContent,
-  StyledSubTitle,
   StyledText,
   StyledTitle,
 } from "./style";
+import styled from "styled-components/macro";
+import jerry from "../../img/jerry.jpg";
+
+const StyledImg = styled.img`
+  display: block;
+  max-width: 100px;
+`;
 
 export default function AboutModal(): React.ReactElement {
   return (
@@ -47,6 +51,9 @@ export default function AboutModal(): React.ReactElement {
           You can also donate here
         </StyledLink>
         .
+      </StyledText>
+      <StyledText>
+        Here is Jerry <StyledImg src={jerry} alt={"picture of Jerry the cat"} />
       </StyledText>
     </StyledModalContent>
   );
