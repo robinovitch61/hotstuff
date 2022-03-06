@@ -15,6 +15,16 @@ export default function TutorialModal(): React.ReactElement {
       <StyledTitle>How to Use This Website</StyledTitle>
 
       <StyledSubTitle>Controls</StyledSubTitle>
+      <StyledText>
+        A tutorial GIF can be found{" "}
+        <StyledLink
+          href="https://user-images.githubusercontent.com/8892054/156910428-92e18984-461b-4f7b-ab5f-ce09b0c5c0c7.gif"
+          target="_blank"
+        >
+          here
+        </StyledLink>
+        .
+      </StyledText>
       <ul>
         <li>Click a node to select it</li>
         <li>Click and drag a node to move it</li>
