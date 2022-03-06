@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ModalState } from "../../App";
 import styled from "styled-components/macro";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
@@ -65,6 +65,18 @@ export default function Modal(props: ModalProps): React.ReactElement {
   useOnClickOutside(modalRef, () =>
     setModalState((prev) => ({ ...prev, visible: false }))
   );
+
+  useEffect(() => {
+    const onKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
+      // esc exits modal
+      if (event.keyCode === 27) {
+        event.preventDefault();
+        setModalState((prevState) => ({ ...prevState, visible: false }));
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [setModalState]);
 
   const modalContent = getModalContent(modalState, setModalState);
 

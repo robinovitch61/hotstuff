@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { AppClipboard, AppConnection, AppNode } from "../App";
-import { makeConnection, makeNode } from "hotstuff-network";
+import { makeConnection, makeNode, ModelOutput } from "hotstuff-network";
 import { newNodeName } from "../utils/nodeConnectionUtils";
 import config from "../config";
 
@@ -12,10 +12,17 @@ export default function useKeyDown(
   appConnections: AppConnection[],
   setAppConnections: (newConnections: AppConnection[]) => void,
   clipboard: AppClipboard,
-  setClipboard: React.Dispatch<React.SetStateAction<AppClipboard>>
+  setClipboard: React.Dispatch<React.SetStateAction<AppClipboard>>,
+  runModel: () => ModelOutput
 ): void {
   useEffect(() => {
     const onKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
+      // meta + > runs model anytime
+      if (event.metaKey && event.keyCode === 190) {
+        event.preventDefault();
+        runModel();
+      }
+
       if (keyboardActive) {
         // meta + A makes all nodes active
         if (event.metaKey && event.keyCode === 65) {
@@ -37,6 +44,7 @@ export default function useKeyDown(
 
         // escape key makes all inactive
         if (event.keyCode === 27) {
+          event.preventDefault();
           setAppNodes(appNodes.map((node) => ({ ...node, isActive: false })));
         }
 
@@ -113,6 +121,7 @@ export default function useKeyDown(
     clipboard,
     deleteNodes,
     keyboardActive,
+    runModel,
     setAppConnections,
     setAppNodes,
     setClipboard,

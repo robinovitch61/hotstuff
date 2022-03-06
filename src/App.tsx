@@ -123,6 +123,20 @@ export default function App(): React.ReactElement {
     setOutput
   );
 
+  const runModel = () => {
+    const output = run({
+      nodes: appState.nodes,
+      connections: appState.connections,
+      timeStepS: appState.timing.timeStepS,
+      totalTimeS: appState.timing.totalTimeS,
+    });
+    if (output.errors?.length) {
+      setTemporaryAppErrors(output.errors.map((err) => err.message));
+    }
+    setOutput(output);
+    return output;
+  };
+
   const [keyboardActive, setKeyboardActive] = useState<boolean>(true);
   const [clipboard, setClipboard] = useState<AppClipboard>(defaultAppClipboard);
   useKeyDown(
@@ -133,7 +147,8 @@ export default function App(): React.ReactElement {
     appState.connections,
     setAppConnections,
     clipboard,
-    setClipboard
+    setClipboard,
+    runModel
   );
 
   const [draw, clearAndRedraw] = useDraw(appState.nodes, appState.connections);
@@ -297,19 +312,7 @@ export default function App(): React.ReactElement {
             setOutput(undefined);
           }}
           deleteConnections={deleteConnections}
-          onRunModel={() => {
-            const output = run({
-              nodes: appState.nodes,
-              connections: appState.connections,
-              timeStepS: appState.timing.timeStepS,
-              totalTimeS: appState.timing.totalTimeS,
-            });
-            if (output.errors?.length) {
-              setTemporaryAppErrors(output.errors.map((err) => err.message));
-            }
-            setOutput(output);
-            return output;
-          }}
+          onRunModel={runModel}
         />
       </StyledApp>
     </div>

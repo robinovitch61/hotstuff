@@ -25,6 +25,7 @@ export default function TutorialModal(): React.ReactElement {
         <li>Escape to deselect all nodes</li>
         <li>Meta + C to copy selected nodes</li>
         <li>Meta + V to paste copied nodes</li>
+        <li>Meta + &gt; to run model</li>
         <li>Double click to add a new node</li>
         <li>
           Hold Alt and click, drag, and release between nodes to connect them
