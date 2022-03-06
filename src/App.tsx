@@ -15,7 +15,7 @@ import {
   defaultAppState,
   defaultModalState,
 } from "./default";
-import useSessionStorageState from "./hooks/useSessionStorageState";
+import useLocalStorageState from "./hooks/useLocalStorageState";
 import { getCanvasCenter } from "./components/Canvas/canvasUtils";
 import {
   getNewAppNode,
@@ -90,7 +90,7 @@ export type AppClipboard = {
 export type ExportedAppState = AppState & { output?: ModelOutput };
 
 export default function App(): React.ReactElement {
-  const [appState, setAppState] = useSessionStorageState<AppState>(
+  const [appState, setAppState] = useLocalStorageState<AppState>(
     defaultAppState,
     "thermalModelAppState"
   );
