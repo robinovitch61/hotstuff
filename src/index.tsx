@@ -10,7 +10,7 @@ const plausible = Plausible({
   apiHost: "https://plausible.theleo.zone",
 });
 
-plausible.trackPageview();
+plausible.enableAutoPageviews();
 
 forceShowScrollbars();
 
