@@ -316,10 +316,10 @@ export default function TheoryModal(): React.ReactElement {
         This partial differential equation can be simplified to a numerical
         equation. The results of the equation are reasonable when the time step
         size between discrete states is small. You&apos;ll notice that if you
-        rerun a model with too large a time step too much, unstable results
-        appear - at too high a time step size, errors compound at each step and
-        blow up the temperature differences to unreasonable numbers. If you see
-        instability, decrease the time step size and rerun your model.
+        rerun a model with too large a time step, unstable results appear - at
+        high time step sizes, errors compound and blow up the temperature
+        differences to unreasonable numbers. If you see instability, decrease
+        the time step size and rerun your model.
       </StyledText>
 
       <StyledText>
