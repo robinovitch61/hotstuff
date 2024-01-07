@@ -8,9 +8,9 @@
 
 ![demo](https://user-images.githubusercontent.com/8892054/156910428-92e18984-461b-4f7b-ab5f-ce09b0c5c0c7.gif)
 
-This repository contains the source code for [thermalmodel.com](https://thermalmodel.com).
+This repository contains the source code for [theleo.zone/thermal-model](https://theleo.zone/thermal-model/).
 
-Engineers often use models to answer electromechanical design questions about heat transfer and temperature. [Thermalmodel.com](https://thermalmodel.com)
+Engineers often use models to answer electromechanical design questions about heat transfer and temperature. [theleo.zone/thermal-model](https://theleo.zone/thermal-model/)
 aims to fill the gap between [back-of-the-envelope-calculations](https://en.wikipedia.org/wiki/Back-of-the-envelope_calculation)
 and complex, expensive tools like [Ansys](https://www.ansys.com/).
 
