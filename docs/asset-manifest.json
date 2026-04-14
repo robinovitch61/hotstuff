@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/thermal-model/static/css/main.7b80d39f.chunk.css",
+    "main.js": "/thermal-model/static/js/main.ff807ba0.chunk.js",
+    "main.js.map": "/thermal-model/static/js/main.ff807ba0.chunk.js.map",
+    "runtime-main.js": "/thermal-model/static/js/runtime-main.3602a160.js",
+    "runtime-main.js.map": "/thermal-model/static/js/runtime-main.3602a160.js.map",
+    "static/js/2.43778cc7.chunk.js": "/thermal-model/static/js/2.43778cc7.chunk.js",
+    "static/js/2.43778cc7.chunk.js.map": "/thermal-model/static/js/2.43778cc7.chunk.js.map",
+    "index.html": "/thermal-model/index.html",
+    "static/css/main.7b80d39f.chunk.css.map": "/thermal-model/static/css/main.7b80d39f.chunk.css.map",
+    "static/js/2.43778cc7.chunk.js.LICENSE.txt": "/thermal-model/static/js/2.43778cc7.chunk.js.LICENSE.txt",
+    "static/media/jerry.83d18dba.jpg": "/thermal-model/static/media/jerry.83d18dba.jpg",
+    "static/media/thermalmodel-logo.00e2dcb9.png": "/thermal-model/static/media/thermalmodel-logo.00e2dcb9.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3602a160.js",
+    "static/js/2.43778cc7.chunk.js",
+    "static/css/main.7b80d39f.chunk.css",
+    "static/js/main.ff807ba0.chunk.js"
+  ]
+}

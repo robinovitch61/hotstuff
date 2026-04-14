@@ -2,6 +2,7 @@
   "name": "thermalmodel.com",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/thermal-model",
   "dependencies": {
     "d3-scale": "^4.0.2",
     "hotstuff-network": "^0.1.3",
